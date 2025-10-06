@@ -1,8 +1,8 @@
-import { CdklabsTypeScriptProject } from "cdklabs-projen-project-types";
+import { CdklabsTypeScriptProject } from 'cdklabs-projen-project-types';
 const project = new CdklabsTypeScriptProject({
-  defaultReleaseBranch: "main",
-  devDeps: ["cdklabs-projen-project-types"],
-  name: "@cdklabs/cdk-construct-analyzer",
+  defaultReleaseBranch: 'main',
+  devDeps: ['cdklabs-projen-project-types'],
+  name: '@cdklabs/cdk-construct-analyzer',
   projenrcTs: true,
   release: false,
 

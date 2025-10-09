@@ -1,11 +1,11 @@
 import { CdklabsTypeScriptProject } from 'cdklabs-projen-project-types';
 const project = new CdklabsTypeScriptProject({
   defaultReleaseBranch: 'main',
-  devDeps: ['cdklabs-projen-project-types'],
+  devDeps: ['cdklabs-projen-project-types', '@types/jest'],
   name: '@cdklabs/cdk-construct-analyzer',
   projenrcTs: true,
   release: false,
-
+  jest: true,
   deps: ['yargs'], /* Runtime dependencies of this module. */
   bin: {
     'cdk-construct-analyzer': './bin/cdk-construct-analyzer',

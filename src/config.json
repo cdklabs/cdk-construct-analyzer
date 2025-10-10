@@ -1,0 +1,16 @@
+{
+  "signals": {
+    "weekly_downloads": {
+      "pillar": "POPULARITY",
+      "weight": 3.0,
+      "enabled": true,
+      "description": "Weekly download count from npm"
+    },
+    "github_stars": {
+      "pillar": "POPULARITY", 
+      "weight": 2.0,
+      "enabled": true,
+      "description": "GitHub repository stars"
+    }
+  }
+}

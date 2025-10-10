@@ -1,8 +1,11 @@
 {
-  "name": "@cdklabs/cdk-construct-analyzer",
+  "name": "cdk-construct-analyzer",
   "repository": {
     "type": "git",
     "url": "https://github.com/cdklabs/cdk-construct-analyzer.git"
+  },
+  "bin": {
+    "cdk-construct-analyzer": "bin/cdk-construct-analyzer"
   },
   "scripts": {
     "build": "npx projen build",
@@ -46,11 +49,17 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
+  "dependencies": {
+    "yargs": "^17.7.2"
+  },
   "engines": {
     "node": ">= 18.12.0"
   },
   "main": "lib/index.js",
   "license": "Apache-2.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "version": "0.0.0",
   "jest": {
     "coverageProvider": "v8",

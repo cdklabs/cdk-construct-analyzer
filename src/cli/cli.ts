@@ -1,6 +1,6 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { ConstructAnalyzer } from './analyzer';
+import { ConstructAnalyzer } from '../lib/analyzer';
 
 export function cli() {
   const analyzer = new ConstructAnalyzer();

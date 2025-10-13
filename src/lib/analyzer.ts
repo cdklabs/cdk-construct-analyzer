@@ -36,7 +36,7 @@ export class ConstructAnalyzer {
   private config: Config;
 
   constructor() {
-    const configData = fs.readFileSync('src/config.json', 'utf8');
+    const configData = fs.readFileSync('src/lib/config.json', 'utf8');
     this.config = JSON.parse(configData);
   }
 

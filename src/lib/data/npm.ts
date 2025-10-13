@@ -10,9 +10,6 @@ export interface NpmPackageData {
 
 export interface NpmDownloadData {
   downloads: number;
-  start: string;
-  end: string;
-  package: string;
 }
 
 export class NpmCollector {

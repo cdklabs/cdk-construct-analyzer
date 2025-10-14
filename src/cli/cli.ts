@@ -11,7 +11,7 @@ export function cli() {
       'Analyze a CDK construct package',
       (yargsBuilder) => {
         return yargsBuilder.positional('package', {
-          describe: 'NPM package name to analyze (e.g., "yargs", "@aws-cdk/core")',
+          describe: 'NPM package name to analyze (e.g., "@aws-cdk/core")',
           type: 'string',
           demandOption: true,
         });

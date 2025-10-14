@@ -1,16 +1,16 @@
 import * as fs from 'fs';
 import { ConstructAnalyzer } from '../../src/lib/analyzer';
-import { collectPackageData } from '../../src/lib/data';
-import { signalCalculators } from '../../src/lib/signals/index';
+import { collectPackageData } from '../../src/lib/data/collect';
+import * as signalsModule from '../../src/lib/signals/index';
 
 // Mock dependencies
 jest.mock('fs');
-jest.mock('../../src/lib/data');
+jest.mock('../../src/lib/data/collect');
 jest.mock('../../src/lib/signals/index');
 
 const mockedFs = fs as jest.Mocked<typeof fs>;
 const mockedCollectPackageData = collectPackageData as jest.MockedFunction<typeof collectPackageData>;
-const mockedSignalCalculators = signalCalculators as jest.Mocked<typeof signalCalculators>;
+const mockedSignalsModule = signalsModule as jest.Mocked<typeof signalsModule>;
 
 describe('ConstructAnalyzer', () => {
   const mockConfig = {
@@ -64,8 +64,8 @@ describe('ConstructAnalyzer', () => {
     it('should analyze package and return score result', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
-      mockedSignalCalculators.weekly_downloads.mockResolvedValue(4); // 4 stars = 75 points
-      mockedSignalCalculators.github_stars.mockResolvedValue(3); // 3 stars = 50 points
+      mockedSignalsModule.calculateWeeklyDownloads.mockResolvedValue(4); // 4 stars = 75 points
+      mockedSignalsModule.calculateGithubStars.mockResolvedValue(3); // 3 stars = 50 points
 
       const analyzer = new ConstructAnalyzer();
       const result = await analyzer.analyzePackage('test-package');
@@ -92,8 +92,8 @@ describe('ConstructAnalyzer', () => {
     it('should calculate pillar scores correctly', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
-      mockedSignalCalculators.weekly_downloads.mockResolvedValue(5); // 5 stars = 100 points
-      mockedSignalCalculators.github_stars.mockResolvedValue(3); // 3 stars = 50 points
+      mockedSignalsModule.calculateWeeklyDownloads.mockResolvedValue(5); // 5 stars = 100 points
+      mockedSignalsModule.calculateGithubStars.mockResolvedValue(3); // 3 stars = 50 points
 
       const analyzer = new ConstructAnalyzer();
       const result = await analyzer.analyzePackage('test-package');
@@ -120,8 +120,8 @@ describe('ConstructAnalyzer', () => {
       mockedFs.readFileSync.mockReturnValue(JSON.stringify(configWithMultiplePillars));
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
-      mockedSignalCalculators.weekly_downloads.mockResolvedValue(5); // 100 points
-      mockedSignalCalculators.github_stars.mockResolvedValue(3); // 50 points
+      mockedSignalsModule.calculateWeeklyDownloads.mockResolvedValue(5); // 100 points
+      mockedSignalsModule.calculateGithubStars.mockResolvedValue(3); // 50 points
 
       const analyzer = new ConstructAnalyzer();
       const result = await analyzer.analyzePackage('test-package');

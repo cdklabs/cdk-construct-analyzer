@@ -1,4 +1,4 @@
-import { PackageData } from '../data';
+import { PackageData } from '../data/collect';
 
 export async function calculateWeeklyDownloads(packageData: PackageData): Promise<number> {
   const downloads = packageData.downloads.downloads || 0;

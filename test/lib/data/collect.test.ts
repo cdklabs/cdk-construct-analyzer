@@ -1,4 +1,4 @@
-import { collectPackageData } from '../../../src/lib/data';
+import { collectPackageData } from '../../../src/lib/data/collect';
 import { GitHubCollector } from '../../../src/lib/data/github';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
@@ -40,13 +40,13 @@ describe('collectPackageData', () => {
 
   it('should collect data from npm and github successfully', async () => {
     const mockNpmInstance = {
-      fetchAll: jest.fn().mockResolvedValue(undefined),
+      fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
       getDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
     };
 
     const mockGitHubInstance = {
-      fetchAll: jest.fn().mockResolvedValue(undefined),
+      fetchPackage: jest.fn().mockResolvedValue(undefined),
       getData: jest.fn().mockReturnValue(mockGitHubData),
     };
 
@@ -55,8 +55,8 @@ describe('collectPackageData', () => {
 
     const result = await collectPackageData('test-package');
 
-    expect(mockNpmInstance.fetchAll).toHaveBeenCalledWith('test-package');
-    expect(mockGitHubInstance.fetchAll).toHaveBeenCalledWith('https://github.com/test/repo');
+    expect(mockNpmInstance.fetchPackage).toHaveBeenCalledWith('test-package');
+    expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith('https://github.com/test/repo');
 
     expect(result).toEqual({
       npm: mockNpmData,
@@ -73,13 +73,13 @@ describe('collectPackageData', () => {
     };
 
     const mockNpmInstance = {
-      fetchAll: jest.fn().mockResolvedValue(undefined),
+      fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(npmDataWithoutRepo),
       getDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
     };
 
     const mockGitHubInstance = {
-      fetchAll: jest.fn().mockResolvedValue(undefined),
+      fetchPackage: jest.fn().mockResolvedValue(undefined),
       getData: jest.fn().mockReturnValue({ stars: 0 }),
     };
 
@@ -88,7 +88,7 @@ describe('collectPackageData', () => {
 
     const result = await collectPackageData('test-package');
 
-    expect(mockGitHubInstance.fetchAll).not.toHaveBeenCalled();
+    expect(mockGitHubInstance.fetchPackage).not.toHaveBeenCalled();
     expect(console.log).toHaveBeenCalledWith('No repository URL found in NPM data');
 
     expect(result).toEqual({
@@ -100,13 +100,13 @@ describe('collectPackageData', () => {
 
   it('should handle github fetch errors gracefully', async () => {
     const mockNpmInstance = {
-      fetchAll: jest.fn().mockResolvedValue(undefined),
+      fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
       getDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
     };
 
     const mockGitHubInstance = {
-      fetchAll: jest.fn().mockRejectedValue(new Error('GitHub API error')),
+      fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
       getData: jest.fn().mockReturnValue({ stars: 0 }),
     };
 

@@ -1,4 +1,4 @@
-import { PackageData } from '../../../src/lib/data';
+import { PackageData } from '../../../src/lib/data/collect';
 import { calculateWeeklyDownloads, calculateGithubStars } from '../../../src/lib/signals/popularity';
 
 describe('Popularity Signals', () => {

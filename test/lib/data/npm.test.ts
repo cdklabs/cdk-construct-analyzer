@@ -12,7 +12,7 @@ describe('NpmCollector', () => {
     jest.clearAllMocks();
   });
 
-  describe('fetchAll', () => {
+  describe('fetchPackage', () => {
     it('should fetch package data successfully', async () => {
       const mockResponse = {
         'name': 'test-package',
@@ -28,7 +28,7 @@ describe('NpmCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('test-package');
+      await collector.fetchPackage('test-package');
 
       expect(mockedFetch).toHaveBeenCalledWith('https://registry.npmjs.org/test-package');
     });
@@ -40,7 +40,7 @@ describe('NpmCollector', () => {
         statusText: 'Not Found',
       } as Response);
 
-      await expect(collector.fetchAll('nonexistent-package')).rejects.toThrow(
+      await expect(collector.fetchPackage('nonexistent-package')).rejects.toThrow(
         'NPM registry returned 404: Not Found',
       );
     });
@@ -48,12 +48,12 @@ describe('NpmCollector', () => {
     it('should handle network errors', async () => {
       mockedFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      await expect(collector.fetchAll('test-package')).rejects.toThrow('Network error');
+      await expect(collector.fetchPackage('test-package')).rejects.toThrow('Network error');
     });
   });
 
   describe('getPackageData', () => {
-    it('should return package data after fetchAll', async () => {
+    it('should return package data after fetchPackage', async () => {
       const mockResponse = {
         'name': 'test-package',
         'dist-tags': { latest: '1.0.0' },
@@ -68,7 +68,7 @@ describe('NpmCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('test-package');
+      await collector.fetchPackage('test-package');
       const result = collector.getPackageData();
 
       expect(result).toEqual({
@@ -81,8 +81,8 @@ describe('NpmCollector', () => {
       });
     });
 
-    it('should throw error if fetchAll not called first', () => {
-      expect(() => collector.getPackageData()).toThrow('Must call fetchAll() first');
+    it('should throw error if fetchPackage not called first', () => {
+      expect(() => collector.getPackageData()).toThrow('Must call fetchPackage() first');
     });
 
 
@@ -101,7 +101,7 @@ describe('NpmCollector', () => {
         json: async () => mockPackageResponse,
       } as Response);
 
-      await collector.fetchAll('test-package');
+      await collector.fetchPackage('test-package');
 
       // Then mock the downloads fetch
       const mockDownloadResponse = {
@@ -124,8 +124,8 @@ describe('NpmCollector', () => {
       expect(result).toEqual(mockDownloadResponse);
     });
 
-    it('should throw error if fetchAll not called first', async () => {
-      await expect(collector.getDownloadData()).rejects.toThrow('Must call fetchAll() first');
+    it('should throw error if fetchPackage not called first', async () => {
+      await expect(collector.getDownloadData()).rejects.toThrow('Must call fetchPackage() first');
     });
 
     it('should handle download API errors', async () => {
@@ -140,7 +140,7 @@ describe('NpmCollector', () => {
         json: async () => mockPackageResponse,
       } as Response);
 
-      await collector.fetchAll('test-package');
+      await collector.fetchPackage('test-package');
 
       // Then mock download API error
       mockedFetch.mockResolvedValueOnce({

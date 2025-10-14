@@ -1,35 +1,51 @@
 import * as fs from 'fs';
-import { collectPackageData } from './data';
-import { signalCalculators } from './signals/index';
+import { collectPackageData } from './data/index';
+import { calculateWeeklyDownloads, calculateGithubStars } from './signals/index';
 
-// What each signal looks like in the config
+/**
+ * Map to signal calculation functions
+ */
+const SIGNAL_CALCULATOR = {
+  weekly_downloads: calculateWeeklyDownloads,
+  github_stars: calculateGithubStars,
+};
+
+/**
+ * Properties of a signal
+ */
 interface SignalConfig {
-  pillar: string;
-  weight: number;
-  enabled: boolean;
-  description: string;
+  readonly pillar: string;
+  readonly weight: number;
+  readonly enabled: boolean;
+  readonly description: string;
 }
 
-// What each pillar looks like in the config
+/**
+ * Properties of a pillar
+ */
 interface PillarConfig {
-  name: string;
-  weight: number;
-  description: string;
+  readonly name: string;
+  readonly weight: number;
+  readonly description: string;
 }
 
-// The overall structure of our config.json file
+/**
+ * Properties of a config object
+ */
 interface Config {
-  signals: Record<string, SignalConfig>; // signal name -> signal config
-  pillars: Record<string, PillarConfig>; // pillar name -> pillar config
+  readonly signals: Record<string, SignalConfig>; // signal name -> signal config
+  readonly pillars: Record<string, PillarConfig>; // pillar name -> pillar config
 }
 
-// What our analyzer returns after analyzing a package
+/**
+ * Properties analyzer result
+ */
 export interface ScoreResult {
-  packageName: string; // "yargs"
-  version: string;
-  totalScore: number; // 85.5
-  pillarScores: Record<string, number>; // { "popularity": 42.3 }
-  signalScores: Record<string, Record<string, number>>; // { "popularity": { "weekly_downloads": 21.1, "github_stars": 21.2 } }
+  readonly packageName: string; // "aws-cdk"
+  readonly version: string; // "1.2.3"
+  readonly totalScore: number; // 85
+  readonly pillarScores: Record<string, number>; // { "popularity": 42 }
+  readonly signalScores: Record<string, Record<string, number>>; // { "popularity": { "weekly_downloads": 4, "github_stars": 2 } }
 }
 
 export class ConstructAnalyzer {
@@ -42,69 +58,80 @@ export class ConstructAnalyzer {
 
   async analyzePackage(packageName: string): Promise<ScoreResult> {
     const packageData = await collectPackageData(packageName);
+    const version = packageData.npm.version;
 
-    const version: string = packageData.npm.version;
-    const signalScores: Record<string, Record<string, number>> = {};
-    const pillarScores: Record<string, number> = {};
-
-    for (const [signalName, signalConfig] of Object.entries(this.config.signals)) {
-      if (!signalConfig.enabled) continue;
-
-      const calculator = signalCalculators[signalName as keyof typeof signalCalculators];
-      if (!calculator) continue;
-
-      // Get star rating (1-5) from signal calculators
-      const starRating = await calculator(packageData);
-
-      // Convert stars to points: 1★=0, 2★=25, 3★=50, 4★=75, 5★=100
-      const points = (starRating - 1) * 25;
-
-      // Organize signals by pillar (store the points for display)
-      if (!signalScores[signalConfig.pillar]) {
-        signalScores[signalConfig.pillar] = {};
-      }
-      signalScores[signalConfig.pillar][signalName] = starRating;
-
-      // For pillar calculation, apply importance weight to the points
-      const weightedScore = points * signalConfig.weight;
-
-      if (!pillarScores[signalConfig.pillar]) {
-        pillarScores[signalConfig.pillar] = 0;
-      }
-      pillarScores[signalConfig.pillar] += weightedScore;
-    }
-
-    // Normalize pillar scores to 0-100 and calculate total
-    const normalizedPillarScores: Record<string, number> = {};
-
-    for (const [pillar, weightedSum] of Object.entries(pillarScores)) {
-      // Get total weight for this pillar to normalize
-      const pillarSignals = Object.entries(this.config.signals).filter(([_, config]) =>
-        config.pillar === pillar && config.enabled,
-      );
-      const totalWeight = pillarSignals.reduce((sum, [_, config]) => sum + config.weight, 0);
-
-      // Normalize pillar score to 0-100 (weighted average)
-      const normalizedPillarScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
-      normalizedPillarScores[pillar] = normalizedPillarScore;
-    }
-
-    // Calculate overall score as equal-weighted average of all pillars
-    const pillarCount = Object.keys(normalizedPillarScores).length;
-
-    let totalScore = 0;
-    if (pillarCount > 0) {
-      const pillarScoreSum = Object.values(normalizedPillarScores).reduce((sum, score) => sum + score, 0);
-      totalScore = pillarScoreSum / pillarCount;
-    }
+    const { signalScores, pillarScores } = await this.calculateSignalScores(packageData);
+    const normalizedPillarScores = this.normalizePillarScores(pillarScores);
+    const totalScore = this.calculateTotalScore(normalizedPillarScores);
 
     return {
       packageName,
       version,
-      totalScore: totalScore,
+      totalScore,
       pillarScores: normalizedPillarScores,
       signalScores,
     };
+  }
+
+  private async calculateSignalScores(packageData: any) {
+    const signalScores: Record<string, Record<string, number>> = {};
+    const pillarScores: Record<string, number> = {};
+
+    const signal_entries = Object.entries(this.config.signals);
+    for (const [signalName, signalConfig] of signal_entries) {
+      if (!signalConfig.enabled) continue;
+
+      const calculator = SIGNAL_CALCULATOR[signalName as keyof typeof SIGNAL_CALCULATOR];
+      if (!calculator) continue;
+
+      const starRating = await calculator(packageData);
+      const points = this.convertStarsToPoints(starRating);
+
+      this.addSignalScore(signalScores, signalConfig.pillar, signalName, starRating);
+      this.addPillarScore(pillarScores, signalConfig.pillar, points, signalConfig.weight);
+    }
+
+    return { signalScores, pillarScores };
+  }
+
+  private convertStarsToPoints(starRating: number): number {
+    return (starRating - 1) * 25;
+  }
+
+  private addSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {
+    (signalScores[pillar] ??= {})[signalName] = starRating;
+  }
+
+  private addPillarScore(pillarScores: Record<string, number>, pillar: string, points: number, weight: number): void {
+    const weightedScore = points * weight;
+    pillarScores[pillar] = (pillarScores[pillar] ?? 0) + weightedScore;
+  }
+
+  private normalizePillarScores(pillarScores: Record<string, number>): Record<string, number> {
+    const normalizedScores: Record<string, number> = {};
+
+    const pillar_entries = Object.entries(pillarScores);
+    for (const [pillar, weightedSum] of pillar_entries) {
+      const totalWeight = this.getTotalWeightForPillar(pillar);
+      const normalizedScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
+      normalizedScores[pillar] = normalizedScore;
+    }
+
+    return normalizedScores;
+  }
+
+  private getTotalWeightForPillar(pillar: string): number {
+    return Object.values(this.config.signals)
+      .filter(config => config.pillar === pillar && config.enabled)
+      .reduce((sum, config) => sum + config.weight, 0);
+  }
+
+  private calculateTotalScore(pillarScores: Record<string, number>): number {
+    const scores = Object.values(pillarScores);
+    if (scores.length === 0) return 0;
+
+    const sum = scores.reduce((total, score) => total + score, 0);
+    return sum / scores.length;
   }
 
 

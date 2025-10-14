@@ -12,7 +12,7 @@ describe('GitHubCollector', () => {
     jest.clearAllMocks();
   });
 
-  describe('fetchAll', () => {
+  describe('fetchPackage', () => {
     it('should fetch GitHub data successfully with standard URL', async () => {
       const mockResponse = {
         stargazers_count: 500,
@@ -23,7 +23,7 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('https://github.com/test/repo');
+      await collector.fetchPackage('https://github.com/test/repo');
 
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/test/repo');
     });
@@ -38,7 +38,7 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('git+https://github.com/facebook/react.git');
+      await collector.fetchPackage('git+https://github.com/facebook/react.git');
 
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/facebook/react');
     });
@@ -53,13 +53,13 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('github.com:microsoft/typescript');
+      await collector.fetchPackage('github.com:microsoft/typescript');
 
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/microsoft/typescript');
     });
 
     it('should throw error for invalid GitHub URLs', async () => {
-      await expect(collector.fetchAll('https://gitlab.com/test/repo')).rejects.toThrow(
+      await expect(collector.fetchPackage('https://gitlab.com/test/repo')).rejects.toThrow(
         'Could not parse GitHub URL: https://gitlab.com/test/repo',
       );
     });
@@ -70,7 +70,7 @@ describe('GitHubCollector', () => {
         status: 404,
       } as Response);
 
-      await expect(collector.fetchAll('https://github.com/test/repo')).rejects.toThrow(
+      await expect(collector.fetchPackage('https://github.com/test/repo')).rejects.toThrow(
         'GitHub fetch failed: Error: GitHub API returned 404',
       );
     });
@@ -78,7 +78,7 @@ describe('GitHubCollector', () => {
     it('should handle network errors', async () => {
       mockedFetch.mockRejectedValueOnce(new Error('Network error'));
 
-      await expect(collector.fetchAll('https://github.com/test/repo')).rejects.toThrow(
+      await expect(collector.fetchPackage('https://github.com/test/repo')).rejects.toThrow(
         'GitHub fetch failed: Error: Network error',
       );
     });
@@ -91,14 +91,14 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('https://github.com/test/repo');
+      await collector.fetchPackage('https://github.com/test/repo');
 
       expect(collector.getStarCount()).toBe(0);
     });
   });
 
   describe('getStarCount', () => {
-    it('should return star count after fetchAll', async () => {
+    it('should return star count after fetchPackage', async () => {
       const mockResponse = {
         stargazers_count: 500,
       };
@@ -108,7 +108,7 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('https://github.com/test/repo');
+      await collector.fetchPackage('https://github.com/test/repo');
 
       expect(collector.getStarCount()).toBe(500);
     });
@@ -129,7 +129,7 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
-      await collector.fetchAll('https://github.com/test/repo');
+      await collector.fetchPackage('https://github.com/test/repo');
 
       expect(collector.getData()).toEqual({
         stars: 500,

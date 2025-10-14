@@ -1,16 +1,137 @@
 {
   "signals": {
+    "first_response_time": {
+      "display_name": "Time to first response",
+      "pillar": "MAINTENANCE",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Time to first response on Github issues"
+    },
+    "commit_frequency": {
+      "display_name": "Commit Frequency",
+      "pillar": "MAINTENANCE",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Number of commits in the past month"
+    },
+    "release_frequency": {
+      "display_name": "Release Frequency",
+      "pillar": "MAINTENANCE",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Number of releases in the past year"
+    },
+    "lockfile_update_recency": {
+      "display_name": "Lockfile Update Recency",
+      "pillar": "MAINTENANCE",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Time of most recent lockfile update"
+    },
+    "open_issues_ratio": {
+      "display_name": "Open / total issues ratio",
+      "pillar": "MAINTENANCE",
+      "weight": 2.0,
+      "enabled": false,
+      "description": "Ratio of open to total issues"
+    },
+    "pr_merge_time": {
+      "display_name": "Median PR time-to-merge",
+      "pillar": "MAINTENANCE",
+      "weight": 2.0,
+      "enabled": false,
+      "description": "Median PR time-to-merge"
+    },
+    "contributors_maintenance": {
+      "display_name": "Number of Contributors",
+      "pillar": "MAINTENANCE",
+      "weight": 2.0,
+      "enabled": false,
+      "description": "GitHub contributors"
+    },
+    "commit_recency": {
+      "display_name": "Most Recent Commit Time",
+      "pillar": "MAINTENANCE",
+      "weight": 2.0,
+      "enabled": false,
+      "description": "Time of most recent commit"
+    },
+    "readme_api_examples": {
+      "display_name": "README, API ref, examples",
+      "pillar": "QUALITY",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Has entry point for users"
+    },
+    "tests_checklist": {
+      "display_name": "Tests checklist (unit/snapshot)",
+      "pillar": "QUALITY",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Includes unit and snapshot tests"
+    },
+    "passing_ci_builds": {
+      "display_name": "Passing CI builds",
+      "pillar": "QUALITY",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Checks for passing CI builds"
+    },
+    "author_track_record": {
+      "display_name": "Author Track Record",
+      "pillar": "QUALITY",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Track record of strong authors"
+    },
+    "changelog_present": {
+      "display_name": "Changelog Present",
+      "pillar": "QUALITY",
+      "weight": 3.0,
+      "enabled": false,
+      "description": "Contains transparency for changes"
+    },
+    "stable_versioning": {
+      "display_name": "Stable versioning",
+      "pillar": "QUALITY",
+      "weight": 2.0,
+      "enabled": false,
+      "description": "Released stable version"
+    },
+    "license_gitignore_npmignore": {
+      "display_name": "License, .gitignore/.npmignore",
+      "pillar": "QUALITY",
+      "weight": 1.0,
+      "enabled": false,
+      "description": "Contains legal clarity and has hygiene"
+    },
+    "multi_language_support": {
+      "display_name": "Multi-language Support",
+      "pillar": "QUALITY",
+      "weight": 1.0,
+      "enabled": false,
+      "description": "Supports multiple languages"
+    },
     "weekly_downloads": {
+      "display_name": "Weekly Downloads",
       "pillar": "POPULARITY",
       "weight": 3.0,
       "enabled": true,
       "description": "Weekly download count from npm"
     },
     "github_stars": {
-      "pillar": "POPULARITY", 
+      "display_name": "Repo Stars",
+      "pillar": "POPULARITY",
       "weight": 2.0,
       "enabled": true,
       "description": "GitHub repository stars"
+    },
+    "contributors_popularity": {
+      "display_name": "Number of Contributors",
+      "pillar": "POPULARITY",
+      "weight": 1.0,
+      "enabled": false,
+      "description": "GitHub contributors"
     }
   }
 }

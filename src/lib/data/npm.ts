@@ -1,21 +1,21 @@
 //TODO: Add more fields as more signals are added
 export interface NpmPackageData {
-  name: string;
-  version: string;
-  repository?: {
+  readonly name: string;
+  readonly version: string;
+  readonly repository?: {
     type: string;
     url: string;
   };
 }
 
 export interface NpmDownloadData {
-  downloads: number;
+  readonly downloads: number;
 }
 
 export class NpmCollector {
   private packageData?: NpmPackageData;
 
-  async fetchAll(packageName: string): Promise<void> {
+  async fetchPackage(packageName: string): Promise<void> {
     const packageRes = await fetch(`https://registry.npmjs.org/${packageName}`);
 
     if (!packageRes.ok) {
@@ -33,14 +33,14 @@ export class NpmCollector {
 
   getPackageData(): NpmPackageData {
     if (!this.packageData) {
-      throw new Error('Must call fetchAll() first');
+      throw new Error('Must call fetchPackage() first');
     }
     return this.packageData;
   }
 
   async fetchDownloadData(): Promise<NpmDownloadData> {
     if (!this.packageData) {
-      throw new Error('Must call fetchAll() first');
+      throw new Error('Must call fetchPackage() first');
     }
 
     const response = await fetch(`https://api.npmjs.org/downloads/point/last-week/${this.packageData.name}`);

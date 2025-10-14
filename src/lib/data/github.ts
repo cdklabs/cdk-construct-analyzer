@@ -1,5 +1,5 @@
 export interface GitHubData {
-  stars: number;
+  readonly stars: number;
 }
 
 function extractRepoInfo(repositoryUrl: string): { owner: string; repo: string } | null {
@@ -25,7 +25,7 @@ export class GitHubCollector {
   // Only store data that could be shared across multiple signals
   private starCount?: number;
 
-  async fetchAll(repositoryUrl: string): Promise<void> {
+  async fetchPackage(repositoryUrl: string): Promise<void> {
     const repoInfo = extractRepoInfo(repositoryUrl);
     if (!repoInfo) {
       throw new Error(`Could not parse GitHub URL: ${repositoryUrl}`);

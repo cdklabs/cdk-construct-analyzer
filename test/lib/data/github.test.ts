@@ -142,6 +142,4 @@ describe('GitHubCollector', () => {
       });
     });
   });
-
-
 });

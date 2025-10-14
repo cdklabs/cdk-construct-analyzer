@@ -87,8 +87,8 @@ export class ConstructAnalyzer {
       const starRating = await calculator(packageData);
       const points = this.convertStarsToPoints(starRating);
 
-      this.addSignalScore(signalScores, signalConfig.pillar, signalName, starRating);
-      this.addPillarScore(pillarScores, signalConfig.pillar, points, signalConfig.weight);
+      this.updateSignalScore(signalScores, signalConfig.pillar, signalName, starRating);
+      this.updatePillarScore(pillarScores, signalConfig.pillar, points, signalConfig.weight);
     }
 
     return { signalScores, pillarScores };
@@ -98,11 +98,11 @@ export class ConstructAnalyzer {
     return (starRating - 1) * 25;
   }
 
-  private addSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {
+  private updateSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {
     (signalScores[pillar] ??= {})[signalName] = starRating;
   }
 
-  private addPillarScore(pillarScores: Record<string, number>, pillar: string, points: number, weight: number): void {
+  private updatePillarScore(pillarScores: Record<string, number>, pillar: string, points: number, weight: number): void {
     const weightedScore = points * weight;
     pillarScores[pillar] = (pillarScores[pillar] ?? 0) + weightedScore;
   }
@@ -133,6 +133,4 @@ export class ConstructAnalyzer {
     const sum = scores.reduce((total, score) => total + score, 0);
     return sum / scores.length;
   }
-
-
 }

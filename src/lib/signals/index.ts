@@ -1,0 +1,1 @@
+export { calculateWeeklyDownloads, calculateGithubStars } from './popularity';

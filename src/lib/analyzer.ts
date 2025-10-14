@@ -56,7 +56,7 @@ export class ConstructAnalyzer {
     this.config = JSON.parse(configData);
   }
 
-  async analyzePackage(packageName: string): Promise<ScoreResult> {
+  public async analyzePackage(packageName: string): Promise<ScoreResult> {
     const packageData = await collectPackageData(packageName);
     const version = packageData.npm.version;
 

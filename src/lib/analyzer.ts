@@ -1,41 +1,5 @@
-import * as fs from 'fs';
-import { collectPackageData } from './data/index';
-import { calculateWeeklyDownloads, calculateGithubStars } from './signals/index';
-
-/**
- * Map to signal calculation functions
- */
-const SIGNAL_CALCULATOR = {
-  weekly_downloads: calculateWeeklyDownloads,
-  github_stars: calculateGithubStars,
-};
-
-/**
- * Properties of a signal
- */
-interface SignalConfig {
-  readonly pillar: string;
-  readonly weight: number;
-  readonly enabled: boolean;
-  readonly description: string;
-}
-
-/**
- * Properties of a pillar
- */
-interface PillarConfig {
-  readonly name: string;
-  readonly weight: number;
-  readonly description: string;
-}
-
-/**
- * Properties of a config object
- */
-interface Config {
-  readonly signals: Record<string, SignalConfig>; // signal name -> signal config
-  readonly pillars: Record<string, PillarConfig>; // pillar name -> pillar config
-}
+import { CONFIG, type Config, type BenchmarkConfig } from './config';
+import { collectPackageData, signalCalculators } from './data/collect';
 
 /**
  * Properties analyzer result
@@ -52,8 +16,7 @@ export class ConstructAnalyzer {
   private config: Config;
 
   constructor() {
-    const configData = fs.readFileSync('src/lib/config.json', 'utf8');
-    this.config = JSON.parse(configData);
+    this.config = CONFIG;
   }
 
   public async analyzePackage(packageName: string): Promise<ScoreResult> {
@@ -81,10 +44,11 @@ export class ConstructAnalyzer {
     for (const [signalName, signalConfig] of signal_entries) {
       if (!signalConfig.enabled) continue;
 
-      const calculator = SIGNAL_CALCULATOR[signalName as keyof typeof SIGNAL_CALCULATOR];
+      const calculator = signalCalculators[signalName as keyof typeof signalCalculators];
       if (!calculator) continue;
 
-      const starRating = await calculator(packageData);
+      const rawValue = calculator(packageData);
+      const starRating = this.convertValueToStars(rawValue, signalConfig.benchmarks);
       const points = this.convertStarsToPoints(starRating);
 
       this.updateSignalScore(signalScores, signalConfig.pillar, signalName, starRating);
@@ -96,6 +60,14 @@ export class ConstructAnalyzer {
 
   private convertStarsToPoints(starRating: number): number {
     return (starRating - 1) * 25;
+  }
+
+  private convertValueToStars(value: number, benchmarks: BenchmarkConfig): number {
+    if (value >= benchmarks.fiveStars) return 5;
+    if (value >= benchmarks.fourStars) return 4;
+    if (value >= benchmarks.threeStars) return 3;
+    if (value >= benchmarks.twoStars) return 2;
+    return 1;
   }
 
   private updateSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {

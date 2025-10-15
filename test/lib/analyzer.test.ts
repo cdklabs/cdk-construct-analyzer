@@ -55,13 +55,13 @@ describe('ConstructAnalyzer', () => {
     mockedFs.readFileSync.mockReturnValue(JSON.stringify(mockConfig));
   });
 
-  it('should load config from file', () => {
+  test('should load config from file', () => {
     new ConstructAnalyzer();
     expect(mockedFs.readFileSync).toHaveBeenCalledWith('src/lib/config.json', 'utf8');
   });
 
   describe('analyzePackage', () => {
-    it('should analyze package and return score result', async () => {
+    test('should analyze package and return score result', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       mockedSignalsModule.calculateWeeklyDownloads.mockResolvedValue(4); // 4 stars = 75 points
@@ -79,7 +79,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.totalScore).toBeLessThanOrEqual(100);
     });
 
-    it('should skip disabled signals', async () => {
+    test('should skip disabled signals', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       const analyzer = new ConstructAnalyzer();
@@ -89,7 +89,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.signalScores.POPULARITY).not.toHaveProperty('disabled_signal');
     });
 
-    it('should calculate pillar scores correctly', async () => {
+    test('should calculate pillar scores correctly', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       mockedSignalsModule.calculateWeeklyDownloads.mockResolvedValue(5); // 5 stars = 100 points
@@ -105,7 +105,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.pillarScores.POPULARITY).toBe(80);
     });
 
-    it('should calculate total score as average of pillar scores', async () => {
+    test('should calculate total score as average of pillar scores', async () => {
       const configWithMultiplePillars = {
         signals: {
           weekly_downloads: { pillar: 'PILLAR1', weight: 1.0, enabled: true, description: 'Test' },
@@ -130,7 +130,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.totalScore).toBe(75);
     });
 
-    it('should handle empty pillars gracefully', async () => {
+    test('should handle empty pillars gracefully', async () => {
       const configWithNoPillars = {
         signals: {},
         pillars: {},

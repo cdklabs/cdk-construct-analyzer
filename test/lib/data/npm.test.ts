@@ -13,7 +13,7 @@ describe('NpmCollector', () => {
   });
 
   describe('fetchPackage', () => {
-    it('should fetch package data successfully', async () => {
+    test('should fetch package data successfully', async () => {
       const mockResponse = {
         'name': 'test-package',
         'dist-tags': { latest: '1.0.0' },
@@ -33,7 +33,7 @@ describe('NpmCollector', () => {
       expect(mockedFetch).toHaveBeenCalledWith('https://registry.npmjs.org/test-package');
     });
 
-    it('should handle API errors', async () => {
+    test('should handle API errors', async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
@@ -45,7 +45,7 @@ describe('NpmCollector', () => {
       );
     });
 
-    it('should handle network errors', async () => {
+    test('should handle network errors', async () => {
       mockedFetch.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(collector.fetchPackage('test-package')).rejects.toThrow('Network error');
@@ -53,7 +53,7 @@ describe('NpmCollector', () => {
   });
 
   describe('getPackageData', () => {
-    it('should return package data after fetchPackage', async () => {
+    test('should return package data after fetchPackage', async () => {
       const mockResponse = {
         'name': 'test-package',
         'dist-tags': { latest: '1.0.0' },
@@ -81,7 +81,7 @@ describe('NpmCollector', () => {
       });
     });
 
-    it('should throw error if fetchPackage not called first', () => {
+    test('should throw error if fetchPackage not called first', () => {
       expect(() => collector.getPackageData()).toThrow('Must call fetchPackage() first');
     });
 
@@ -89,7 +89,7 @@ describe('NpmCollector', () => {
   });
 
   describe('getDownloadData', () => {
-    it('should fetch download data successfully', async () => {
+    test('should fetch download data successfully', async () => {
       // First mock the package fetch
       const mockPackageResponse = {
         'name': 'test-package',
@@ -124,11 +124,11 @@ describe('NpmCollector', () => {
       expect(result).toEqual(mockDownloadResponse);
     });
 
-    it('should throw error if fetchPackage not called first', async () => {
+    test('should throw error if fetchPackage not called first', async () => {
       await expect(collector.getDownloadData()).rejects.toThrow('Must call fetchPackage() first');
     });
 
-    it('should handle download API errors', async () => {
+    test('should handle download API errors', async () => {
       // First fetch package data
       const mockPackageResponse = {
         'name': 'test-package',

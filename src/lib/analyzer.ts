@@ -1,5 +1,6 @@
-import { CONFIG, type Config, type BenchmarkConfig } from './config';
+import { CONFIG } from './config';
 import { collectPackageData, signalCalculators } from './data/collect';
+import type { Config, BenchmarkConfig } from './types';
 
 /**
  * Properties analyzer result
@@ -42,8 +43,6 @@ export class ConstructAnalyzer {
 
     const signal_entries = Object.entries(this.config.signals);
     for (const [signalName, signalConfig] of signal_entries) {
-      if (!signalConfig.enabled) continue;
-
       const calculator = signalCalculators[signalName as keyof typeof signalCalculators];
       if (!calculator) continue;
 
@@ -94,7 +93,7 @@ export class ConstructAnalyzer {
 
   private getTotalWeightForPillar(pillar: string): number {
     return Object.values(this.config.signals)
-      .filter(config => config.pillar === pillar && config.enabled)
+      .filter(config => config.pillar === pillar)
       .reduce((sum, config) => sum + config.weight, 0);
   }
 

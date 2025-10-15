@@ -13,7 +13,7 @@ describe('GitHubCollector', () => {
   });
 
   describe('fetchPackage', () => {
-    it('should fetch GitHub data successfully with standard URL', async () => {
+    test('should fetch GitHub data successfully with standard URL', async () => {
       const mockResponse = {
         stargazers_count: 500,
       };
@@ -28,7 +28,7 @@ describe('GitHubCollector', () => {
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/test/repo');
     });
 
-    it('should handle git+https URLs', async () => {
+    test('should handle git+https URLs', async () => {
       const mockResponse = {
         stargazers_count: 500,
       };
@@ -43,7 +43,7 @@ describe('GitHubCollector', () => {
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/facebook/react');
     });
 
-    it('should handle SSH URLs', async () => {
+    test('should handle SSH URLs', async () => {
       const mockResponse = {
         stargazers_count: 500,
       };
@@ -58,13 +58,13 @@ describe('GitHubCollector', () => {
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/microsoft/typescript');
     });
 
-    it('should throw error for invalid GitHub URLs', async () => {
+    test('should throw error for invalid GitHub URLs', async () => {
       await expect(collector.fetchPackage('https://gitlab.com/test/repo')).rejects.toThrow(
         'Could not parse GitHub URL: https://gitlab.com/test/repo',
       );
     });
 
-    it('should handle GitHub API errors', async () => {
+    test('should handle GitHub API errors', async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
@@ -75,7 +75,7 @@ describe('GitHubCollector', () => {
       );
     });
 
-    it('should handle network errors', async () => {
+    test('should handle network errors', async () => {
       mockedFetch.mockRejectedValueOnce(new Error('Network error'));
 
       await expect(collector.fetchPackage('https://github.com/test/repo')).rejects.toThrow(
@@ -83,7 +83,7 @@ describe('GitHubCollector', () => {
       );
     });
 
-    it('should handle missing stargazers_count', async () => {
+    test('should handle missing stargazers_count', async () => {
       const mockResponse = {};
 
       mockedFetch.mockResolvedValueOnce({
@@ -98,7 +98,7 @@ describe('GitHubCollector', () => {
   });
 
   describe('getStarCount', () => {
-    it('should return star count after fetchPackage', async () => {
+    test('should return star count after fetchPackage', async () => {
       const mockResponse = {
         stargazers_count: 500,
       };
@@ -113,13 +113,13 @@ describe('GitHubCollector', () => {
       expect(collector.getStarCount()).toBe(500);
     });
 
-    it('should return 0 if no data fetched', () => {
+    test('should return 0 if no data fetched', () => {
       expect(collector.getStarCount()).toBe(0);
     });
   });
 
   describe('getData', () => {
-    it('should return GitHub data object', async () => {
+    test('should return GitHub data object', async () => {
       const mockResponse = {
         stargazers_count: 500,
       };
@@ -136,7 +136,7 @@ describe('GitHubCollector', () => {
       });
     });
 
-    it('should return default data if no fetch performed', () => {
+    test('should return default data if no fetch performed', () => {
       expect(collector.getData()).toEqual({
         stars: 0,
       });

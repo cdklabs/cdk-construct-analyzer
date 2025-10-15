@@ -29,7 +29,7 @@ describe('CLI', () => {
     processExitSpy.mockRestore();
   });
 
-  it('should analyze package and display results', async () => {
+  test('should analyze package and display results', async () => {
     const mockResult = {
       packageName: 'test-package',
       version: '1.0.0',
@@ -64,7 +64,7 @@ describe('CLI', () => {
     expect(consoleSpy.log).toHaveBeenCalledWith('  github_stars: 3.8');
   });
 
-  it('should handle analyzer errors gracefully', async () => {
+  test('should handle analyzer errors gracefully', async () => {
     const mockError = new Error('Package not found');
     const mockAnalyzePackage = jest.fn().mockRejectedValue(mockError);
     MockedConstructAnalyzer.mockImplementation(() => ({
@@ -79,7 +79,7 @@ describe('CLI', () => {
     expect(processExitSpy).toHaveBeenCalledWith(1);
   });
 
-  it('should handle non-Error exceptions', async () => {
+  test('should handle non-Error exceptions', async () => {
     const mockAnalyzePackage = jest.fn().mockRejectedValue('String error');
     MockedConstructAnalyzer.mockImplementation(() => ({
       analyzePackage: mockAnalyzePackage,

@@ -2,6 +2,17 @@ import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { ConstructAnalyzer } from '../lib/analyzer';
 
+/**
+ * Converts snake_case signal names to Display Name format
+ * Example: "weekly_downloads" -> "Weekly Downloads"
+ */
+function convertToDisplayName(signalName: string): string {
+  return signalName
+    .split('_')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
 export function cli() {
   const analyzer = new ConstructAnalyzer();
 
@@ -35,11 +46,10 @@ export function cli() {
           Object.entries(result.signalScores).forEach(([pillar, signals]) => {
             console.log(`\n=== ${pillar} ===`);
             Object.entries(signals as Record<string, number>).forEach(([signal, score]) => {
-              console.log(`  ${signal}: ${score.toFixed(1)}`);
+              const display_name = convertToDisplayName(signal);
+              console.log(`  ${display_name}: ${score.toFixed(1)}`);
             });
           });
-          // TODO: ADD AND IMPLEMENT DISPLAY NAMES FOR EACH SIGNAL
-          // TODO: FIX UP OUTPUT FORMATTING/MAYBE SEPARATE INPUT AND OUTPUT
 
         } catch (error) {
           console.error('Error:', error instanceof Error ? error.message : error);

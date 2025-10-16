@@ -22,17 +22,26 @@ export type BenchmarkFunction = (value: number) => number;
  * Properties of a signal configuration
  */
 export interface SignalConfig {
-  readonly pillar: string;
+  readonly name: string;
   readonly weight: number;
   readonly description: string;
-  readonly benchmarks: BenchmarkFunction;
+  readonly benchmarks: BenchmarkConfig | BenchmarkFunction;
+}
+
+/**
+ * Pillar configuration
+ */
+export interface PillarConfig {
+  readonly name: string;
+  readonly description: string;
+  readonly signals: SignalConfig[];
 }
 
 /**
  * Complete configuration interface
  */
 export interface Config {
-  readonly signals: Record<string, SignalConfig>;
+  readonly pillars: PillarConfig[];
 }
 
 /**

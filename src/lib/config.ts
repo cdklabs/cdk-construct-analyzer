@@ -1,3 +1,4 @@
+import { categorizeByBuckets } from './scoring';
 import type { Config } from './types';
 
 /**
@@ -188,23 +189,13 @@ export const CONFIG: Config = {
       pillar: 'POPULARITY',
       weight: 3.0,
       description: 'Weekly download count from npm',
-      benchmarks: {
-        fiveStars: 2500, // 2.5k+
-        fourStars: 251, // 251-2.5k
-        threeStars: 41, // 41-250
-        twoStars: 6, // 6-40
-      },
+      benchmarks: (downloads: number) => categorizeByBuckets([2500, 251, 41, 6], downloads),
     },
     github_stars: {
       pillar: 'POPULARITY',
       weight: 2.0,
       description: 'GitHub repository stars',
-      benchmarks: {
-        fiveStars: 638, // ≥638
-        fourStars: 28, // 28-637
-        threeStars: 4, // 4-27
-        twoStars: 1, // 1-3
-      },
+      benchmarks: (stars: number) => categorizeByBuckets([638, 28, 4, 1], stars),
     },
     // number_of_contributors_popularity: {
     //   pillar: 'POPULARITY',

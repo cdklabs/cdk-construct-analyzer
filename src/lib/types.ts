@@ -3,14 +3,20 @@
  */
 
 /**
- * Benchmark configuration for converting raw values to star ratings (1-5)
+ * Benchmark configuration for converting raw values to quality ratings (1-5)
  */
 export interface BenchmarkConfig {
-  readonly fiveStars: number;
-  readonly fourStars: number;
-  readonly threeStars: number;
-  readonly twoStars: number;
+  readonly five: number; // Level 5
+  readonly four: number; // Level 4
+  readonly three: number; // Level 3
+  readonly two: number; // Level 2
+  // one is the default else case
 }
+
+/**
+ * Benchmark function type for converting raw values to quality levels (1-5)
+ */
+export type BenchmarkFunction = (value: number) => number;
 
 /**
  * Properties of a signal configuration
@@ -19,7 +25,7 @@ export interface SignalConfig {
   readonly pillar: string;
   readonly weight: number;
   readonly description: string;
-  readonly benchmarks: BenchmarkConfig;
+  readonly benchmarks: BenchmarkFunction;
 }
 
 /**
@@ -27,4 +33,19 @@ export interface SignalConfig {
  */
 export interface Config {
   readonly signals: Record<string, SignalConfig>;
+}
+
+/**
+ * Checklist item configuration for scoring
+ */
+export interface ChecklistItem {
+  readonly present: boolean;
+  readonly value: number;
+}
+
+/**
+ * Generic checklist interface for scoring
+ */
+export interface Checklist {
+  readonly [key: string]: ChecklistItem;
 }

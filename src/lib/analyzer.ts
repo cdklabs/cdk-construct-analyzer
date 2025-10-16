@@ -1,6 +1,6 @@
 import { CONFIG } from './config';
 import { collectPackageData, signalCalculators } from './data/collect';
-import type { Config, BenchmarkConfig } from './types';
+import type { Config } from './types';
 
 /**
  * Properties analyzer result
@@ -47,26 +47,18 @@ export class ConstructAnalyzer {
       if (!calculator) continue;
 
       const rawValue = calculator(packageData);
-      const starRating = this.convertValueToStars(rawValue, signalConfig.benchmarks);
-      const points = this.convertStarsToPoints(starRating);
+      const level = signalConfig.benchmarks(rawValue);
+      const points = this.convertLevelToPoints(level);
 
-      this.updateSignalScore(signalScores, signalConfig.pillar, signalName, starRating);
+      this.updateSignalScore(signalScores, signalConfig.pillar, signalName, level);
       this.updatePillarScore(pillarScores, signalConfig.pillar, points, signalConfig.weight);
     }
 
     return { signalScores, pillarScores };
   }
 
-  private convertStarsToPoints(starRating: number): number {
-    return (starRating - 1) * 25;
-  }
-
-  private convertValueToStars(value: number, benchmarks: BenchmarkConfig): number {
-    if (value >= benchmarks.fiveStars) return 5;
-    if (value >= benchmarks.fourStars) return 4;
-    if (value >= benchmarks.threeStars) return 3;
-    if (value >= benchmarks.twoStars) return 2;
-    return 1;
+  private convertLevelToPoints(level: number): number {
+    return (level - 1) * 25;
   }
 
   private updateSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {

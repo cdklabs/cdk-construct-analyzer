@@ -28,7 +28,7 @@ describe('ConstructAnalyzer', () => {
   });
 
   describe('analyzePackage', () => {
-    it('should analyze package and return score result', async () => {
+    test('should analyze package and return score result', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       mockedCollectModule.calculateWeeklyDownloads.mockReturnValue(10000); // Raw download count
@@ -46,7 +46,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.totalScore).toBeLessThanOrEqual(100);
     });
 
-    it('should skip disabled signals', async () => {
+    test('should skip disabled signals', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       const analyzer = new ConstructAnalyzer();
@@ -56,7 +56,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.signalScores.POPULARITY).not.toHaveProperty('disabled_signal');
     });
 
-    it('should calculate pillar scores correctly', async () => {
+    test('should calculate pillar scores correctly', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       mockedCollectModule.calculateWeeklyDownloads.mockReturnValue(3000); // Raw download count for 5 stars

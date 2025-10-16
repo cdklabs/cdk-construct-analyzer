@@ -38,7 +38,7 @@ describe('collectPackageData', () => {
     jest.restoreAllMocks();
   });
 
-  it('should collect data from npm and github successfully', async () => {
+  test('should collect data from npm and github successfully', async () => {
     const mockNpmInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
@@ -65,7 +65,7 @@ describe('collectPackageData', () => {
     });
   });
 
-  it('should handle missing repository URL', async () => {
+  test('should handle missing repository URL', async () => {
     const npmDataWithoutRepo = {
       name: 'test-package',
       version: '1.0.0',
@@ -98,7 +98,7 @@ describe('collectPackageData', () => {
     });
   });
 
-  it('should handle github fetch errors gracefully', async () => {
+  test('should handle github fetch errors gracefully', async () => {
     const mockNpmInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),

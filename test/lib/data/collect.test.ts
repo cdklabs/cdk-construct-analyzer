@@ -1,4 +1,4 @@
-import { collectPackageData } from '../../../src/lib/data/collect';
+import { collectPackageData, calculateWeeklyDownloads, calculateGithubStars, calculateContributorsLastMonth } from '../../../src/lib/data/collect';
 import { GitHubCollector } from '../../../src/lib/data/github';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
@@ -24,6 +24,7 @@ describe('collectPackageData', () => {
 
   const mockGitHubData = {
     stars: 500,
+    contributorsLastMonth: 3,
   };
 
   beforeEach(() => {
@@ -80,7 +81,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue({ stars: 0 }),
+      getData: jest.fn().mockReturnValue({ stars: 0, contributorsLastMonth: 0 }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -94,7 +95,7 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       npm: npmDataWithoutRepo,
       downloads: mockDownloadData,
-      github: { stars: 0 },
+      github: { stars: 0, contributorsLastMonth: 0 },
     });
   });
 
@@ -107,7 +108,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
-      getData: jest.fn().mockReturnValue({ stars: 0 }),
+      getData: jest.fn().mockReturnValue({ stars: 0, contributorsLastMonth: 0 }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -120,9 +121,29 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       npm: mockNpmData,
       downloads: mockDownloadData,
-      github: { stars: 0 },
+      github: { stars: 0, contributorsLastMonth: 0 },
     });
   });
 
 
+});
+
+describe('signal calculators', () => {
+  const mockPackageData = {
+    npm: { name: 'test', version: '1.0.0' },
+    downloads: { downloads: 5000 },
+    github: { stars: 100, contributorsLastMonth: 5 },
+  };
+
+  test('should calculate weekly downloads', () => {
+    expect(calculateWeeklyDownloads(mockPackageData)).toBe(5000);
+  });
+
+  test('should calculate github stars', () => {
+    expect(calculateGithubStars(mockPackageData)).toBe(100);
+  });
+
+  test('should calculate contributors last month', () => {
+    expect(calculateContributorsLastMonth(mockPackageData)).toBe(5);
+  });
 });

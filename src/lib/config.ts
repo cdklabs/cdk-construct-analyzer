@@ -7,6 +7,18 @@ import type { Config } from './types';
 export const CONFIG: Config = {
   pillars: [
     {
+      name: 'MAINTENANCE',
+      description: 'Measures how actively maintained and updated the package is',
+      signals: [
+        {
+          name: 'number_of_contributors_maintenance',
+          weight: 2.0,
+          description: 'Number of Contributors in the past month',
+          benchmarks: (contributors: number) => categorizeByBuckets([4, 3, 1, 1], contributors),
+        },
+      ],
+    },
+    {
       name: 'POPULARITY',
       description: 'Measures how widely adopted and used the package is',
       signals: [
@@ -22,20 +34,14 @@ export const CONFIG: Config = {
           description: 'GitHub repository stars',
           benchmarks: (stars: number) => categorizeByBuckets([638, 28, 4, 1], stars),
         },
+        {
+          name: 'number_of_contributors_popularity',
+          weight: 1.0,
+          description: 'Number of Contributors in the past month',
+          benchmarks: (contributors: number) => categorizeByBuckets([4, 3, 1, 1], contributors),
+        },
       ],
     },
-    // {
-    //   name: 'MAINTENANCE',
-    //   description: 'Measures how actively maintained and updated the package is',
-    //   signals: [
-    //     {
-    //       name: 'time_to_first_response',
-    //       weight: 3,
-    //       description: 'Time to first response on issues',
-    //       benchmarks: function,
-    //     },
-    //   ],
-    // },
     // {
     //   name: 'QUALITY',
     //   description: 'Measures the overall quality and reliability of the package',

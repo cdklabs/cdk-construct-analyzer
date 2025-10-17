@@ -18,7 +18,12 @@ export async function collectPackageData(packageName: string): Promise<PackageDa
   const downloadData = await npmCollector.getDownloadData();
 
   // Fetch GitHub data if repository URL exists
-  let githubData: GitHubData = { stars: 0 };
+  let githubData: GitHubData = {
+    stars: 0,
+    hasReadme: false,
+    hasApiDocs: false,
+    hasExamples: false,
+  };
   if (npmData.repository?.url) {
     try {
       await githubCollector.fetchPackage(npmData.repository.url);
@@ -48,9 +53,18 @@ export function calculateGithubStars(packageData: PackageData): number {
   return packageData.github.stars;
 }
 
+export function calculateDocumentationCompleteness(packageData: PackageData): any {
+  return {
+    hasReadme: packageData.github.hasReadme,
+    hasApiDocs: packageData.github.hasApiDocs,
+    hasExamples: packageData.github.hasExamples,
+  };
+}
+
 export const signalCalculators = {
   weekly_downloads: calculateWeeklyDownloads,
   github_stars: calculateGithubStars,
+  documentation_completeness: calculateDocumentationCompleteness,
 };
 
 // Re-export types and classes for convenience

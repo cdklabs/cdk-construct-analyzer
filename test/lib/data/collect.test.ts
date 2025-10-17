@@ -24,6 +24,9 @@ describe('collectPackageData', () => {
 
   const mockGitHubData = {
     stars: 500,
+    hasReadme: true,
+    hasApiDocs: true,
+    hasExamples: true,
   };
 
   beforeEach(() => {
@@ -80,7 +83,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue({ stars: 0 }),
+      getData: jest.fn().mockReturnValue({ stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -94,7 +97,7 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       npm: npmDataWithoutRepo,
       downloads: mockDownloadData,
-      github: { stars: 0 },
+      github: { stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false },
     });
   });
 
@@ -107,7 +110,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
-      getData: jest.fn().mockReturnValue({ stars: 0 }),
+      getData: jest.fn().mockReturnValue({ stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -120,7 +123,7 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       npm: mockNpmData,
       downloads: mockDownloadData,
-      github: { stars: 0 },
+      github: { stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false },
     });
   });
 

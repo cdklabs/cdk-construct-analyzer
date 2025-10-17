@@ -1,41 +1,6 @@
-import * as fs from 'fs';
-import { collectPackageData } from './data/index';
-import { calculateWeeklyDownloads, calculateGithubStars } from './signals/index';
-
-/**
- * Map to signal calculation functions
- */
-const SIGNAL_CALCULATOR = {
-  weekly_downloads: calculateWeeklyDownloads,
-  github_stars: calculateGithubStars,
-};
-
-/**
- * Properties of a signal
- */
-interface SignalConfig {
-  readonly pillar: string;
-  readonly weight: number;
-  readonly enabled: boolean;
-  readonly description: string;
-}
-
-/**
- * Properties of a pillar
- */
-interface PillarConfig {
-  readonly name: string;
-  readonly weight: number;
-  readonly description: string;
-}
-
-/**
- * Properties of a config object
- */
-interface Config {
-  readonly signals: Record<string, SignalConfig>; // signal name -> signal config
-  readonly pillars: Record<string, PillarConfig>; // pillar name -> pillar config
-}
+import { CONFIG } from './config';
+import { collectPackageData, signalCalculators } from './data/collect';
+import type { Config } from './types';
 
 /**
  * Properties analyzer result
@@ -52,8 +17,7 @@ export class ConstructAnalyzer {
   private config: Config;
 
   constructor() {
-    const configData = fs.readFileSync('src/lib/config.json', 'utf8');
-    this.config = JSON.parse(configData);
+    this.config = CONFIG;
   }
 
   public async analyzePackage(packageName: string): Promise<ScoreResult> {
@@ -77,25 +41,25 @@ export class ConstructAnalyzer {
     const signalScores: Record<string, Record<string, number>> = {};
     const pillarScores: Record<string, number> = {};
 
-    const signal_entries = Object.entries(this.config.signals);
-    for (const [signalName, signalConfig] of signal_entries) {
-      if (!signalConfig.enabled) continue;
+    for (const pillar of this.config.pillars) {
+      for (const signal of pillar.signals) {
+        const calculator = signalCalculators[signal.name as keyof typeof signalCalculators];
+        if (!calculator) continue;
 
-      const calculator = SIGNAL_CALCULATOR[signalName as keyof typeof SIGNAL_CALCULATOR];
-      if (!calculator) continue;
+        const rawValue = calculator(packageData);
+        const level = signal.benchmarks(rawValue);
+        const points = this.convertLevelToPoints(level);
 
-      const starRating = await calculator(packageData);
-      const points = this.convertStarsToPoints(starRating);
-
-      this.updateSignalScore(signalScores, signalConfig.pillar, signalName, starRating);
-      this.updatePillarScore(pillarScores, signalConfig.pillar, points, signalConfig.weight);
+        this.updateSignalScore(signalScores, pillar.name, signal.name, level);
+        this.updatePillarScore(pillarScores, pillar.name, points, signal.weight);
+      }
     }
 
     return { signalScores, pillarScores };
   }
 
-  private convertStarsToPoints(starRating: number): number {
-    return (starRating - 1) * 25;
+  private convertLevelToPoints(level: number): number {
+    return (level - 1) * 25;
   }
 
   private updateSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {
@@ -120,10 +84,11 @@ export class ConstructAnalyzer {
     return normalizedScores;
   }
 
-  private getTotalWeightForPillar(pillar: string): number {
-    return Object.values(this.config.signals)
-      .filter(config => config.pillar === pillar && config.enabled)
-      .reduce((sum, config) => sum + config.weight, 0);
+  private getTotalWeightForPillar(pillarName: string): number {
+    const pillar = this.config.pillars.find(p => p.name === pillarName);
+    if (!pillar) return 0;
+
+    return pillar.signals.reduce((sum, signal) => sum + signal.weight, 0);
   }
 
   private calculateTotalScore(pillarScores: Record<string, number>): number {

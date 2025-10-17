@@ -37,6 +37,22 @@ export async function collectPackageData(packageName: string): Promise<PackageDa
   };
 }
 
+/**
+ * Signal calculation functions that return raw numeric values
+ */
+export function calculateWeeklyDownloads(packageData: PackageData): number {
+  return packageData.downloads.downloads;
+}
+
+export function calculateGithubStars(packageData: PackageData): number {
+  return packageData.github.stars;
+}
+
+export const signalCalculators = {
+  weekly_downloads: calculateWeeklyDownloads,
+  github_stars: calculateGithubStars,
+};
+
 // Re-export types and classes for convenience
 export type { NpmPackageData, NpmDownloadData, GitHubData };
 export { NpmCollector, GitHubCollector };

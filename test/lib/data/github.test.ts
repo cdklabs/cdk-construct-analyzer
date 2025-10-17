@@ -10,6 +10,11 @@ describe('GitHubCollector', () => {
   beforeEach(() => {
     collector = new GitHubCollector();
     jest.clearAllMocks();
+    jest.spyOn(console, 'warn').mockImplementation();
+  });
+
+  afterEach(() => {
+    jest.restoreAllMocks();
   });
 
   describe('fetchPackage', () => {
@@ -21,6 +26,11 @@ describe('GitHubCollector', () => {
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
       } as Response);
 
       await collector.fetchPackage('https://github.com/test/repo');
@@ -38,6 +48,11 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
+      } as Response);
+
       await collector.fetchPackage('git+https://github.com/facebook/react.git');
 
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/facebook/react');
@@ -51,6 +66,11 @@ describe('GitHubCollector', () => {
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
       } as Response);
 
       await collector.fetchPackage('github.com:microsoft/typescript');
@@ -91,6 +111,11 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
+      } as Response);
+
       await collector.fetchPackage('https://github.com/test/repo');
 
       expect(collector.getStarCount()).toBe(0);
@@ -106,6 +131,11 @@ describe('GitHubCollector', () => {
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
       } as Response);
 
       await collector.fetchPackage('https://github.com/test/repo');
@@ -129,17 +159,55 @@ describe('GitHubCollector', () => {
         json: async () => mockResponse,
       } as Response);
 
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [
+          { author: { login: 'user1' }, commit: { message: 'Add feature' } },
+        ],
+      } as Response);
+
       await collector.fetchPackage('https://github.com/test/repo');
 
       expect(collector.getData()).toEqual({
         stars: 500,
+        contributorsLastMonth: 1,
       });
     });
 
     test('should return default data if no fetch performed', () => {
       expect(collector.getData()).toEqual({
         stars: 0,
+        contributorsLastMonth: 0,
       });
+    });
+  });
+
+  describe('getContributorsLastMonth', () => {
+    test('should count contributors excluding bots', async () => {
+      const mockRepoResponse = { stargazers_count: 100 };
+      const mockCommitsResponse = [
+        { author: { login: 'user1' }, commit: { message: 'Add feature' } },
+        { author: { login: 'user2' }, commit: { message: 'Fix bug' } },
+        { author: { login: 'dependabot[bot]' }, commit: { message: 'chore(deps): bump version' } },
+      ];
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRepoResponse,
+      } as Response);
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockCommitsResponse,
+      } as Response);
+
+      await collector.fetchPackage('https://github.com/test/repo');
+
+      expect(collector.getContributorsLastMonth()).toBe(2); // Should exclude bot
+    });
+
+    test('should return 0 if no data fetched', () => {
+      expect(collector.getContributorsLastMonth()).toBe(0);
     });
   });
 });

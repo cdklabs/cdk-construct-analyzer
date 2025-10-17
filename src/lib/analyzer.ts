@@ -78,7 +78,7 @@ export class ConstructAnalyzer {
     for (const [pillar, weightedSum] of pillar_entries) {
       const totalWeight = this.getTotalWeightForPillar(pillar);
       const normalizedScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
-      normalizedScores[pillar] = normalizedScore;
+      normalizedScores[pillar] = Math.round(normalizedScore);
     }
 
     return normalizedScores;
@@ -96,6 +96,6 @@ export class ConstructAnalyzer {
     if (scores.length === 0) return 0;
 
     const sum = scores.reduce((total, score) => total + score, 0);
-    return sum / scores.length;
+    return Math.round(sum / scores.length);
   }
 }

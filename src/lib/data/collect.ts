@@ -18,7 +18,7 @@ export async function collectPackageData(packageName: string): Promise<PackageDa
   const downloadData = await npmCollector.getDownloadData();
 
   // Fetch GitHub data if repository URL exists
-  let githubData: GitHubData = { stars: 0 };
+  let githubData: GitHubData = { stars: 0, contributorsLastMonth: 0 };
   if (npmData.repository?.url) {
     try {
       await githubCollector.fetchPackage(npmData.repository.url);
@@ -48,9 +48,15 @@ export function calculateGithubStars(packageData: PackageData): number {
   return packageData.github.stars;
 }
 
+export function calculateContributorsLastMonth(packageData: PackageData): number {
+  return packageData.github.contributorsLastMonth;
+}
+
 export const signalCalculators = {
   weekly_downloads: calculateWeeklyDownloads,
   github_stars: calculateGithubStars,
+  number_of_contributors_maintenance: calculateContributorsLastMonth,
+  number_of_contributors_popularity: calculateContributorsLastMonth,
 };
 
 // Re-export types and classes for convenience

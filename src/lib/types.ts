@@ -5,7 +5,7 @@
 /**
  * Benchmark function type for converting raw values to quality levels (1-5)
  */
-export type BenchmarkFunction = (value: number) => number;
+export type BenchmarkFunction = (value: any) => number;
 
 /**
  * Properties of a signal configuration

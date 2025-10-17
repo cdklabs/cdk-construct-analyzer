@@ -3,17 +3,6 @@
  */
 
 /**
- * Benchmark configuration for converting raw values to quality ratings (1-5)
- */
-export interface BenchmarkConfig {
-  readonly five: number; // Level 5
-  readonly four: number; // Level 4
-  readonly three: number; // Level 3
-  readonly two: number; // Level 2
-  // one is the default else case
-}
-
-/**
  * Benchmark function type for converting raw values to quality levels (1-5)
  */
 export type BenchmarkFunction = (value: number) => number;
@@ -25,7 +14,7 @@ export interface SignalConfig {
   readonly name: string;
   readonly weight: number;
   readonly description: string;
-  readonly benchmarks: BenchmarkConfig | BenchmarkFunction;
+  readonly benchmarks: BenchmarkFunction;
 }
 
 /**

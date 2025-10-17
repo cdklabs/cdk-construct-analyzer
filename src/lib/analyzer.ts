@@ -1,6 +1,6 @@
 import { CONFIG } from './config';
 import { collectPackageData, signalCalculators } from './data/collect';
-import type { Config, BenchmarkConfig, BenchmarkFunction } from './types';
+import type { Config } from './types';
 
 /**
  * Properties analyzer result
@@ -47,7 +47,7 @@ export class ConstructAnalyzer {
         if (!calculator) continue;
 
         const rawValue = calculator(packageData);
-        const level = this.convertValueToLevel(rawValue, signal.benchmarks);
+        const level = signal.benchmarks(rawValue);
         const points = this.convertLevelToPoints(level);
 
         this.updateSignalScore(signalScores, pillar.name, signal.name, level);
@@ -60,20 +60,6 @@ export class ConstructAnalyzer {
 
   private convertLevelToPoints(level: number): number {
     return (level - 1) * 25;
-  }
-
-  private convertValueToLevel(value: number, benchmarks: BenchmarkConfig | BenchmarkFunction): number {
-    // If benchmarks is a function, call it directly
-    if (typeof benchmarks === 'function') {
-      return benchmarks(value);
-    }
-
-    // Otherwise, use the object-based approach
-    if (value >= benchmarks.five) return 5;
-    if (value >= benchmarks.four) return 4;
-    if (value >= benchmarks.three) return 3;
-    if (value >= benchmarks.two) return 2;
-    return 1; // one (default)
   }
 
   private updateSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {

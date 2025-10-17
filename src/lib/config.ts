@@ -1,4 +1,4 @@
-import { categorizeByBuckets } from './scoring';
+import { categorizeByBuckets, categorizeByChecklist } from './scoring';
 import type { Config } from './types';
 
 /**
@@ -36,23 +36,23 @@ export const CONFIG: Config = {
     //     },
     //   ],
     // },
-    // {
-    //   name: 'QUALITY',
-    //   description: 'Measures the overall quality and reliability of the package',
-    //   signals: [
-    //     {
-    //       name: 'documentation_completeness',
-    //       weight: 3.0,
-    //       description: 'Presence of README, API reference, and usage examples',
-    //       benchmarks: (docData: any) => categorizeByChecklist(
-    //         {
-    //           readme: { present: docData.hasReadme, value: 2 },
-    //           apiDocs: { present: docData.hasApiDocs, value: 1 },
-    //           examples: { present: docData.hasExamples, value: 1 },
-    //         }
-    //       ),
-    //     },
-    //   ],
-    // },
+    {
+      name: 'QUALITY',
+      description: 'Measures the overall quality and reliability of the package',
+      signals: [
+        {
+          name: 'documentation_completeness',
+          weight: 3.0,
+          description: 'Presence of README, API reference, and usage examples',
+          benchmarks: (docData: any) => categorizeByChecklist(
+            {
+              readme: { present: docData.hasReadme, value: 2 },
+              apiDocs: { present: docData.hasApiDocs, value: 1 },
+              examples: { present: docData.hasExamples, value: 1 },
+            },
+          ),
+        },
+      ],
+    },
   ],
 };

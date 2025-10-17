@@ -20,6 +20,9 @@ describe('ConstructAnalyzer', () => {
     },
     github: {
       stars: 500,
+      hasReadme: true,
+      hasApiDocs: true,
+      hasExamples: true,
     },
   };
 
@@ -33,6 +36,11 @@ describe('ConstructAnalyzer', () => {
 
       mockedCollectModule.calculateWeeklyDownloads.mockReturnValue(10000); // Raw download count
       mockedCollectModule.calculateGithubStars.mockReturnValue(500); // Raw star count
+      mockedCollectModule.calculateDocumentationCompleteness.mockReturnValue({
+        hasReadme: true,
+        hasApiDocs: true,
+        hasExamples: true,
+      });
 
       const analyzer = new ConstructAnalyzer();
       const result = await analyzer.analyzePackage('test-package');
@@ -61,6 +69,11 @@ describe('ConstructAnalyzer', () => {
 
       mockedCollectModule.calculateWeeklyDownloads.mockReturnValue(3000); // Raw download count for 5 stars
       mockedCollectModule.calculateGithubStars.mockReturnValue(500); // Raw star count for 4 stars
+      mockedCollectModule.calculateDocumentationCompleteness.mockReturnValue({
+        hasReadme: true,
+        hasApiDocs: true,
+        hasExamples: true,
+      });
 
       const analyzer = new ConstructAnalyzer();
       const result = await analyzer.analyzePackage('test-package');
@@ -77,6 +90,11 @@ describe('ConstructAnalyzer', () => {
 
       mockedCollectModule.calculateWeeklyDownloads.mockReturnValue(3000); // Raw download count
       mockedCollectModule.calculateGithubStars.mockReturnValue(500); // Raw star count
+      mockedCollectModule.calculateDocumentationCompleteness.mockReturnValue({
+        hasReadme: true,
+        hasApiDocs: true,
+        hasExamples: true,
+      });
 
       const analyzer = new ConstructAnalyzer();
       const result = await analyzer.analyzePackage('test-package');

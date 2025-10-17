@@ -18,9 +18,15 @@ describe('GitHubCollector', () => {
         stargazers_count: 500,
       };
 
+      // Mock the main repo API call
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      // Mock documentation file/directory checks (all return false for simplicity)
+      mockedFetch.mockResolvedValue({
+        ok: false,
       } as Response);
 
       await collector.fetchPackage('https://github.com/test/repo');
@@ -33,9 +39,15 @@ describe('GitHubCollector', () => {
         stargazers_count: 500,
       };
 
+      // Mock the main repo API call
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      // Mock documentation file/directory checks (all return false for simplicity)
+      mockedFetch.mockResolvedValue({
+        ok: false,
       } as Response);
 
       await collector.fetchPackage('git+https://github.com/facebook/react.git');
@@ -48,9 +60,15 @@ describe('GitHubCollector', () => {
         stargazers_count: 500,
       };
 
+      // Mock the main repo API call
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      // Mock documentation file/directory checks (all return false for simplicity)
+      mockedFetch.mockResolvedValue({
+        ok: false,
       } as Response);
 
       await collector.fetchPackage('github.com:microsoft/typescript');
@@ -86,9 +104,15 @@ describe('GitHubCollector', () => {
     test('should handle missing stargazers_count', async () => {
       const mockResponse = {};
 
+      // Mock the main repo API call
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      // Mock documentation file/directory checks (all return false for simplicity)
+      mockedFetch.mockResolvedValue({
+        ok: false,
       } as Response);
 
       await collector.fetchPackage('https://github.com/test/repo');
@@ -103,9 +127,15 @@ describe('GitHubCollector', () => {
         stargazers_count: 500,
       };
 
+      // Mock the main repo API call
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      // Mock documentation file/directory checks (all return false for simplicity)
+      mockedFetch.mockResolvedValue({
+        ok: false,
       } as Response);
 
       await collector.fetchPackage('https://github.com/test/repo');
@@ -124,21 +154,33 @@ describe('GitHubCollector', () => {
         stargazers_count: 500,
       };
 
+      // Mock the main repo API call
       mockedFetch.mockResolvedValueOnce({
         ok: true,
         json: async () => mockResponse,
+      } as Response);
+
+      // Mock documentation file/directory checks (all return false for simplicity)
+      mockedFetch.mockResolvedValue({
+        ok: false,
       } as Response);
 
       await collector.fetchPackage('https://github.com/test/repo');
 
       expect(collector.getData()).toEqual({
         stars: 500,
+        hasReadme: false,
+        hasApiDocs: false,
+        hasExamples: false,
       });
     });
 
     test('should return default data if no fetch performed', () => {
       expect(collector.getData()).toEqual({
         stars: 0,
+        hasReadme: false,
+        hasApiDocs: false,
+        hasExamples: false,
       });
     });
   });

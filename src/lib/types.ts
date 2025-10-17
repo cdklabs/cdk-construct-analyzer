@@ -40,10 +40,3 @@ export interface ChecklistItem {
   readonly present: boolean;
   readonly value: number;
 }
-
-/**
- * Generic checklist interface for scoring
- */
-export interface Checklist {
-  readonly [key: string]: ChecklistItem;
-}

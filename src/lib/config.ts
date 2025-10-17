@@ -42,9 +42,15 @@ export const CONFIG: Config = {
     //   signals: [
     //     {
     //       name: 'documentation_completeness',
-    //       weight: 3,
-    //       description: 'Presence of README, API reference, and examples',
-    //       benchmarks: function,
+    //       weight: 3.0,
+    //       description: 'Presence of README, API reference, and usage examples',
+    //       benchmarks: (docData: any) => categorizeByChecklist(
+    //         {
+    //           readme: { present: docData.hasReadme, value: 2 },
+    //           apiDocs: { present: docData.hasApiDocs, value: 1 },
+    //           examples: { present: docData.hasExamples, value: 1 },
+    //         }
+    //       ),
     //     },
     //   ],
     // },

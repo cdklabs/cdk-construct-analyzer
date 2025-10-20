@@ -1,4 +1,5 @@
 import { collectPackageData } from '../../../src/lib/data/collect';
+import * as collectModule from '../../../src/lib/data/collect';
 import { GitHubCollector } from '../../../src/lib/data/github';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
@@ -124,5 +125,35 @@ describe('collectPackageData', () => {
     });
   });
 
+  describe('calculateTimeToFirstResponse', () => {
+    test('should return time to first response from GitHub data', () => {
+      const packageData = {
+        npm: { name: 'test', version: '1.0.0' },
+        downloads: { downloads: 1000 },
+        github: {
+          stars: 100,
+          timeToFirstResponseWeeks: 2.5,
+        },
+      };
 
+      const result = collectModule.calculateTimeToFirstResponse(packageData as any);
+
+      expect(result).toBe(2.5);
+    });
+
+    test('should return default high value when no response time data', () => {
+      const packageData = {
+        npm: { name: 'test', version: '1.0.0' },
+        downloads: { downloads: 1000 },
+        github: {
+          stars: 100,
+          timeToFirstResponseWeeks: undefined,
+        },
+      };
+
+      const result = collectModule.calculateTimeToFirstResponse(packageData as any);
+
+      expect(result).toBe(999);
+    });
+  });
 });

@@ -24,18 +24,18 @@ export const CONFIG: Config = {
         },
       ],
     },
-    // {
-    //   name: 'MAINTENANCE',
-    //   description: 'Measures how actively maintained and updated the package is',
-    //   signals: [
-    //     {
-    //       name: 'time_to_first_response',
-    //       weight: 3,
-    //       description: 'Time to first response on issues',
-    //       benchmarks: function,
-    //     },
-    //   ],
-    // },
+    {
+      name: 'MAINTENANCE',
+      description: 'Measures how actively maintained and updated the package is',
+      signals: [
+        {
+          name: 'time_to_first_response',
+          weight: 3,
+          description: 'Time to first response on issues',
+          benchmarks: (weeks: number) => categorizeByBuckets([52, 12, 4, 1], weeks),
+        },
+      ],
+    },
     // {
     //   name: 'QUALITY',
     //   description: 'Measures the overall quality and reliability of the package',

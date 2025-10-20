@@ -48,9 +48,14 @@ export function calculateGithubStars(packageData: PackageData): number {
   return packageData.github.stars;
 }
 
+export function calculateTimeToFirstResponse(packageData: PackageData): number {
+  return packageData.github.timeToFirstResponseWeeks ?? 999; // Default to very high value if no data
+}
+
 export const signalCalculators = {
   weekly_downloads: calculateWeeklyDownloads,
   github_stars: calculateGithubStars,
+  time_to_first_response: calculateTimeToFirstResponse,
 };
 
 // Re-export types and classes for convenience

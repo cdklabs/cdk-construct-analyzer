@@ -142,4 +142,178 @@ describe('GitHubCollector', () => {
       });
     });
   });
+
+  describe('time to first response', () => {
+    test('should calculate time to first response from issues', async () => {
+      const mockRepoResponse = {
+        stargazers_count: 500,
+      };
+
+      const mockIssues = [
+        {
+          id: 1,
+          created_at: '2024-01-01T00:00:00Z',
+          comments_url: 'https://api.github.com/repos/test/repo/issues/1/comments',
+          pull_request: null,
+        },
+        {
+          id: 2,
+          created_at: '2024-01-02T00:00:00Z',
+          comments_url: 'https://api.github.com/repos/test/repo/issues/2/comments',
+          pull_request: null,
+        },
+      ];
+
+      const mockComments1 = [
+        {
+          created_at: '2024-01-08T00:00:00Z', // 7 days later = 1 week
+        },
+      ];
+
+      const mockComments2 = [
+        {
+          created_at: '2024-01-16T00:00:00Z', // 14 days later = 2 weeks
+        },
+      ];
+
+      // Mock repo API call
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRepoResponse,
+      } as Response);
+
+      // Mock issues API call
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIssues,
+      } as Response);
+
+      // Mock comments API calls
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockComments1,
+      } as Response);
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockComments2,
+      } as Response);
+
+      await collector.fetchPackage('https://github.com/test/repo');
+
+      const data = collector.getData();
+      expect(data.timeToFirstResponseWeeks).toBe(1.5); // Median of 1 and 2 weeks
+    });
+
+    test('should handle issues with no comments', async () => {
+      const mockRepoResponse = {
+        stargazers_count: 500,
+      };
+
+      const mockIssues = [
+        {
+          id: 1,
+          created_at: '2024-01-01T00:00:00Z',
+          comments_url: 'https://api.github.com/repos/test/repo/issues/1/comments',
+          pull_request: null,
+        },
+      ];
+
+      // Mock repo API call
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRepoResponse,
+      } as Response);
+
+      // Mock issues API call
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIssues,
+      } as Response);
+
+      // Mock empty comments
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => [],
+      } as Response);
+
+      await collector.fetchPackage('https://github.com/test/repo');
+
+      const data = collector.getData();
+      expect(data.timeToFirstResponseWeeks).toBeUndefined();
+    });
+
+    test('should skip pull requests when calculating response time', async () => {
+      const mockRepoResponse = {
+        stargazers_count: 500,
+      };
+
+      const mockIssues = [
+        {
+          id: 1,
+          created_at: '2024-01-01T00:00:00Z',
+          comments_url: 'https://api.github.com/repos/test/repo/issues/1/comments',
+          pull_request: { url: 'https://api.github.com/repos/test/repo/pulls/1' }, // This is a PR
+        },
+        {
+          id: 2,
+          created_at: '2024-01-02T00:00:00Z',
+          comments_url: 'https://api.github.com/repos/test/repo/issues/2/comments',
+          pull_request: null, // This is an issue
+        },
+      ];
+
+      const mockComments = [
+        {
+          created_at: '2024-01-09T00:00:00Z', // 7 days later = 1 week
+        },
+      ];
+
+      // Mock repo API call
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRepoResponse,
+      } as Response);
+
+      // Mock issues API call
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockIssues,
+      } as Response);
+
+      // Mock comments API call (only for the issue, not the PR)
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockComments,
+      } as Response);
+
+      await collector.fetchPackage('https://github.com/test/repo');
+
+      const data = collector.getData();
+      expect(data.timeToFirstResponseWeeks).toBe(1); // Only the issue response time
+    });
+
+    test('should handle issues API errors gracefully', async () => {
+      const mockRepoResponse = {
+        stargazers_count: 500,
+      };
+
+      // Mock repo API call
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockRepoResponse,
+      } as Response);
+
+      // Mock issues API call failure
+      mockedFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+      } as Response);
+
+      await collector.fetchPackage('https://github.com/test/repo');
+
+      const data = collector.getData();
+      expect(data.timeToFirstResponseWeeks).toBeUndefined();
+    });
+  });
 });

@@ -1,4 +1,4 @@
-import { categorizeByBuckets } from './scoring';
+import { categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
 import type { Config } from './types';
 
 /**
@@ -14,13 +14,13 @@ export const CONFIG: Config = {
           name: 'weekly_downloads',
           weight: 3.0,
           description: 'Weekly download count from npm',
-          benchmarks: (downloads: number) => categorizeByBuckets([2500, 251, 41, 6], downloads),
+          benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },
         {
           name: 'github_stars',
           weight: 2.0,
           description: 'GitHub repository stars',
-          benchmarks: (stars: number) => categorizeByBuckets([638, 28, 4, 1], stars),
+          benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
       ],
     },
@@ -32,7 +32,7 @@ export const CONFIG: Config = {
           name: 'time_to_first_response',
           weight: 3,
           description: 'Time to first response on issues',
-          benchmarks: (weeks: number) => categorizeByBuckets([52, 12, 4, 1], weeks),
+          benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
       ],
     },

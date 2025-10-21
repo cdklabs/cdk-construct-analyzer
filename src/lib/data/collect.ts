@@ -1,4 +1,4 @@
-import { DocumentationCompleteness, PackageData } from '../types';
+import { PackageData } from '../types';
 import { GitHubCollector, GitHubRawData } from './github';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 
@@ -86,7 +86,3 @@ export async function collectPackageData(packageName: string): Promise<PackageDa
   const rawData = await fetchAllData(packageName);
   return processPackageData(rawData);
 }
-
-// Re-export types and classes for convenience
-export type { NpmPackageData, NpmDownloadData, DocumentationCompleteness };
-export { NpmCollector, GitHubCollector };

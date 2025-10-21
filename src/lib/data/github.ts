@@ -1,3 +1,5 @@
+import { GitHubRepo } from './github-repo';
+
 export interface GitHubData {
   readonly stars: number;
 }
@@ -31,13 +33,15 @@ export class GitHubCollector {
       throw new Error(`Could not parse GitHub URL: ${repositoryUrl}`);
     }
 
+    const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
+
     try {
-      const response = await fetch(`https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repo}`);
-      if (!response.ok) {
-        throw new Error(`GitHub API returned ${response.status}`);
+      const metadataResponse = await githubRepo.metadata();
+      if (metadataResponse.error) {
+        throw new Error(metadataResponse.error);
       }
 
-      const fullResponse = await response.json() as any;
+      const fullResponse = metadataResponse.data;
       this.starCount = fullResponse.stargazers_count || 0;
     } catch (error) {
       throw new Error(`GitHub fetch failed: ${error}`);

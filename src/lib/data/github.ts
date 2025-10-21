@@ -32,6 +32,8 @@ export class GitHubCollector {
       throw new Error(`Could not parse GitHub URL: ${repositoryUrl}`);
     }
 
+    const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
+
     try {
       // Fetch basic repo data
       const response = await fetch(`https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repo}`);

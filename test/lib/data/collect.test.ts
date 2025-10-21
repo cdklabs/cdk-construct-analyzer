@@ -22,11 +22,14 @@ describe('collectPackageData', () => {
     downloads: 10000,
   };
 
-  const mockGitHubData = {
+  const mockGitHubRawData = {
     stars: 500,
-    hasReadme: true,
-    hasApiDocs: true,
-    hasExamples: true,
+    repoContents: {
+      'README.md': true,
+      'docs': true,
+      'examples': true,
+    },
+    readmeContent: '# Test Package\n\n```js\nconsole.log("example");\n```',
   };
 
   beforeEach(() => {
@@ -50,7 +53,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue(mockGitHubData),
+      getRawData: jest.fn().mockReturnValue(mockGitHubRawData),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -62,9 +65,14 @@ describe('collectPackageData', () => {
     expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith('https://github.com/test/repo');
 
     expect(result).toEqual({
-      npm: mockNpmData,
-      downloads: mockDownloadData,
-      github: mockGitHubData,
+      version: '1.0.0',
+      weeklyDownloads: 10000,
+      githubStars: 500,
+      documentationCompleteness: {
+        hasReadme: true,
+        hasApiDocs: true,
+        hasExamples: true,
+      },
     });
   });
 
@@ -83,7 +91,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue({ stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false }),
+      getRawData: jest.fn().mockReturnValue({ stars: 0, repoContents: {}, readmeContent: null }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -95,9 +103,14 @@ describe('collectPackageData', () => {
     expect(console.log).toHaveBeenCalledWith('No repository URL found in NPM data');
 
     expect(result).toEqual({
-      npm: npmDataWithoutRepo,
-      downloads: mockDownloadData,
-      github: { stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false },
+      version: '1.0.0',
+      weeklyDownloads: 10000,
+      githubStars: 0,
+      documentationCompleteness: {
+        hasReadme: false,
+        hasApiDocs: false,
+        hasExamples: false,
+      },
     });
   });
 
@@ -110,7 +123,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
-      getData: jest.fn().mockReturnValue({ stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false }),
+      getRawData: jest.fn().mockReturnValue({ stars: 0, repoContents: {}, readmeContent: null }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -121,9 +134,14 @@ describe('collectPackageData', () => {
     expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: Error: GitHub API error');
 
     expect(result).toEqual({
-      npm: mockNpmData,
-      downloads: mockDownloadData,
-      github: { stars: 0, hasReadme: false, hasApiDocs: false, hasExamples: false },
+      version: '1.0.0',
+      weeklyDownloads: 10000,
+      githubStars: 0,
+      documentationCompleteness: {
+        hasReadme: false,
+        hasApiDocs: false,
+        hasExamples: false,
+      },
     });
   });
 

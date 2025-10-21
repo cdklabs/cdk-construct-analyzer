@@ -1,13 +1,20 @@
-import { GitHubCollector, GitHubData } from './github';
+import { DocumentationCompleteness, PackageData } from '../types';
+import { GitHubCollector, GitHubRawData } from './github';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 
-export interface PackageData {
+/**
+ * Raw data fetched from external APIs before processing
+ */
+interface RawPackageData {
   readonly npm: NpmPackageData;
   readonly downloads: NpmDownloadData;
-  readonly github: GitHubData;
+  readonly github: GitHubRawData | null;
 }
 
-export async function collectPackageData(packageName: string): Promise<PackageData> {
+/**
+ * Phase 1: Fetch all raw data from external APIs
+ */
+async function fetchAllData(packageName: string): Promise<RawPackageData> {
   // Create collectors
   const npmCollector = new NpmCollector();
   const githubCollector = new GitHubCollector();
@@ -17,17 +24,12 @@ export async function collectPackageData(packageName: string): Promise<PackageDa
   const npmData = npmCollector.getPackageData();
   const downloadData = await npmCollector.getDownloadData();
 
-  // Fetch GitHub data if repository URL exists
-  let githubData: GitHubData = {
-    stars: 0,
-    hasReadme: false,
-    hasApiDocs: false,
-    hasExamples: false,
-  };
+  // Fetch GitHub raw data if repository URL exists
+  let githubRawData: GitHubRawData | null = null;
   if (npmData.repository?.url) {
     try {
       await githubCollector.fetchPackage(npmData.repository.url);
-      githubData = githubCollector.getData();
+      githubRawData = githubCollector.getRawData();
     } catch (error) {
       console.warn(`GitHub fetch failed: ${error}`);
     }
@@ -38,35 +40,62 @@ export async function collectPackageData(packageName: string): Promise<PackageDa
   return {
     npm: npmData,
     downloads: downloadData,
-    github: githubData,
+    github: githubRawData,
   };
 }
 
 /**
- * Signal calculation functions that return raw numeric values
+ * Phase 2: Process raw data into final structured format organized by signal names
  */
-export function calculateWeeklyDownloads(packageData: PackageData): number {
-  return packageData.downloads.downloads;
-}
+function processPackageData(rawData: RawPackageData): PackageData {
+  // Process GitHub data directly in signals
+  let githubStars = 0;
+  let documentationCompleteness: DocumentationCompleteness = {
+    hasReadme: false,
+    hasApiDocs: false,
+    hasExamples: false,
+  };
 
-export function calculateGithubStars(packageData: PackageData): number {
-  return packageData.github.stars;
-}
+  if (rawData.github) {
+    const { stars, repoContents } = rawData.github;
+    githubStars = stars;
 
-export function calculateDocumentationCompleteness(packageData: PackageData): any {
+    // Process README existence - check if any file contains "README"
+    const hasReadme = Boolean(rawData.github.readmeContent);
+
+    // Process API documentation existence - check for docs directories and API files
+    const hasApiDocs = Object.keys(repoContents).some(path => {
+      const lowerPath = path.toLowerCase();
+      return lowerPath.includes('docs') ||
+        lowerPath.includes('documentation') ||
+        lowerPath.includes('api');
+    });
+
+    // Process examples existence - check for code blocks in README
+    const hasExamples = Boolean(rawData.github.readmeContent && rawData.github.readmeContent.includes('```'));
+
+    documentationCompleteness = {
+      hasReadme,
+      hasApiDocs,
+      hasExamples,
+    };
+  }
   return {
-    hasReadme: packageData.github.hasReadme,
-    hasApiDocs: packageData.github.hasApiDocs,
-    hasExamples: packageData.github.hasExamples,
+    version: rawData.npm.version,
+    weeklyDownloads: rawData.downloads.downloads,
+    githubStars: githubStars,
+    documentationCompleteness: documentationCompleteness,
   };
 }
 
-export const signalCalculators = {
-  weekly_downloads: calculateWeeklyDownloads,
-  github_stars: calculateGithubStars,
-  documentation_completeness: calculateDocumentationCompleteness,
-};
+/**
+ * Main entry point: Fetch and process package data
+ */
+export async function collectPackageData(packageName: string): Promise<PackageData> {
+  const rawData = await fetchAllData(packageName);
+  return processPackageData(rawData);
+}
 
 // Re-export types and classes for convenience
-export type { NpmPackageData, NpmDownloadData, GitHubData };
+export type { NpmPackageData, NpmDownloadData, DocumentationCompleteness };
 export { NpmCollector, GitHubCollector };

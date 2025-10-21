@@ -40,3 +40,16 @@ export interface ChecklistItem {
   readonly present: boolean;
   readonly value: number;
 }
+
+export type PackageData = {
+  readonly version: string;
+  readonly weeklyDownloads?: number;
+  readonly githubStars?: number;
+  readonly documentationCompleteness?: DocumentationCompleteness;
+} & Record<string, any>;
+
+export type DocumentationCompleteness = {
+  readonly hasReadme: boolean;
+  readonly hasApiDocs: boolean;
+  readonly hasExamples: boolean;
+};

@@ -1,8 +1,7 @@
-export interface GitHubData {
+export interface GitHubRawData {
   readonly stars: number;
-  readonly hasReadme: boolean;
-  readonly hasApiDocs: boolean;
-  readonly hasExamples: boolean;
+  readonly repoContents: Record<string, boolean>; // path -> exists
+  readonly readmeContent: string | null; // README file content
 }
 
 function extractRepoInfo(repositoryUrl: string): { owner: string; repo: string } | null {
@@ -25,11 +24,7 @@ function extractRepoInfo(repositoryUrl: string): { owner: string; repo: string }
 }
 
 export class GitHubCollector {
-  // Only store data that could be shared across multiple signals
-  private starCount?: number;
-  private hasReadme?: boolean;
-  private hasApiDocs?: boolean;
-  private hasExamples?: boolean;
+  private rawData?: GitHubRawData;
 
   async fetchPackage(repositoryUrl: string): Promise<void> {
     const repoInfo = extractRepoInfo(repositoryUrl);
@@ -38,80 +33,131 @@ export class GitHubCollector {
     }
 
     try {
+      // Fetch basic repo data
       const response = await fetch(`https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repo}`);
       if (!response.ok) {
         throw new Error(`GitHub API returned ${response.status}`);
       }
 
       const fullResponse = await response.json() as any;
-      this.starCount = fullResponse.stargazers_count || 0;
+      const starCount = fullResponse.stargazersCount || 0;
 
-      // Fetch documentation data
-      await this.fetchDocumentationData(repoInfo.owner, repoInfo.repo);
+      // Fetch all file/directory existence data
+      const repoContents = await this.fetchAllRepoContents(repoInfo.owner, repoInfo.repo);
+
+      // Fetch README content using the discovered files
+      const readmeContent = await this.fetchReadmeContent(repoInfo.owner, repoInfo.repo, repoContents);
+
+      this.rawData = {
+        stars: starCount,
+        repoContents,
+        readmeContent,
+      };
     } catch (error) {
       throw new Error(`GitHub fetch failed: ${error}`);
     }
   }
 
-  private async fetchDocumentationData(owner: string, repo: string): Promise<void> {
+  private async fetchAllRepoContents(owner: string, repo: string): Promise<Record<string, boolean>> {
+    const results: Record<string, boolean> = {};
+    const visitedPaths = new Set<string>();
+
     try {
-      // Check for README
-      this.hasReadme = await this.checkFileExists(owner, repo, 'README.md') ||
-                       await this.checkFileExists(owner, repo, 'README.rst') ||
-                       await this.checkFileExists(owner, repo, 'README.txt') ||
-                       await this.checkFileExists(owner, repo, 'README');
-
-      // Check for API documentation (common patterns)
-      this.hasApiDocs = await this.checkFileExists(owner, repo, 'docs/api.md') ||
-                        await this.checkFileExists(owner, repo, 'docs/API.md') ||
-                        await this.checkFileExists(owner, repo, 'API.md') ||
-                        await this.checkDirectoryExists(owner, repo, 'docs') ||
-                        await this.checkDirectoryExists(owner, repo, 'documentation');
-
-      // Check for examples
-      this.hasExamples = await this.checkDirectoryExists(owner, repo, 'examples') ||
-                         await this.checkDirectoryExists(owner, repo, 'example') ||
-                         await this.checkFileExists(owner, repo, 'examples.md') ||
-                         await this.checkFileExists(owner, repo, 'EXAMPLES.md');
+      // Start recursive fetch from root
+      await this.fetchDirectoryContentsRecursive(owner, repo, '', results, visitedPaths);
     } catch (error) {
-      // If documentation check fails, default to false
-      this.hasReadme = false;
-      this.hasApiDocs = false;
-      this.hasExamples = false;
+      console.warn(`Failed to fetch repository contents: ${error}`);
     }
+
+    return results;
   }
 
-  private async checkFileExists(owner: string, repo: string, path: string): Promise<boolean> {
-    try {
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
-      return response.ok;
-    } catch {
-      return false;
+  private async fetchDirectoryContentsRecursive(
+    owner: string,
+    repo: string,
+    path: string,
+    results: Record<string, boolean>,
+    visitedPaths: Set<string>,
+    maxDepth: number = 3,
+    currentDepth: number = 0,
+  ): Promise<void> {
+    // Prevent infinite recursion and limit depth, also should not need
+    // to recurse more than 3 layers for the  documentation?
+    if (currentDepth >= maxDepth || visitedPaths.has(path)) {
+      return;
     }
-  }
 
-  private async checkDirectoryExists(owner: string, repo: string, path: string): Promise<boolean> {
+    visitedPaths.add(path);
+
     try {
       const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
-      if (!response.ok) return false;
+      if (!response.ok) return;
 
       const data = await response.json() as any;
-      return Array.isArray(data) && data.length > 0;
-    } catch {
-      return false;
+      if (!Array.isArray(data)) return;
+
+      // Process all items in parallel
+      const directoryPromises: Promise<void>[] = [];
+
+      for (const item of data) {
+        const itemPath = path ? `${path}/${item.name}` : item.name;
+        results[itemPath] = true;
+
+        // Also add just the filename for easier matching
+        results[item.name] = true;
+
+        // If it's a directory, recursively fetch its contents
+        if (item.type === 'dir') {
+          directoryPromises.push(
+            this.fetchDirectoryContentsRecursive(
+              owner,
+              repo,
+              itemPath,
+              results,
+              visitedPaths,
+              maxDepth,
+              currentDepth + 1,
+            ),
+          );
+        }
+      }
+
+      // Wait for all subdirectory fetches to complete
+      await Promise.all(directoryPromises);
+    } catch (error) {
+      // Silently fail for individual directory fetches
     }
   }
 
-  getStarCount(): number {
-    return this.starCount || 0;
+  private async fetchReadmeContent(owner: string, repo: string, repoContents: Record<string, boolean>): Promise<string | null> {
+    // Find README file from the repository contents
+    const readmeFile = Object.keys(repoContents).find(path =>
+      path.toLowerCase().includes('readme') && !path.includes('/'),
+    );
+
+    if (!readmeFile) {
+      return null;
+    }
+
+    try {
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${readmeFile}`);
+      if (response.ok) {
+        const data = await response.json() as any;
+        if (data.content && data.encoding === 'base64') {
+          return atob(data.content);
+        }
+      }
+    } catch (error) {
+      console.warn(`Failed to fetch README content: ${error}`);
+    }
+
+    return null;
   }
 
-  getData(): GitHubData {
-    return {
-      stars: this.getStarCount(),
-      hasReadme: this.hasReadme ?? false,
-      hasApiDocs: this.hasApiDocs ?? false,
-      hasExamples: this.hasExamples ?? false,
-    };
+  getRawData(): GitHubRawData {
+    if (!this.rawData) {
+      throw new Error('Must call fetchPackage() first');
+    }
+    return this.rawData;
   }
 }

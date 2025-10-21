@@ -39,8 +39,8 @@ describe('CLI', () => {
       },
       signalScores: {
         POPULARITY: {
-          weekly_downloads: 4.2,
-          github_stars: 3.8,
+          weeklyDownloads: 4.2,
+          githubStars: 3.8,
         },
       },
     };

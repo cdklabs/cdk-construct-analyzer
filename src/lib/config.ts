@@ -1,5 +1,5 @@
 import { categorizeByBuckets, categorizeByChecklist } from './scoring';
-import type { Config } from './types';
+import type { Config, DocumentationCompleteness } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks
@@ -44,11 +44,12 @@ export const CONFIG: Config = {
           name: 'documentationCompleteness',
           weight: 3,
           description: 'Presence of README, API reference, and usage examples',
-          benchmarks: (docData: any) => categorizeByChecklist(
+          benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
             {
-              readme: { present: docData.hasReadme, value: 2 },
+              readme: { present: docData.hasReadme, value: 1 },
               apiDocs: { present: docData.hasApiDocs, value: 1 },
               examples: { present: docData.hasExamples, value: 1 },
+              multipleExamples: { present: docData.multipleExamples, value: 1 },
             },
           ),
         },

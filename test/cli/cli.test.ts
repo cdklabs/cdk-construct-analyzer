@@ -33,14 +33,14 @@ describe('CLI', () => {
     const mockResult = {
       packageName: 'test-package',
       version: '1.0.0',
-      totalScore: 85.5,
+      totalScore: 85,
       pillarScores: {
-        POPULARITY: 42.3,
+        POPULARITY: 42,
       },
       signalScores: {
         POPULARITY: {
-          weeklyDownloads: 4.2,
-          githubStars: 3.8,
+          weeklyDownloads: 4,
+          githubStars: 3,
         },
       },
     };
@@ -58,10 +58,10 @@ describe('CLI', () => {
     expect(mockAnalyzePackage).toHaveBeenCalledWith('test-package');
     expect(consoleSpy.log).toHaveBeenCalledWith('LIBRARY: test-package');
     expect(consoleSpy.log).toHaveBeenCalledWith('VERSION: 1.0.0');
-    expect(consoleSpy.log).toHaveBeenCalledWith('\nOVERALL SCORE: 85.5/100');
-    expect(consoleSpy.log).toHaveBeenCalledWith('  POPULARITY: 42.3');
-    expect(consoleSpy.log).toHaveBeenCalledWith('  Weekly Downloads: 4.2');
-    expect(consoleSpy.log).toHaveBeenCalledWith('  Github Stars: 3.8');
+    expect(consoleSpy.log).toHaveBeenCalledWith('\nOVERALL SCORE: 85/100');
+    expect(consoleSpy.log).toHaveBeenCalledWith('  POPULARITY: 42');
+    expect(consoleSpy.log).toHaveBeenCalledWith('  Weekly Downloads: 4');
+    expect(consoleSpy.log).toHaveBeenCalledWith('  Github Stars: 3');
   });
 
   test('should handle analyzer errors gracefully', async () => {

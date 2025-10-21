@@ -8,7 +8,7 @@ import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 interface RawPackageData {
   readonly npm: NpmPackageData;
   readonly downloads: NpmDownloadData;
-  readonly github: GitHubRawData | null;
+  readonly github?: GitHubRawData;
 }
 
 /**
@@ -24,23 +24,18 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   const npmData = npmCollector.getPackageData();
   const downloadData = await npmCollector.getDownloadData();
 
-  // Fetch GitHub raw data if repository URL exists
-  let githubRawData: GitHubRawData | null = null;
-  if (npmData.repository?.url) {
-    try {
-      await githubCollector.fetchPackage(npmData.repository.url);
-      githubRawData = githubCollector.getRawData();
-    } catch (error) {
-      console.warn(`GitHub fetch failed: ${error}`);
-    }
-  } else {
-    console.log('No repository URL found in NPM data');
+  let githubRawData;
+  try {
+    await githubCollector.fetchPackage(npmData.repository.url);
+    githubRawData = githubCollector.getRawData();
+  } catch (error) {
+    console.warn(`GitHub fetch failed: ${error}`);
   }
 
   return {
     npm: npmData,
     downloads: downloadData,
-    github: githubRawData,
+    ...(githubRawData && { github: githubRawData }),
   };
 }
 
@@ -49,42 +44,38 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
  */
 function processPackageData(rawData: RawPackageData): PackageData {
   // Process GitHub data directly in signals
-  let githubStars = 0;
-  let documentationCompleteness: DocumentationCompleteness = {
-    hasReadme: false,
-    hasApiDocs: false,
-    hasExamples: false,
-  };
-
-  if (rawData.github) {
-    const { repoData, repoContents, readmeContent } = rawData.github;
-    githubStars = repoData.stargazers_count || 0;
-
-    // Process README existence - check if any file contains "README"
-    const hasReadme = Boolean(readmeContent);
-
-    // Process API documentation existence - check for docs directories and API files
-    const hasApiDocs = Object.keys(repoContents).some(path => {
-      const lowerPath = path.toLowerCase();
-      return lowerPath.includes('docs') ||
-        lowerPath.includes('documentation') ||
-        lowerPath.includes('api');
-    });
-
-    // Process examples existence - check for code blocks in README
-    const hasExamples = Boolean(rawData.github.readmeContent && rawData.github.readmeContent.includes('```'));
-
-    documentationCompleteness = {
-      hasReadme,
-      hasApiDocs,
-      hasExamples,
-    };
+  if (!rawData.github) {
+    return { version: rawData.npm.version };
   }
+
+  const { repoData, repoContents, readmeContent } = rawData.github;
+
+  // Process README existence - check if any file contains the word "readme", case-insensitive
+  const hasReadme = Boolean(readmeContent);
+
+  // Process API documentation existence - check for docs directories and API files
+  const hasApiDocs = Object.keys(repoContents).some(path => {
+    const lowercasePath = path.toLowerCase();
+    return ['docs', 'documentation', 'api'].includes(lowercasePath);
+  });
+
+  // Process examples existence - check for code blocks in README
+  const numBackticks = (rawData.github.readmeContent?.match(/```/g) || []).length;
+
+  const numExamples = Math.floor(numBackticks / 2);
+  const hasExamples = numExamples > 0;
+  const multipleExamples = numExamples > 1;
+
   return {
     version: rawData.npm.version,
     weeklyDownloads: rawData.downloads.downloads,
-    githubStars: githubStars,
-    documentationCompleteness: documentationCompleteness,
+    githubStars: repoData.stargazers_count || 0,
+    documentationCompleteness: {
+      hasReadme,
+      hasApiDocs,
+      hasExamples,
+      multipleExamples,
+    },
   };
 }
 

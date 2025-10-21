@@ -59,11 +59,19 @@ export class GitHubCollector {
 
   private async fetchAllRepoContents(owner: string, repo: string): Promise<Record<string, boolean>> {
     const results: Record<string, boolean> = {};
-    const visitedPaths = new Set<string>();
 
     try {
-      // Start recursive fetch from root
-      await this.fetchDirectoryContentsRecursive(owner, repo, '', results, visitedPaths);
+      // Only fetch root directory contents - documentation should be easily discoverable
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`);
+      if (!response.ok) return results;
+
+      const data = await response.json() as any;
+      if (!Array.isArray(data)) return results;
+
+      // Process all items in the root directory
+      for (const item of data) {
+        results[item.name] = true;
+      }
     } catch (error) {
       console.warn(`Failed to fetch repository contents: ${error}`);
     }
@@ -71,67 +79,10 @@ export class GitHubCollector {
     return results;
   }
 
-  private async fetchDirectoryContentsRecursive(
-    owner: string,
-    repo: string,
-    path: string,
-    results: Record<string, boolean>,
-    visitedPaths: Set<string>,
-    maxDepth: number = 3,
-    currentDepth: number = 0,
-  ): Promise<void> {
-    // Prevent infinite recursion and limit depth, also should not need
-    // to recurse more than 3 layers for the  documentation?
-    if (currentDepth >= maxDepth || visitedPaths.has(path)) {
-      return;
-    }
-
-    visitedPaths.add(path);
-
-    try {
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
-      if (!response.ok) return;
-
-      const data = await response.json() as any;
-      if (!Array.isArray(data)) return;
-
-      // Process all items in parallel
-      const directoryPromises: Promise<void>[] = [];
-
-      for (const item of data) {
-        const itemPath = path ? `${path}/${item.name}` : item.name;
-        results[itemPath] = true;
-
-        // Also add just the filename for easier matching
-        results[item.name] = true;
-
-        // If it's a directory, recursively fetch its contents
-        if (item.type === 'dir') {
-          directoryPromises.push(
-            this.fetchDirectoryContentsRecursive(
-              owner,
-              repo,
-              itemPath,
-              results,
-              visitedPaths,
-              maxDepth,
-              currentDepth + 1,
-            ),
-          );
-        }
-      }
-
-      // Wait for all subdirectory fetches to complete
-      await Promise.all(directoryPromises);
-    } catch (error) {
-      // Silently fail for individual directory fetches
-    }
-  }
-
   private async fetchReadmeContent(owner: string, repo: string, repoContents: Record<string, boolean>): Promise<string | null> {
-    // Find README file from the repository contents
-    const readmeFile = Object.keys(repoContents).find(path =>
-      path.toLowerCase().includes('readme') && !path.includes('/'),
+    // Find README file from the root directory contents
+    const readmeFile = Object.keys(repoContents).find(filename =>
+      filename.toLowerCase().includes('readme'),
     );
 
     if (!readmeFile) {

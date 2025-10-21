@@ -52,4 +52,5 @@ export type DocumentationCompleteness = {
   readonly hasReadme: boolean;
   readonly hasApiDocs: boolean;
   readonly hasExamples: boolean;
+  readonly multipleExamples: boolean;
 };

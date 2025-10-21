@@ -22,7 +22,7 @@ describe('GitHubCollector', () => {
       // Mock all fetch calls to return empty/default responses
       mockedFetch.mockResolvedValue({
         ok: true,
-        json: async () => ({ stargazersCount: 100 }),
+        json: async () => ({ stargazers_count: 100 }),
       } as Response);
 
       await collector.fetchPackage('https://github.com/test/repo');
@@ -61,7 +61,7 @@ describe('GitHubCollector', () => {
       mockedFetch
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => ({ stargazersCount: 500 }),
+          json: async () => ({ stargazers_count: 500 }),
         } as Response)
         .mockResolvedValueOnce({
           ok: true,

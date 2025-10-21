@@ -40,7 +40,7 @@ export class GitHubCollector {
       }
 
       const fullResponse = await response.json() as any;
-      const starCount = fullResponse.stargazersCount || 0;
+      const starCount = fullResponse.stargazers_count || 0;
 
       // Fetch all file/directory existence data
       const repoContents = await this.fetchAllRepoContents(repoInfo.owner, repoInfo.repo);

@@ -32,7 +32,6 @@ describe('GitHubRepo', () => {
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo');
       expect(result).toEqual({
         data: mockData,
-        status: 200,
       });
     });
 
@@ -46,7 +45,6 @@ describe('GitHubRepo', () => {
 
       expect(result).toEqual({
         error: 'GitHub API returned 404 for https://api.github.com/repos/cdklabs/test-repo',
-        status: 404,
       });
     });
   });
@@ -65,7 +63,6 @@ describe('GitHubRepo', () => {
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo/contents/');
       expect(result).toEqual({
         data: mockData,
-        status: 200,
       });
     });
 
@@ -82,7 +79,6 @@ describe('GitHubRepo', () => {
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo/contents/src');
       expect(result).toEqual({
         data: mockData,
-        status: 200,
       });
     });
 
@@ -96,7 +92,6 @@ describe('GitHubRepo', () => {
 
       expect(result).toEqual({
         error: 'GitHub API returned 404 for https://api.github.com/repos/cdklabs/test-repo/contents/nonexistent',
-        status: 404,
       });
     });
   });

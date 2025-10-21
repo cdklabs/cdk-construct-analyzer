@@ -1,7 +1,6 @@
 export interface GitHubApiResponse {
   data?: any;
   error?: string;
-  status?: number;
 }
 
 export class GitHubRepo {
@@ -27,12 +26,11 @@ export class GitHubRepo {
       if (!response.ok) {
         return {
           error: `GitHub API returned ${response.status} for ${url}`,
-          status: response.status,
         };
       }
 
       const data = await response.json();
-      return { data, status: response.status };
+      return { data };
     } catch (error) {
       return {
         error: `Network error: ${error instanceof Error ? error.message : 'Unknown error'}`,

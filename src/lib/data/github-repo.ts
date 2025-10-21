@@ -1,5 +1,5 @@
-export interface GitHubApiResponse<T = any> {
-  data?: T;
+export interface GitHubApiResponse {
+  data?: any;
   error?: string;
   status?: number;
 }
@@ -15,10 +15,6 @@ export class GitHubRepo {
     return this.fetchWithErrorHandling(this.baseUrl);
   }
 
-  async file(filePath: string): Promise<GitHubApiResponse> {
-    return this.fetchWithErrorHandling(`${this.baseUrl}/contents/${filePath}`);
-  }
-
   async contents(path: string = ''): Promise<GitHubApiResponse> {
     const url = path ? `${this.baseUrl}/contents/${path}` : `${this.baseUrl}/contents/`;
     return this.fetchWithErrorHandling(url);
@@ -30,7 +26,7 @@ export class GitHubRepo {
 
       if (!response.ok) {
         return {
-          error: `GitHub API returned ${response.status}`,
+          error: `GitHub API returned ${response.status} for ${url}`,
           status: response.status,
         };
       }

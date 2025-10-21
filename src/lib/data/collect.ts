@@ -57,11 +57,11 @@ function processPackageData(rawData: RawPackageData): PackageData {
   };
 
   if (rawData.github) {
-    const { stars, repoContents } = rawData.github;
-    githubStars = stars;
+    const { repoData, repoContents, readmeContent } = rawData.github;
+    githubStars = repoData.stargazers_count || 0;
 
     // Process README existence - check if any file contains "README"
-    const hasReadme = Boolean(rawData.github.readmeContent);
+    const hasReadme = Boolean(readmeContent);
 
     // Process API documentation existence - check for docs directories and API files
     const hasApiDocs = Object.keys(repoContents).some(path => {

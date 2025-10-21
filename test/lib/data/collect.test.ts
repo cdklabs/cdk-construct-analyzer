@@ -23,7 +23,9 @@ describe('collectPackageData', () => {
   };
 
   const mockGitHubRawData = {
-    stars: 500,
+    repoData: {
+      stargazers_count: 500,
+    },
     repoContents: {
       'README.md': true,
       'docs': true,
@@ -91,7 +93,11 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getRawData: jest.fn().mockReturnValue({ stars: 0, repoContents: {}, readmeContent: null }),
+      getRawData: jest.fn().mockReturnValue({
+        repoData: { stargazers_count: 0 },
+        repoContents: {},
+        readmeContent: null,
+      }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -123,7 +129,11 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
-      getRawData: jest.fn().mockReturnValue({ stars: 0, repoContents: {}, readmeContent: null }),
+      getRawData: jest.fn().mockReturnValue({
+        repoData: { stargazers_count: 0 },
+        repoContents: {},
+        readmeContent: null,
+      }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);

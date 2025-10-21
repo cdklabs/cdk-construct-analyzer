@@ -1,5 +1,5 @@
 export interface GitHubRawData {
-  readonly stars: number;
+  readonly repoData: any; // Full GitHub API response
   readonly repoContents: Record<string, boolean>; // path -> exists
   readonly readmeContent: string | null; // README file content
 }
@@ -39,8 +39,7 @@ export class GitHubCollector {
         throw new Error(`GitHub API returned ${response.status}`);
       }
 
-      const fullResponse = await response.json() as any;
-      const starCount = fullResponse.stargazers_count || 0;
+      const repoData = await response.json() as any;
 
       // Fetch all file/directory existence data
       const repoContents = await this.fetchAllRepoContents(repoInfo.owner, repoInfo.repo);
@@ -49,7 +48,7 @@ export class GitHubCollector {
       const readmeContent = await this.fetchReadmeContent(repoInfo.owner, repoInfo.repo, repoContents);
 
       this.rawData = {
-        stars: starCount,
+        repoData,
         repoContents,
         readmeContent,
       };

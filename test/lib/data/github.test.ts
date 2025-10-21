@@ -75,7 +75,7 @@ describe('GitHubCollector', () => {
       await collector.fetchPackage('https://github.com/test/repo');
 
       const rawData = collector.getRawData();
-      expect(rawData.stars).toBe(500);
+      expect(rawData.repoData.stargazers_count).toBe(500);
       expect(rawData.repoContents).toBeDefined();
       expect(rawData.readmeContent).toBe('# Test');
     });

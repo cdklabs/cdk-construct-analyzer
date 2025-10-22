@@ -1,5 +1,4 @@
 import { ConstructAnalyzer } from '../../src/lib/analyzer';
-import { CONFIG } from '../../src/lib/config';
 import { collectPackageData } from '../../src/lib/data/collect';
 
 // Mock dependencies
@@ -19,8 +18,6 @@ describe('ConstructAnalyzer', () => {
     },
   };
 
-  // Get all pillars from the new config structure
-  const enabledPillars = CONFIG.pillars.map(pillar => pillar.name);
 
   beforeEach(() => {
     jest.clearAllMocks();

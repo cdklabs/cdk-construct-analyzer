@@ -32,6 +32,23 @@ describe('collectPackageData', () => {
       'examples': true,
     },
     readmeContent: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
+    contributorsData: [
+      {
+        author: { login: 'user1' },
+        committer: { login: 'user1' },
+        commit: { message: 'Add new feature' },
+      },
+      {
+        author: { login: 'user2' },
+        committer: { login: 'user2' },
+        commit: { message: 'Fix bug' },
+      },
+      {
+        author: { login: 'dependabot[bot]' },
+        committer: { login: 'dependabot[bot]' },
+        commit: { message: 'chore(deps): bump version' },
+      },
+    ],
   };
 
   beforeEach(() => {
@@ -75,6 +92,7 @@ describe('collectPackageData', () => {
       version: '1.0.0',
       weeklyDownloads: 10000,
       githubStars: 500,
+      contributorsLastMonth: 2, // user1 and user2, excluding dependabot
       documentationCompleteness: {
         hasReadme: true,
         hasApiDocs: true,
@@ -96,7 +114,6 @@ describe('collectPackageData', () => {
       getRawData: jest.fn().mockReturnValue({
         repoData: { stargazers_count: 0 },
         repoContents: {},
-        readmeContent: null,
       }),
     };
 

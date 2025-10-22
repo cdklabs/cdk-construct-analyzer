@@ -26,14 +26,14 @@ describe('GitHubCollector', () => {
         json: async () => ({ stargazers_count: 100 }),
       } as Response);
 
-      const repo1 = new GitHubRepo('test', 'repo');
+      const repo1 = new GitHubRepo('cdklabs', 'repo1');
       await collector.fetchPackage(repo1);
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/test/repo');
+      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/repo1');
 
       jest.clearAllMocks();
-      const repo2 = new GitHubRepo('facebook', 'react');
+      const repo2 = new GitHubRepo('cdklabs', 'repo2');
       await collector.fetchPackage(repo2);
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/facebook/react');
+      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/repo2');
     });
 
     test('should handle API errors', async () => {
@@ -80,32 +80,41 @@ describe('GitHubCollector', () => {
     });
   });
 
-  describe('getContributorsLastMonth', () => {
-    test('should count contributors excluding bots', async () => {
+  describe('contributors data fetching', () => {
+    test('should fetch contributors data and include it in raw data', async () => {
       const mockRepoResponse = { stargazers_count: 100 };
+      const mockContentsResponse = [{ name: 'README.md', type: 'file' }];
+      const mockReadmeResponse = { content: btoa('# Test'), encoding: 'base64' };
       const mockCommitsResponse = [
         { author: { login: 'user1' }, commit: { message: 'Add feature' } },
         { author: { login: 'user2' }, commit: { message: 'Fix bug' } },
         { author: { login: 'dependabot[bot]' }, commit: { message: 'chore(deps): bump version' } },
       ];
 
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockRepoResponse,
-      } as Response);
+      mockedFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockRepoResponse,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockContentsResponse,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockReadmeResponse,
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockCommitsResponse,
+        } as Response);
 
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockCommitsResponse,
-      } as Response);
+      const repo = new GitHubRepo('test', 'repo');
+      await collector.fetchPackage(repo);
 
-      await collector.fetchPackage('https://github.com/test/repo');
-
-      expect(collector.getContributorsLastMonth()).toBe(2); // Should exclude bot
-    });
-
-    test('should return 0 if no data fetched', () => {
-      expect(collector.getContributorsLastMonth()).toBe(0);
+      const rawData = collector.getRawData();
+      expect(rawData.contributorsData).toBeDefined();
+      expect(rawData.contributorsData).toHaveLength(3);
     });
   });
 });

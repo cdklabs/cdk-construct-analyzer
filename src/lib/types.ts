@@ -45,6 +45,7 @@ export type PackageData = {
   readonly version: string;
   readonly weeklyDownloads?: number;
   readonly githubStars?: number;
+  readonly contributorsLastMonth?: number;
   readonly documentationCompleteness?: DocumentationCompleteness;
 } & Record<string, any>;
 

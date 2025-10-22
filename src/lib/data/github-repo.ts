@@ -19,6 +19,14 @@ export class GitHubRepo {
     return this.fetchWithErrorHandling(url);
   }
 
+  async commits(since?: string, perPage: number = 100): Promise<GitHubApiResponse> {
+    let url = `${this.baseUrl}/commits?per_page=${perPage}`;
+    if (since) {
+      url += `&since=${since}`;
+    }
+    return this.fetchWithErrorHandling(url);
+  }
+
   private async fetchWithErrorHandling(url: string): Promise<GitHubApiResponse> {
     try {
       const response = await fetch(url);

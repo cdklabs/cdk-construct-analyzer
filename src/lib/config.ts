@@ -12,9 +12,28 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'number_of_contributors_maintenance',
-          weight: 2.0,
+          weight: 2,
           description: 'Number of Contributors in the past month',
           benchmarks: (contributors: number) => categorizeByBuckets([4, 3, 1, 1], contributors),
+        },
+      ],
+    },
+    {
+      name: 'QUALITY',
+      description: 'Measures the overall quality and reliability of the package',
+      signals: [
+        {
+          name: 'documentationCompleteness',
+          weight: 3,
+          description: 'Presence of README, API reference, and usage examples',
+          benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
+            {
+              readme: { present: docData.hasReadme, value: 1 },
+              apiDocs: { present: docData.hasApiDocs, value: 1 },
+              oneExample: { present: docData.hasExample, value: 1 },
+              multipleExamples: { present: docData.multipleExamples, value: 1 },
+            },
+          ),
         },
       ],
     },
@@ -36,40 +55,9 @@ export const CONFIG: Config = {
         },
         {
           name: 'number_of_contributors_popularity',
-          weight: 1.0,
+          weight: 1,
           description: 'Number of Contributors in the past month',
           benchmarks: (contributors: number) => categorizeByBuckets([4, 3, 1, 1], contributors),
-        },
-      ],
-    },
-    // {
-    //   name: 'MAINTENANCE',
-    //   description: 'Measures how actively maintained and updated the package is',
-    //   signals: [
-    //     {
-    //       name: 'timeToFirstResponse',
-    //       weight: 3,
-    //       description: 'Time to first response on issues',
-    //       benchmarks: function,
-    //     },
-    //   ],
-    // },
-    {
-      name: 'QUALITY',
-      description: 'Measures the overall quality and reliability of the package',
-      signals: [
-        {
-          name: 'documentationCompleteness',
-          weight: 3,
-          description: 'Presence of README, API reference, and usage examples',
-          benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
-            {
-              readme: { present: docData.hasReadme, value: 1 },
-              apiDocs: { present: docData.hasApiDocs, value: 1 },
-              oneExample: { present: docData.hasExample, value: 1 },
-              multipleExamples: { present: docData.multipleExamples, value: 1 },
-            },
-          ),
         },
       ],
     },

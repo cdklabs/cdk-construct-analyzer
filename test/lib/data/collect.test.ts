@@ -78,7 +78,7 @@ describe('collectPackageData', () => {
       documentationCompleteness: {
         hasReadme: true,
         hasApiDocs: true,
-        hasExamples: true,
+        hasExample: true,
         multipleExamples: true,
       },
     });
@@ -105,7 +105,7 @@ describe('collectPackageData', () => {
 
     const result = await collectPackageData('test-package');
 
-    // expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: Error: GitHub API error');
+    expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: Error: GitHub API error');
 
     expect(result).toEqual({
       version: '1.0.0',

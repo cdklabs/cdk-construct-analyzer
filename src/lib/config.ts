@@ -48,7 +48,7 @@ export const CONFIG: Config = {
             {
               readme: { present: docData.hasReadme, value: 1 },
               apiDocs: { present: docData.hasApiDocs, value: 1 },
-              examples: { present: docData.hasExamples, value: 1 },
+              oneExample: { present: docData.hasExample, value: 1 },
               multipleExamples: { present: docData.multipleExamples, value: 1 },
             },
           ),

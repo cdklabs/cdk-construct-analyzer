@@ -51,6 +51,6 @@ export type PackageData = {
 export type DocumentationCompleteness = {
   readonly hasReadme: boolean;
   readonly hasApiDocs: boolean;
-  readonly hasExamples: boolean;
+  readonly hasExample: boolean;
   readonly multipleExamples: boolean;
 };

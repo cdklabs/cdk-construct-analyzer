@@ -65,20 +65,20 @@ function processPackageData(rawData: RawPackageData): PackageData {
   });
 
   // Process examples existence - check for code blocks in README
-  const numBackticks = (rawData.github.readmeContent?.match(/```/g) || []).length;
+  const numBackticks = (rawData.github.readmeContent?.match(/```/g) ?? []).length;
 
   const numExamples = Math.floor(numBackticks / 2);
-  const hasExamples = numExamples > 0;
+  const hasExample = numExamples > 0;
   const multipleExamples = numExamples > 1;
 
   return {
     version: rawData.npm.version,
     weeklyDownloads: rawData.downloads.downloads,
-    githubStars: repoData.stargazers_count || 0,
+    githubStars: repoData.stargazers_count ?? 0,
     documentationCompleteness: {
       hasReadme,
       hasApiDocs,
-      hasExamples,
+      hasExample,
       multipleExamples,
     },
   };

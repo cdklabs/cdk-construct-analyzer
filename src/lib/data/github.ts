@@ -45,14 +45,14 @@ export class GitHubCollector {
     return repoContents;
   }
 
-  private async fetchReadmeContent(githubRepo: GitHubRepo, repoContents: Record<string, boolean>): Promise<string | null> {
+  private async fetchReadmeContent(githubRepo: GitHubRepo, repoContents: Record<string, boolean>): Promise<string | undefined> {
     try {
       const readmeFile = Object.keys(repoContents).find(filename =>
         filename.toLowerCase().startsWith('readme'),
       );
 
       if (!readmeFile) {
-        return null;
+        return undefined;
       }
 
       const response = await githubRepo.contents(readmeFile);
@@ -60,10 +60,10 @@ export class GitHubCollector {
         return atob(response.data.content);
       }
 
-      return null;
+      return undefined;
     } catch (error) {
       console.warn(`Failed to fetch README: ${error}`);
-      return null;
+      return undefined;
     }
   }
 

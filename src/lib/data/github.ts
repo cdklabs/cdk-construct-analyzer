@@ -72,12 +72,10 @@ export class GitHubCollector {
 
   private async fetchContributorsLastMonth(githubRepo: GitHubRepo): Promise<any[] | undefined> {
     try {
-      // Calculate date one month ago
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
       const since = oneMonthAgo.toISOString();
 
-      // Fetch commits from the past month using GitHubRepo method
       const response = await githubRepo.commits(since);
 
       if (response.error) {

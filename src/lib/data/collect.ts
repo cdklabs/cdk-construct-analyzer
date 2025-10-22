@@ -119,7 +119,7 @@ export function extractRepoInfo(repositoryUrl: string): { owner: string; repo: s
 /**
  * Process contributors data to count unique human contributors from the last month
  */
-function processContributorsData(contributorsData?: any[]): number {
+export function processContributorsData(contributorsData?: any[]): number {
   if (!contributorsData?.length) {
     return 0;
   }
@@ -149,8 +149,7 @@ function processContributorsData(contributorsData?: any[]): number {
 /**
  * Check if a username or commit message indicates bot/automated activity
  */
-function isBotOrAutomated(username: string, commitMessage: string): boolean {
-  // Common bot patterns in usernames
+export function isBotOrAutomated(username: string, commitMessage: string): boolean {
   const botPatterns = [
     /bot$/i,
     /\[bot\]$/i,
@@ -161,7 +160,6 @@ function isBotOrAutomated(username: string, commitMessage: string): boolean {
     return true;
   }
 
-  // Common automated commit message patterns
   const automatedMessagePatterns = [
     /^chore\(deps\):/i,
     /^bump version/i,

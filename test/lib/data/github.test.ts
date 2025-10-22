@@ -82,13 +82,13 @@ describe('GitHubCollector', () => {
 
   describe('contributors data fetching', () => {
     test('should fetch contributors data and include it in raw data', async () => {
-      const mockRepoResponse = { stargazers_count: 100 };
-      const mockContentsResponse = [{ name: 'README.md', type: 'file' }];
-      const mockReadmeResponse = { content: btoa('# Test'), encoding: 'base64' };
+      const mockRepoResponse = {stargazers_count: 100};
+      const mockContentsResponse = [{name: 'README.md', type: 'file'}];
+      const mockReadmeResponse = {content: btoa('# Test'), encoding: 'base64'};
       const mockCommitsResponse = [
-        { author: { login: 'user1' }, commit: { message: 'Add feature' } },
-        { author: { login: 'user2' }, commit: { message: 'Fix bug' } },
-        { author: { login: 'dependabot[bot]' }, commit: { message: 'chore(deps): bump version' } },
+        {author: {login: 'user1'}, commit: {message: 'Add feature' }},
+        {author: {login: 'user2'}, commit: {message: 'Fix bug' }},
+        {author: {login:'dependabot[bot]'}, commit: {message: 'chore(deps): bump version'}},
       ];
 
       mockedFetch

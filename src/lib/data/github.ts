@@ -1,7 +1,9 @@
+import { GitHubRepo } from './github-repo';
+
 export interface GitHubRawData {
   readonly repoData: any; // Full GitHub API response
   readonly repoContents: Record<string, boolean>; // path -> exists
-  readonly readmeContent: string | null; // README file content
+  readonly readmeContent?: string; // README file content
 }
 
 function extractRepoInfo(repositoryUrl: string): { owner: string; repo: string } | null {
@@ -35,19 +37,35 @@ export class GitHubCollector {
     const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
 
     try {
-      // Fetch basic repo data
-      const response = await fetch(`https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repo}`);
-      if (!response.ok) {
-        throw new Error(`GitHub API returned ${response.status}`);
+      const metadataResponse = await githubRepo.metadata();
+      if (metadataResponse.error) {
+        throw new Error(metadataResponse.error);
       }
 
-      const repoData = await response.json() as any;
+      const repoData = metadataResponse.data;
 
-      // Fetch all file/directory existence data
-      const repoContents = await this.fetchAllRepoContents(repoInfo.owner, repoInfo.repo);
+      // Fetch all root directory contents
+      const contentsResponse = await githubRepo.contents();
+      const repoContents: Record<string, boolean> = {};
 
-      // Fetch README content using the discovered files
-      const readmeContent = await this.fetchReadmeContent(repoInfo.owner, repoInfo.repo, repoContents);
+      if (!contentsResponse.error && Array.isArray(contentsResponse.data)) {
+        for (const item of contentsResponse.data) {
+          repoContents[item.name] = true;
+        }
+      }
+
+      // Find and fetch README content
+      const readmeFile = Object.keys(repoContents).find(filename =>
+        filename.toLowerCase().includes('readme'),
+      );
+
+      let readmeContent;
+      if (readmeFile) {
+        const fileResponse = await githubRepo.contents(readmeFile);
+        if (!fileResponse.error && fileResponse.data?.content && fileResponse.data?.encoding === 'base64') {
+          readmeContent = atob(fileResponse.data.content);
+        }
+      }
 
       this.rawData = {
         repoData,
@@ -57,53 +75,6 @@ export class GitHubCollector {
     } catch (error) {
       throw new Error(`GitHub fetch failed: ${error}`);
     }
-  }
-
-  private async fetchAllRepoContents(owner: string, repo: string): Promise<Record<string, boolean>> {
-    const results: Record<string, boolean> = {};
-
-    try {
-      // Only fetch root directory contents - documentation should be easily discoverable
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/`);
-      if (!response.ok) return results;
-
-      const data = await response.json() as any;
-      if (!Array.isArray(data)) return results;
-
-      // Process all items in the root directory
-      for (const item of data) {
-        results[item.name] = true;
-      }
-    } catch (error) {
-      console.warn(`Failed to fetch repository contents: ${error}`);
-    }
-
-    return results;
-  }
-
-  private async fetchReadmeContent(owner: string, repo: string, repoContents: Record<string, boolean>): Promise<string | null> {
-    // Find README file from the root directory contents
-    const readmeFile = Object.keys(repoContents).find(filename =>
-      filename.toLowerCase().includes('readme'),
-    );
-
-    if (!readmeFile) {
-      return null;
-    }
-
-    try {
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${readmeFile}`);
-      if (response.ok) {
-        const data = await response.json() as any;
-        if (data.content && data.encoding === 'base64') {
-          return atob(data.content);
-        }
-      }
-    } catch (error) {
-      console.warn(`Failed to fetch README content: ${error}`);
-    }
-
-    return null;
   }
 
   getRawData(): GitHubRawData {

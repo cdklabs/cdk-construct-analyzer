@@ -29,5 +29,5 @@ export function categorizeByChecklist<T extends Record<string, ChecklistItem>>(
     return sum + (item.present ? item.value : 0);
   }, 0);
 
-  return totalScore + 1; // 1 star by default
+  return Math.max(1, Math.min(totalScore + 1, 5)); // min 1, max 5
 }

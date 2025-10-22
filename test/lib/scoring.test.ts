@@ -64,5 +64,27 @@ describe('scoring functions', () => {
       // Score: 1 + 1 + 1 + 1 = 4, plus default 1 = 5
       expect(categorizeByChecklist(checklist)).toBe(5);
     });
+
+    test('should cap score at maximum of 5', () => {
+      const checklist: Record<string, ChecklistItem> = {
+        feature1: { present: true, value: 3 },
+        feature2: { present: true, value: 3 },
+        feature3: { present: true, value: 3 },
+      };
+
+      // Score: 3 + 3 + 3 = 9, plus default 1 = 10, but capped at 5
+      expect(categorizeByChecklist(checklist)).toBe(5);
+    });
+
+    test('should handle negative values and ensure minimum of 1', () => {
+      const checklist: Record<string, ChecklistItem> = {
+        negativeFeature: { present: true, value: -2 },
+        anotherNegative: { present: true, value: -3 },
+        positiveFeature: { present: true, value: 4 },
+        anotherPositive: { present: false, value: 5 },
+      };
+
+      expect(categorizeByChecklist(checklist)).toBe(1);
+    });
   });
 });

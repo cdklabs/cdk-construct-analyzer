@@ -78,7 +78,7 @@ export class GitHubCollector {
       const since = oneMonthAgo.toISOString();
 
       // Fetch commits from the past month using GitHubRepo method
-      const response = await githubRepo.commits(since, 100);
+      const response = await githubRepo.commits(since);
 
       if (response.error) {
         console.warn(`Failed to fetch commits: ${response.error}`);

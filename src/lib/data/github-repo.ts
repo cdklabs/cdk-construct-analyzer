@@ -4,6 +4,8 @@ export interface GitHubApiResponse {
 }
 
 export class GitHubRepo {
+  private static readonly MAX_COMMITS_TO_FETCH = 100;
+
   private readonly baseUrl: string;
 
   constructor(readonly owner: string, readonly repo: string) {
@@ -19,7 +21,7 @@ export class GitHubRepo {
     return this.fetchWithErrorHandling(url);
   }
 
-  async commits(since?: string, perPage: number = 100): Promise<GitHubApiResponse> {
+  async commits(since?: string, perPage: number = GitHubRepo.MAX_COMMITS_TO_FETCH): Promise<GitHubApiResponse> {
     let url = `${this.baseUrl}/commits?per_page=${perPage}`;
     if (since) {
       url += `&since=${since}`;

@@ -76,15 +76,16 @@ function processPackageData(rawData: RawPackageData): PackageData {
 
   return {
     version: rawData.npm.version,
-    weeklyDownloads: rawData.downloads.downloads,
-    githubStars: repoData.stargazers_count ?? 0,
-    contributorsLastMonth,
+    numberOfContributorsMaintenance: contributorsLastMonth,
     documentationCompleteness: {
       hasReadme,
       hasApiDocs,
       hasExample,
       multipleExamples,
     },
+    weeklyDownloads: rawData.downloads.downloads,
+    githubStars: repoData.stargazers_count ?? 0,
+    numberOfContributorsPopularity: contributorsLastMonth,
   };
 }
 
@@ -119,31 +120,25 @@ export function extractRepoInfo(repositoryUrl: string): { owner: string; repo: s
  * Process contributors data to count unique human contributors from the last month
  */
 function processContributorsData(contributorsData?: any[]): number {
-  if (!contributorsData || !Array.isArray(contributorsData)) {
+  if (!contributorsData?.length) {
     return 0;
   }
 
-  // Extract unique contributors, excluding bots and automated commits
   const contributors = new Set<string>();
 
   for (const commit of contributorsData) {
-    const author = commit.author;
-    const committer = commit.committer;
+    const { author, committer, commit: commitData } = commit;
+    const message = commitData?.message ?? '';
 
-    // Skip if no author info
-    if (!author?.login) continue;
-
-    // Skip bots and automated accounts
-    if (isBotOrAutomated(author.login, commit.commit?.message ?? '')) {
-      continue;
+    // Process author
+    if (author?.login && !isBotOrAutomated(author.login, message)) {
+      contributors.add(author.login);
     }
 
-    contributors.add(author.login);
-
-    // Also count committer if different from author and not a bot
+    // Process committer if different from author
     if (committer?.login &&
-        committer.login !== author.login &&
-        !isBotOrAutomated(committer.login, commit.commit?.message ?? '')) {
+        committer.login !== author?.login &&
+        !isBotOrAutomated(committer.login, message)) {
       contributors.add(committer.login);
     }
   }
@@ -159,19 +154,9 @@ function isBotOrAutomated(username: string, commitMessage: string): boolean {
   const botPatterns = [
     /bot$/i,
     /\[bot\]$/i,
-    /^dependabot/i,
-    /^renovate/i,
-    /^greenkeeper/i,
-    /^snyk-bot/i,
-    /^github-actions/i,
-    /^codecov/i,
-    /^semantic-release/i,
     /^automation/i,
-    /^ci-/i,
-    /^auto-/i,
   ];
 
-  // Check username patterns
   if (botPatterns.some(pattern => pattern.test(username))) {
     return true;
   }
@@ -179,16 +164,11 @@ function isBotOrAutomated(username: string, commitMessage: string): boolean {
   // Common automated commit message patterns
   const automatedMessagePatterns = [
     /^chore\(deps\):/i,
-    /^chore\(release\):/i,
     /^bump version/i,
     /^update dependencies/i,
-    /^automated/i,
-    /^auto-/i,
-    /^\d+\.\d+\.\d+$/, // Version numbers only
-    /^release \d+\.\d+\.\d+/i,
+    /^auto/i,
   ];
 
-  // Check commit message patterns
   if (automatedMessagePatterns.some(pattern => pattern.test(commitMessage.trim()))) {
     return true;
   }

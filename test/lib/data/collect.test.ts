@@ -90,15 +90,16 @@ describe('collectPackageData', () => {
 
     expect(result).toEqual({
       version: '1.0.0',
-      weeklyDownloads: 10000,
-      githubStars: 500,
-      contributorsLastMonth: 2, // user1 and user2, excluding dependabot
+      numberOfContributorsMaintenance: 2,
       documentationCompleteness: {
         hasReadme: true,
         hasApiDocs: true,
         hasExample: true,
         multipleExamples: true,
       },
+      weeklyDownloads: 10000,
+      githubStars: 500,
+      numberOfContributorsPopularity: 2,
     });
   });
 

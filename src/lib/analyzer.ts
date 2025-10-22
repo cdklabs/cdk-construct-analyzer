@@ -1,6 +1,6 @@
 import { CONFIG } from './config';
-import { collectPackageData, signalCalculators } from './data/collect';
-import type { Config } from './types';
+import { collectPackageData } from './data/collect';
+import type { Config, PackageData } from './types';
 
 /**
  * Properties analyzer result
@@ -10,7 +10,7 @@ export interface ScoreResult {
   readonly version: string; // "1.2.3"
   readonly totalScore: number; // 85
   readonly pillarScores: Record<string, number>; // { "popularity": 42 }
-  readonly signalScores: Record<string, Record<string, number>>; // { "popularity": { "weekly_downloads": 4, "github_stars": 2 } }
+  readonly signalScores: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 4, "githubStars": 2 } }
 }
 
 export class ConstructAnalyzer {
@@ -22,7 +22,7 @@ export class ConstructAnalyzer {
 
   public async analyzePackage(packageName: string): Promise<ScoreResult> {
     const packageData = await collectPackageData(packageName);
-    const version = packageData.npm.version;
+    const version = packageData.version;
 
     const { signalScores, pillarScores } = await this.calculateSignalScores(packageData);
     const normalizedPillarScores = this.normalizePillarScores(pillarScores);
@@ -37,16 +37,19 @@ export class ConstructAnalyzer {
     };
   }
 
-  private async calculateSignalScores(packageData: any) {
+  private async calculateSignalScores(packageData: PackageData) {
     const signalScores: Record<string, Record<string, number>> = {};
     const pillarScores: Record<string, number> = {};
 
     for (const pillar of this.config.pillars) {
       for (const signal of pillar.signals) {
-        const calculator = signalCalculators[signal.name as keyof typeof signalCalculators];
-        if (!calculator) continue;
+        const rawValue = packageData[signal.name];
 
-        const rawValue = calculator(packageData);
+        if (rawValue === undefined) {
+          console.warn(`Signal data not found: ${signal.name}`);
+          continue;
+        }
+
         const level = signal.benchmarks(rawValue);
         const points = this.convertLevelToPoints(level);
 
@@ -74,8 +77,8 @@ export class ConstructAnalyzer {
   private normalizePillarScores(pillarScores: Record<string, number>): Record<string, number> {
     const normalizedScores: Record<string, number> = {};
 
-    const pillar_entries = Object.entries(pillarScores);
-    for (const [pillar, weightedSum] of pillar_entries) {
+    const pillarEntries = Object.entries(pillarScores);
+    for (const [pillar, weightedSum] of pillarEntries) {
       const totalWeight = this.getTotalWeightForPillar(pillar);
       const normalizedScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
       normalizedScores[pillar] = normalizedScore;

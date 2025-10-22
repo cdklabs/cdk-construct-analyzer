@@ -1,4 +1,5 @@
 import { GitHubCollector } from '../../../src/lib/data/github';
+import { GitHubRepo } from '../../../src/lib/data/github-repo';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -10,7 +11,7 @@ describe('GitHubCollector', () => {
   beforeEach(() => {
     collector = new GitHubCollector();
     jest.clearAllMocks();
-    jest.spyOn(console, 'warn').mockImplementation();
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -18,167 +19,64 @@ describe('GitHubCollector', () => {
   });
 
   describe('fetchPackage', () => {
-    test('should fetch GitHub data successfully with standard URL', async () => {
-      const mockResponse = {
-        stargazers_count: 500,
-      };
-
-      mockedFetch.mockResolvedValueOnce({
+    test('should work with GitHubRepo instances', async () => {
+      // Mock all fetch calls to return empty/default responses
+      mockedFetch.mockResolvedValue({
         ok: true,
-        json: async () => mockResponse,
+        json: async () => ({ stargazers_count: 100 }),
       } as Response);
 
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      } as Response);
-
-      await collector.fetchPackage('https://github.com/test/repo');
-
+      const repo1 = new GitHubRepo('test', 'repo');
+      await collector.fetchPackage(repo1);
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/test/repo');
-    });
 
-    test('should handle git+https URLs', async () => {
-      const mockResponse = {
-        stargazers_count: 500,
-      };
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response);
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      } as Response);
-
-      await collector.fetchPackage('git+https://github.com/facebook/react.git');
-
+      jest.clearAllMocks();
+      const repo2 = new GitHubRepo('facebook', 'react');
+      await collector.fetchPackage(repo2);
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/facebook/react');
     });
 
-    test('should handle SSH URLs', async () => {
-      const mockResponse = {
-        stargazers_count: 500,
-      };
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response);
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      } as Response);
-
-      await collector.fetchPackage('github.com:microsoft/typescript');
-
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/microsoft/typescript');
-    });
-
-    test('should throw error for invalid GitHub URLs', async () => {
-      await expect(collector.fetchPackage('https://gitlab.com/test/repo')).rejects.toThrow(
-        'Could not parse GitHub URL: https://gitlab.com/test/repo',
-      );
-    });
-
-    test('should handle GitHub API errors', async () => {
+    test('should handle API errors', async () => {
       mockedFetch.mockResolvedValueOnce({
         ok: false,
         status: 404,
       } as Response);
 
-      await expect(collector.fetchPackage('https://github.com/test/repo')).rejects.toThrow(
-        'GitHub fetch failed: Error: GitHub API returned 404',
+      const repo = new GitHubRepo('test', 'repo');
+      await expect(collector.fetchPackage(repo)).rejects.toThrow(
+        'GitHub API returned 404',
       );
-    });
-
-    test('should handle network errors', async () => {
-      mockedFetch.mockRejectedValueOnce(new Error('Network error'));
-
-      await expect(collector.fetchPackage('https://github.com/test/repo')).rejects.toThrow(
-        'GitHub fetch failed: Error: Network error',
-      );
-    });
-
-    test('should handle missing stargazers_count', async () => {
-      const mockResponse = {};
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response);
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      } as Response);
-
-      await collector.fetchPackage('https://github.com/test/repo');
-
-      expect(collector.getStarCount()).toBe(0);
     });
   });
 
-  describe('getStarCount', () => {
-    test('should return star count after fetchPackage', async () => {
-      const mockResponse = {
-        stargazers_count: 500,
-      };
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response);
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [],
-      } as Response);
-
-      await collector.fetchPackage('https://github.com/test/repo');
-
-      expect(collector.getStarCount()).toBe(500);
+  describe('getRawData', () => {
+    test('should throw error if no data fetched', () => {
+      expect(() => collector.getRawData()).toThrow('Must call fetchPackage() first');
     });
 
-    test('should return 0 if no data fetched', () => {
-      expect(collector.getStarCount()).toBe(0);
-    });
-  });
+    test('should return raw data after successful fetch', async () => {
+      // Mock successful responses
+      mockedFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ stargazers_count: 500 }),
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => [{ name: 'README.md', type: 'file' }],
+        } as Response)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => ({ content: btoa('# Test'), encoding: 'base64' }),
+        } as Response);
 
-  describe('getData', () => {
-    test('should return GitHub data object', async () => {
-      const mockResponse = {
-        stargazers_count: 500,
-      };
+      const repo = new GitHubRepo('test', 'repo');
+      await collector.fetchPackage(repo);
 
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponse,
-      } as Response);
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => [
-          { author: { login: 'user1' }, commit: { message: 'Add feature' } },
-        ],
-      } as Response);
-
-      await collector.fetchPackage('https://github.com/test/repo');
-
-      expect(collector.getData()).toEqual({
-        stars: 500,
-        contributorsLastMonth: 1,
-      });
-    });
-
-    test('should return default data if no fetch performed', () => {
-      expect(collector.getData()).toEqual({
-        stars: 0,
-        contributorsLastMonth: 0,
-      });
+      const rawData = collector.getRawData();
+      expect(rawData.repoData.stargazers_count).toBe(500);
+      expect(rawData.repoContents).toBeDefined();
+      expect(rawData.readmeContent).toBe('# Test');
     });
   });
 

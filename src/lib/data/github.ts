@@ -1,55 +1,69 @@
-export interface GitHubData {
-  readonly stars: number;
-  readonly contributorsLastMonth: number;
-}
+import { GitHubRepo, GitHubApiResponse } from './github-repo';
 
-function extractRepoInfo(repositoryUrl: string): { owner: string; repo: string } | null {
-  const patterns = [
-    /github\.com[\/:]([^\/]+)\/([^\/\.]+)/, // "https://github.com/yargs/yargs"
-    /git\+https:\/\/github\.com\/([^\/]+)\/([^\/\.]+)/, // "git+https://github.com/facebook/react.git"
-    /https:\/\/github\.com\/([^\/]+)\/([^\/\.]+)/, // "github.com:microsoft/typescript"
-  ];
-
-  for (const pattern of patterns) {
-    const match = repositoryUrl.match(pattern);
-    if (match) {
-      return {
-        owner: match[1],
-        repo: match[2].replace(/\.git$/, ''),
-      };
-    }
-  }
-  return null;
+export interface GitHubRawData {
+  readonly repoData: any; // Full GitHub API response
+  readonly repoContents: Record<string, boolean>; // path -> exists
+  readonly readmeContent?: string; // README file content
 }
 
 export class GitHubCollector {
-  // Only store data that could be shared across multiple signals
-  private starCount?: number;
-  private contributorsLastMonth?: number;
-  private repoInfo?: { owner: string; repo: string };
+  private rawData?: GitHubRawData;
 
-  async fetchPackage(repositoryUrl: string): Promise<void> {
-    const repoInfo = extractRepoInfo(repositoryUrl);
-    if (!repoInfo) {
-      throw new Error(`Could not parse GitHub URL: ${repositoryUrl}`);
+  private handleResponse(response: GitHubApiResponse): any {
+    if (response.error) {
+      throw new Error(response.error);
     }
+    return response.data;
+  }
 
-    this.repoInfo = repoInfo;
+  async fetchPackage(githubRepo: GitHubRepo): Promise<void> {
+    const repoData = await this.fetchRepoMetadata(githubRepo);
+    const repoContents = await this.fetchRepoContents(githubRepo);
+    const readmeContent = await this.fetchReadmeContent(githubRepo, repoContents);
 
+    this.rawData = {
+      repoData,
+      repoContents,
+      ...(readmeContent && { readmeContent }),
+    };
+  }
+
+  private async fetchRepoMetadata(githubRepo: GitHubRepo): Promise<any> {
+    const response = await githubRepo.metadata();
+    return this.handleResponse(response);
+  }
+
+  private async fetchRepoContents(githubRepo: GitHubRepo): Promise<Record<string, boolean>> {
+    const response = await githubRepo.contents();
+    const repoContents: Record<string, boolean> = {};
+
+    if (!response.error && Array.isArray(response.data)) {
+      for (const item of response.data) {
+        repoContents[item.name] = true;
+      }
+    }
+    return repoContents;
+  }
+
+  private async fetchReadmeContent(githubRepo: GitHubRepo, repoContents: Record<string, boolean>): Promise<string | undefined> {
     try {
-      // Fetch basic repo data
-      const response = await fetch(`https://api.github.com/repos/${repoInfo.owner}/${repoInfo.repo}`);
-      if (!response.ok) {
-        throw new Error(`GitHub API returned ${response.status}`);
+      const readmeFile = Object.keys(repoContents).find(filename =>
+        filename.toLowerCase().startsWith('readme'),
+      );
+
+      if (!readmeFile) {
+        return undefined;
       }
 
-      const fullResponse = await response.json() as any;
-      this.starCount = fullResponse.stargazers_count || 0;
+      const response = await githubRepo.contents(readmeFile);
+      if (!response.error && response.data?.content && response.data?.encoding === 'base64') {
+        return atob(response.data.content);
+      }
 
-      // Fetch contributors from the past month
-      this.contributorsLastMonth = await this.fetchContributorsLastMonth();
+      return undefined;
     } catch (error) {
-      throw new Error(`GitHub fetch failed: ${error}`);
+      console.warn(`Failed to fetch README: ${error}`);
+      return undefined;
     }
   }
 

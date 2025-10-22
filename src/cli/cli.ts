@@ -4,13 +4,13 @@ import { ConstructAnalyzer } from '../lib/analyzer';
 
 /**
  * Converts snake_case signal names to Display Name format
- * Example: "weekly_downloads" -> "Weekly Downloads"
+ * Example: "weeklyDownloads" -> "Weekly Downloads"
  */
 function convertToDisplayName(signalName: string): string {
   return signalName
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+    .trim();
 }
 
 export function cli() {

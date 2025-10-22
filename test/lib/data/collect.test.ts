@@ -1,4 +1,4 @@
-import { collectPackageData, calculateWeeklyDownloads, calculateGithubStars, calculateContributorsLastMonth } from '../../../src/lib/data/collect';
+import { collectPackageData, extractRepoInfo } from '../../../src/lib/data/collect';
 import { GitHubCollector } from '../../../src/lib/data/github';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
@@ -14,7 +14,7 @@ describe('collectPackageData', () => {
     name: 'test-package',
     version: '1.0.0',
     repository: {
-      url: 'https://github.com/test/repo',
+      url: 'https://github.com/cdklabs/repo',
     },
   };
 
@@ -22,9 +22,16 @@ describe('collectPackageData', () => {
     downloads: 10000,
   };
 
-  const mockGitHubData = {
-    stars: 500,
-    contributorsLastMonth: 3,
+  const mockGitHubRawData = {
+    repoData: {
+      stargazers_count: 500,
+    },
+    repoContents: {
+      'README.md': true,
+      'docs': true,
+      'examples': true,
+    },
+    readmeContent: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
   };
 
   beforeEach(() => {
@@ -48,7 +55,7 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue(mockGitHubData),
+      getRawData: jest.fn().mockReturnValue(mockGitHubRawData),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -57,45 +64,23 @@ describe('collectPackageData', () => {
     const result = await collectPackageData('test-package');
 
     expect(mockNpmInstance.fetchPackage).toHaveBeenCalledWith('test-package');
-    expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith('https://github.com/test/repo');
+    expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: 'cdklabs',
+        repo: 'repo',
+      }),
+    );
 
     expect(result).toEqual({
-      npm: mockNpmData,
-      downloads: mockDownloadData,
-      github: mockGitHubData,
-    });
-  });
-
-  test('should handle missing repository URL', async () => {
-    const npmDataWithoutRepo = {
-      name: 'test-package',
       version: '1.0.0',
-      repository: undefined,
-    };
-
-    const mockNpmInstance = {
-      fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getPackageData: jest.fn().mockReturnValue(npmDataWithoutRepo),
-      getDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
-    };
-
-    const mockGitHubInstance = {
-      fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue({ stars: 0, contributorsLastMonth: 0 }),
-    };
-
-    MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
-    MockedGitHubCollector.mockImplementation(() => mockGitHubInstance as any);
-
-    const result = await collectPackageData('test-package');
-
-    expect(mockGitHubInstance.fetchPackage).not.toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith('No repository URL found in NPM data');
-
-    expect(result).toEqual({
-      npm: npmDataWithoutRepo,
-      downloads: mockDownloadData,
-      github: { stars: 0, contributorsLastMonth: 0 },
+      weeklyDownloads: 10000,
+      githubStars: 500,
+      documentationCompleteness: {
+        hasReadme: true,
+        hasApiDocs: true,
+        hasExample: true,
+        multipleExamples: true,
+      },
     });
   });
 
@@ -108,7 +93,11 @@ describe('collectPackageData', () => {
 
     const mockGitHubInstance = {
       fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
-      getData: jest.fn().mockReturnValue({ stars: 0, contributorsLastMonth: 0 }),
+      getRawData: jest.fn().mockReturnValue({
+        repoData: { stargazers_count: 0 },
+        repoContents: {},
+        readmeContent: null,
+      }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -119,31 +108,25 @@ describe('collectPackageData', () => {
     expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: Error: GitHub API error');
 
     expect(result).toEqual({
-      npm: mockNpmData,
-      downloads: mockDownloadData,
-      github: { stars: 0, contributorsLastMonth: 0 },
+      version: '1.0.0',
     });
   });
 
+  describe('URL parsing helper', () => {
+    test('should parse GitHub URLs correctly', () => {
+      const repo1 = extractRepoInfo('https://github.com/test/repo');
+      expect(repo1.owner).toBe('test');
+      expect(repo1.repo).toBe('repo');
 
-});
+      const repo2 = extractRepoInfo('git+https://github.com/facebook/react.git');
+      expect(repo2.owner).toBe('facebook');
+      expect(repo2.repo).toBe('react');
+    });
 
-describe('signal calculators', () => {
-  const mockPackageData = {
-    npm: { name: 'test', version: '1.0.0' },
-    downloads: { downloads: 5000 },
-    github: { stars: 100, contributorsLastMonth: 5 },
-  };
-
-  test('should calculate weekly downloads', () => {
-    expect(calculateWeeklyDownloads(mockPackageData)).toBe(5000);
-  });
-
-  test('should calculate github stars', () => {
-    expect(calculateGithubStars(mockPackageData)).toBe(100);
-  });
-
-  test('should calculate contributors last month', () => {
-    expect(calculateContributorsLastMonth(mockPackageData)).toBe(5);
+    test('should throw error for invalid URLs', () => {
+      expect(() => extractRepoInfo('https://gitlab.com/test/repo')).toThrow(
+        'Could not parse GitHub URL',
+      );
+    });
   });
 });

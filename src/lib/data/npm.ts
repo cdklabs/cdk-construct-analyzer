@@ -2,7 +2,7 @@
 export interface NpmPackageData {
   readonly name: string;
   readonly version: string;
-  readonly repository: {
+  readonly repository?: {
     type: string;
     url: string;
   };
@@ -49,9 +49,5 @@ export class NpmCollector {
     }
 
     return await response.json() as NpmDownloadData;
-  }
-
-  async getDownloadData(): Promise<NpmDownloadData> {
-    return this.fetchDownloadData();
   }
 }

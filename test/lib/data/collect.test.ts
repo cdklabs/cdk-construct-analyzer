@@ -67,7 +67,7 @@ describe('collectPackageData', () => {
     const mockNpmInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
-      getDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
     };
 
     const mockGitHubInstance = {
@@ -107,7 +107,7 @@ describe('collectPackageData', () => {
     const mockNpmInstance = {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
-      getDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
     };
 
     const mockGitHubInstance = {
@@ -127,6 +127,7 @@ describe('collectPackageData', () => {
 
     expect(result).toEqual({
       version: '1.0.0',
+      weeklyDownloads: 10000,
     });
   });
 

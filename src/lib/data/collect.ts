@@ -23,9 +23,27 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   // Fetch NPM data (required)
   await npmCollector.fetchPackage(packageName);
   const npmData = npmCollector.getPackageData();
-  const downloadData = await npmCollector.getDownloadData();
+  const downloadData = await npmCollector.fetchDownloadData();
 
-  const repoInfo = extractRepoInfo(npmData.repository.url);
+  // Check if repository information is available
+  if (!npmData.repository?.url) {
+    console.warn(`No repository URL found for package: ${packageName}`);
+    return {
+      npm: npmData,
+      downloads: downloadData,
+    };
+  }
+
+  let repoInfo;
+  try {
+    repoInfo = extractRepoInfo(npmData.repository.url);
+  } catch (error) {
+    console.warn(`Failed to parse repository URL for ${packageName}: ${error}`);
+    return {
+      npm: npmData,
+      downloads: downloadData,
+    };
+  }
 
   const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
 
@@ -50,7 +68,10 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
 function processPackageData(rawData: RawPackageData): PackageData {
   // Process GitHub data directly in signals
   if (!rawData.github) {
-    return { version: rawData.npm.version };
+    return {
+      version: rawData.npm.version,
+      weeklyDownloads: rawData.downloads.downloads,
+    };
   }
 
   const { repoData, repoContents, readmeContent, contributorsData } = rawData.github;

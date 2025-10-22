@@ -14,7 +14,8 @@ describe('ConstructAnalyzer', () => {
     documentationCompleteness: {
       hasReadme: true,
       hasApiDocs: true,
-      hasExamples: true,
+      hasExample: true,
+      multipleExamples: true,
     },
   };
 

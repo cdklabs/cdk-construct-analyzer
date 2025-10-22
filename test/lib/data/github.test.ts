@@ -1,4 +1,5 @@
 import { GitHubCollector } from '../../../src/lib/data/github';
+import { GitHubRepo } from '../../../src/lib/data/github-repo';
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -10,7 +11,7 @@ describe('GitHubCollector', () => {
   beforeEach(() => {
     collector = new GitHubCollector();
     jest.clearAllMocks();
-    jest.spyOn(console, 'warn').mockImplementation(() => {});
+    jest.spyOn(console, 'warn').mockImplementation(() => { });
   });
 
   afterEach(() => {
@@ -18,25 +19,21 @@ describe('GitHubCollector', () => {
   });
 
   describe('fetchPackage', () => {
-    test('should parse GitHub URLs correctly', async () => {
+    test('should work with GitHubRepo instances', async () => {
       // Mock all fetch calls to return empty/default responses
       mockedFetch.mockResolvedValue({
         ok: true,
         json: async () => ({ stargazers_count: 100 }),
       } as Response);
 
-      await collector.fetchPackage('https://github.com/test/repo');
+      const repo1 = new GitHubRepo('test', 'repo');
+      await collector.fetchPackage(repo1);
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/test/repo');
 
       jest.clearAllMocks();
-      await collector.fetchPackage('git+https://github.com/facebook/react.git');
+      const repo2 = new GitHubRepo('facebook', 'react');
+      await collector.fetchPackage(repo2);
       expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/facebook/react');
-    });
-
-    test('should throw error for invalid URLs', async () => {
-      await expect(collector.fetchPackage('https://gitlab.com/test/repo')).rejects.toThrow(
-        'Could not parse GitHub URL',
-      );
     });
 
     test('should handle API errors', async () => {
@@ -45,7 +42,8 @@ describe('GitHubCollector', () => {
         status: 404,
       } as Response);
 
-      await expect(collector.fetchPackage('https://github.com/test/repo')).rejects.toThrow(
+      const repo = new GitHubRepo('test', 'repo');
+      await expect(collector.fetchPackage(repo)).rejects.toThrow(
         'GitHub API returned 404',
       );
     });
@@ -72,7 +70,8 @@ describe('GitHubCollector', () => {
           json: async () => ({ content: btoa('# Test'), encoding: 'base64' }),
         } as Response);
 
-      await collector.fetchPackage('https://github.com/test/repo');
+      const repo = new GitHubRepo('test', 'repo');
+      await collector.fetchPackage(repo);
 
       const rawData = collector.getRawData();
       expect(rawData.repoData.stargazers_count).toBe(500);

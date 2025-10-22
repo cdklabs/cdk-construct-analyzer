@@ -6,25 +6,6 @@ export interface GitHubRawData {
   readonly readmeContent?: string; // README file content
 }
 
-function extractRepoInfo(repositoryUrl: string): { owner: string; repo: string } | null {
-  const patterns = [
-    /github\.com[\/:]([^\/]+)\/([^\/\.]+)/, // "https://github.com/yargs/yargs"
-    /git\+https:\/\/github\.com\/([^\/]+)\/([^\/\.]+)/, // "git+https://github.com/facebook/react.git"
-    /https:\/\/github\.com\/([^\/]+)\/([^\/\.]+)/, // "github.com:microsoft/typescript"
-  ];
-
-  for (const pattern of patterns) {
-    const match = repositoryUrl.match(pattern);
-    if (match) {
-      return {
-        owner: match[1],
-        repo: match[2].replace(/\.git$/, ''),
-      };
-    }
-  }
-  return null;
-}
-
 export class GitHubCollector {
   private rawData?: GitHubRawData;
 
@@ -35,27 +16,16 @@ export class GitHubCollector {
     return response.data;
   }
 
-  async fetchPackage(repositoryUrl: string): Promise<void> {
-    const repoInfo = extractRepoInfo(repositoryUrl);
-    if (!repoInfo) {
-      throw new Error(`Could not parse GitHub URL: ${repositoryUrl}`);
-    }
+  async fetchPackage(githubRepo: GitHubRepo): Promise<void> {
+    const repoData = await this.fetchRepoMetadata(githubRepo);
+    const repoContents = await this.fetchRepoContents(githubRepo);
+    const readmeContent = await this.fetchReadmeContent(githubRepo, repoContents);
 
-    const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
-
-    try {
-      const repoData = await this.fetchRepoMetadata(githubRepo);
-      const repoContents = await this.fetchRepoContents(githubRepo);
-      const readmeContent = await this.fetchReadmeContent(githubRepo, repoContents);
-
-      this.rawData = {
-        repoData,
-        repoContents,
-        ...(readmeContent && { readmeContent }),
-      };
-    } catch (error) {
-      throw new Error(`GitHub fetch failed: ${error}`);
-    }
+    this.rawData = {
+      repoData,
+      repoContents,
+      ...(readmeContent && { readmeContent }),
+    };
   }
 
   private async fetchRepoMetadata(githubRepo: GitHubRepo): Promise<any> {

@@ -1,4 +1,4 @@
-import { collectPackageData } from '../../../src/lib/data/collect';
+import { collectPackageData, extractRepoInfo } from '../../../src/lib/data/collect';
 import { GitHubCollector } from '../../../src/lib/data/github';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
@@ -14,7 +14,7 @@ describe('collectPackageData', () => {
     name: 'test-package',
     version: '1.0.0',
     repository: {
-      url: 'https://github.com/test/repo',
+      url: 'https://github.com/cdklabs/repo',
     },
   };
 
@@ -64,7 +64,12 @@ describe('collectPackageData', () => {
     const result = await collectPackageData('test-package');
 
     expect(mockNpmInstance.fetchPackage).toHaveBeenCalledWith('test-package');
-    expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith('https://github.com/test/repo');
+    expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith(
+      expect.objectContaining({
+        owner: 'cdklabs',
+        repo: 'repo',
+      }),
+    );
 
     expect(result).toEqual({
       version: '1.0.0',
@@ -104,6 +109,24 @@ describe('collectPackageData', () => {
 
     expect(result).toEqual({
       version: '1.0.0',
+    });
+  });
+
+  describe('URL parsing helper', () => {
+    test('should parse GitHub URLs correctly', () => {
+      const repo1 = extractRepoInfo('https://github.com/test/repo');
+      expect(repo1.owner).toBe('test');
+      expect(repo1.repo).toBe('repo');
+
+      const repo2 = extractRepoInfo('git+https://github.com/facebook/react.git');
+      expect(repo2.owner).toBe('facebook');
+      expect(repo2.repo).toBe('react');
+    });
+
+    test('should throw error for invalid URLs', () => {
+      expect(() => extractRepoInfo('https://gitlab.com/test/repo')).toThrow(
+        'Could not parse GitHub URL',
+      );
     });
   });
 });

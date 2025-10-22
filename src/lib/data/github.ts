@@ -1,4 +1,4 @@
-import { GitHubRepo } from './github-repo';
+import { GitHubRepo, GitHubApiResponse } from './github-repo';
 
 export interface GitHubRawData {
   readonly repoData: any; // Full GitHub API response
@@ -28,6 +28,13 @@ function extractRepoInfo(repositoryUrl: string): { owner: string; repo: string }
 export class GitHubCollector {
   private rawData?: GitHubRawData;
 
+  private handleResponse(response: GitHubApiResponse): any {
+    if (response.error) {
+      throw new Error(response.error);
+    }
+    return response.data;
+  }
+
   async fetchPackage(repositoryUrl: string): Promise<void> {
     const repoInfo = extractRepoInfo(repositoryUrl);
     if (!repoInfo) {
@@ -37,43 +44,56 @@ export class GitHubCollector {
     const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
 
     try {
-      const metadataResponse = await githubRepo.metadata();
-      if (metadataResponse.error) {
-        throw new Error(metadataResponse.error);
-      }
-
-      const repoData = metadataResponse.data;
-
-      // Fetch all root directory contents
-      const contentsResponse = await githubRepo.contents();
-      const repoContents: Record<string, boolean> = {};
-
-      if (!contentsResponse.error && Array.isArray(contentsResponse.data)) {
-        for (const item of contentsResponse.data) {
-          repoContents[item.name] = true;
-        }
-      }
-
-      // Find and fetch README content
-      const readmeFile = Object.keys(repoContents).find(filename =>
-        filename.toLowerCase().includes('readme'),
-      );
-
-      let readmeContent;
-      if (readmeFile) {
-        const fileResponse = await githubRepo.contents(readmeFile);
-        if (!fileResponse.error && fileResponse.data?.content && fileResponse.data?.encoding === 'base64') {
-          readmeContent = atob(fileResponse.data.content);
-        }
-      }
+      const repoData = await this.fetchRepoMetadata(githubRepo);
+      const repoContents = await this.fetchRepoContents(githubRepo);
+      const readmeContent = await this.fetchReadmeContent(githubRepo, repoContents);
 
       this.rawData = {
         repoData,
         repoContents,
-        readmeContent,
+        ...(readmeContent && { readmeContent }),
       };
     } catch (error) {
       throw new Error(`GitHub fetch failed: ${error}`);
+    }
+  }
+
+  private async fetchRepoMetadata(githubRepo: GitHubRepo): Promise<any> {
+    const response = await githubRepo.metadata();
+    return this.handleResponse(response);
+  }
+
+  private async fetchRepoContents(githubRepo: GitHubRepo): Promise<Record<string, boolean>> {
+    const response = await githubRepo.contents();
+    const repoContents: Record<string, boolean> = {};
+
+    if (!response.error && Array.isArray(response.data)) {
+      for (const item of response.data) {
+        repoContents[item.name] = true;
+      }
+    }
+    return repoContents;
+  }
+
+  private async fetchReadmeContent(githubRepo: GitHubRepo, repoContents: Record<string, boolean>): Promise<string | null> {
+    try {
+      const readmeFile = Object.keys(repoContents).find(filename =>
+        filename.toLowerCase().startsWith('readme'),
+      );
+
+      if (!readmeFile) {
+        return null;
+      }
+
+      const response = await githubRepo.contents(readmeFile);
+      if (!response.error && response.data?.content && response.data?.encoding === 'base64') {
+        return atob(response.data.content);
+      }
+
+      return null;
+    } catch (error) {
+      console.warn(`Failed to fetch README: ${error}`);
+      return null;
     }
   }
 

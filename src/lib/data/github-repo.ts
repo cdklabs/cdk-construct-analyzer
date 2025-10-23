@@ -11,7 +11,6 @@ export class GitHubRepo {
   constructor(readonly owner: string, readonly repo: string) {}
 
   async metadata(): Promise<GitHubApiResponse> {
-    // First, get the repository contents to find README file
     const contentsQuery = `
       query GetRepositoryContents($owner: String!, $name: String!) {
         repository(owner: $owner, name: $name) {
@@ -39,7 +38,6 @@ export class GitHubRepo {
     const repository = contentsResult.data.repository;
     const entries = repository.rootContents?.entries ?? [];
 
-    // Find README file (any file that starts with "readme" case-insensitive)
     const readmeFile = entries.find((entry: any) =>
       entry.type === 'blob' &&
       entry.name.toLowerCase().startsWith('readme'),
@@ -55,7 +53,6 @@ export class GitHubRepo {
       };
     }
 
-    // Second query to get the README content
     const readmeQuery = `
       query GetReadmeContent($owner: String!, $name: String!, $path: String!) {
         repository(owner: $owner, name: $name) {
@@ -89,7 +86,6 @@ export class GitHubRepo {
       return readmeResult;
     }
 
-    // Extract README text and return as simple string
     const readmeText = (readmeResult.data.repository as any).readme?.text;
 
     return {

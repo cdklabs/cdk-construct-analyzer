@@ -54,3 +54,25 @@ export type DocumentationCompleteness = {
   readonly hasExample: boolean;
   readonly multipleExamples: boolean;
 };
+
+/**
+ * GitHub GraphQL API response types
+ */
+export interface GitHubRepositoryEntry {
+  readonly name: string;
+  readonly type: 'blob' | 'tree';
+}
+
+export interface GitHubRepositoryContents {
+  readonly entries: GitHubRepositoryEntry[];
+}
+
+export interface GitHubRepositoryBlob {
+  readonly text: string;
+}
+
+export interface GitHubRepository {
+  readonly stargazerCount: number;
+  readonly rootContents?: GitHubRepositoryContents;
+  readonly readmeContent?: string;
+}

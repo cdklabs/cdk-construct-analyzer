@@ -34,12 +34,12 @@ export function cli() {
           console.log(`LIBRARY: ${result.packageName}`);
           console.log(`VERSION: ${result.version}`);
 
-          console.log(`\nOVERALL SCORE: ${result.totalScore}/100`);
+          console.log(`\nOVERALL SCORE: ${Math.round(result.totalScore)}/100`);
 
           console.log('\n---');
           console.log('\nSUBSCORES');
           Object.entries(result.pillarScores).forEach(([pillar, score]) => {
-            console.log(`  ${pillar}: ${(score as number)}`);
+            console.log(`  ${pillar}: ${Math.round(score as number)}`);
           });
 
           console.log('\n---');

@@ -31,9 +31,7 @@ describe('collectPackageData', () => {
         { name: 'examples', type: 'tree' as const },
       ],
     },
-    readme: {
-      text: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
-    },
+    readmeContent: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
   };
 
   beforeEach(() => {

@@ -11,12 +11,56 @@ export class GitHubRepo {
   constructor(readonly owner: string, readonly repo: string) {}
 
   async metadata(): Promise<GitHubApiResponse> {
-    const query = `
-      query GetRepositoryEssentials($owner: String!, $name: String!) {
+    // First, get the repository contents to find README file
+    const contentsQuery = `
+      query GetRepositoryContents($owner: String!, $name: String!) {
         repository(owner: $owner, name: $name) {
           stargazerCount
           
-          # Root directory contents (for checking docs folders)
+          # Root directory contents (for checking docs folders and README files)
+          rootContents: object(expression: "HEAD:") {
+            ... on Tree {
+              entries {
+                name
+                type
+              }
+            }
+          }
+        }
+      }
+    `;
+
+    const contentsResult = await this.executeQuery(contentsQuery, { owner: this.owner, name: this.repo });
+
+    if (contentsResult.error || !contentsResult.data?.repository) {
+      return contentsResult;
+    }
+
+    const repository = contentsResult.data.repository;
+    const entries = repository.rootContents?.entries || [];
+
+    // Find README file (any file that starts with "readme" case-insensitive)
+    const readmeFile = entries.find((entry: any) =>
+      entry.type === 'blob' &&
+      entry.name.toLowerCase().startsWith('readme'),
+    );
+
+    if (!readmeFile) {
+      return {
+        data: {
+          repository: {
+            ...repository,
+          } as GitHubRepository,
+        },
+      };
+    }
+
+    // Second query to get the README content
+    const readmeQuery = `
+      query GetReadmeContent($owner: String!, $name: String!, $path: String!) {
+        repository(owner: $owner, name: $name) {
+          stargazerCount
+          
           rootContents: object(expression: "HEAD:") {
             ... on Tree {
               entries {
@@ -26,18 +70,7 @@ export class GitHubRepo {
             }
           }
           
-          # README content variations (for checking examples)
-          readme: object(expression: "HEAD:README.md") {
-            ... on Blob {
-              text
-            }
-          }
-          readmeAlternative: object(expression: "HEAD:readme.md") {
-            ... on Blob {
-              text
-            }
-          }
-          readmeTxt: object(expression: "HEAD:README.txt") {
+          readme: object(expression: $path) {
             ... on Blob {
               text
             }
@@ -46,7 +79,28 @@ export class GitHubRepo {
       }
     `;
 
-    return this.executeQuery(query, { owner: this.owner, name: this.repo });
+    const readmeResult = await this.executeQuery(readmeQuery, {
+      owner: this.owner,
+      name: this.repo,
+      path: `HEAD:${readmeFile.name}`,
+    });
+
+    if (readmeResult.error || !readmeResult.data?.repository) {
+      return readmeResult;
+    }
+
+    // Extract README text and return as simple string
+    const readmeText = (readmeResult.data.repository as any).readme?.text;
+
+    return {
+      data: {
+        repository: {
+          stargazerCount: readmeResult.data.repository.stargazerCount,
+          rootContents: readmeResult.data.repository.rootContents,
+          readmeContent: readmeText,
+        } as GitHubRepository,
+      },
+    };
   }
 
   private async executeQuery(query: string, variables: Record<string, any>): Promise<GitHubApiResponse> {

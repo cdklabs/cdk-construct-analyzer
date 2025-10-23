@@ -74,7 +74,5 @@ export interface GitHubRepositoryBlob {
 export interface GitHubRepository {
   readonly stargazerCount: number;
   readonly rootContents?: GitHubRepositoryContents;
-  readonly readme?: GitHubRepositoryBlob;
-  readonly readmeAlternative?: GitHubRepositoryBlob;
-  readonly readmeTxt?: GitHubRepositoryBlob;
+  readonly readmeContent?: string;
 }

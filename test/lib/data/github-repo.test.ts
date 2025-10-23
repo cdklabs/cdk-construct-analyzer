@@ -19,20 +19,80 @@ describe('GitHubRepo', () => {
   });
 
   describe('metadata', () => {
-    test('should fetch essential repository data successfully', async () => {
-      const mockResponseData = {
+    test('should fetch repository data with README successfully', async () => {
+      const mockContentsResponse = {
         data: {
           repository: {
             stargazerCount: 42,
             rootContents: {
               entries: [
-                { name: 'README.md', type: 'blob' as const },
-                { name: 'package.json', type: 'blob' as const },
-                { name: 'docs', type: 'tree' as const },
+                { name: 'README.md', type: 'blob' },
+                { name: 'package.json', type: 'blob' },
+                { name: 'docs', type: 'tree' },
+              ],
+            },
+          },
+        },
+      };
+
+      const mockReadmeResponse = {
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'README.md', type: 'blob' },
+                { name: 'package.json', type: 'blob' },
+                { name: 'docs', type: 'tree' },
               ],
             },
             readme: {
-              text: '# Test Repository\n\n```js\nconsole.log("example");\n```',
+              text: '# Test Repository\n\nThis is a test.',
+            },
+          },
+        },
+      };
+
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockContentsResponse,
+        } as any)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockReadmeResponse,
+        } as any);
+
+      const result = await githubRepo.metadata();
+
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(result).toEqual({
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'README.md', type: 'blob' },
+                { name: 'package.json', type: 'blob' },
+                { name: 'docs', type: 'tree' },
+              ],
+            },
+            readmeContent: '# Test Repository\n\nThis is a test.',
+          },
+        },
+      });
+    });
+
+    test('should handle repository with no README', async () => {
+      const mockContentsResponse = {
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'package.json', type: 'blob' },
+                { name: 'src', type: 'tree' },
+              ],
             },
           },
         },
@@ -40,25 +100,24 @@ describe('GitHubRepo', () => {
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponseData,
+        json: async () => mockContentsResponse,
       } as any);
 
       const result = await githubRepo.metadata();
 
-      expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'cdk-construct-analyzer',
-        },
-        body: expect.stringContaining('query GetRepositoryEssentials'),
-      });
-
-      const callArgs = mockFetch.mock.calls[0];
-      const body = JSON.parse(callArgs[1].body);
-      expect(body.variables).toEqual({ owner: 'cdklabs', name: 'test-repo' });
+      expect(mockFetch).toHaveBeenCalledTimes(1);
       expect(result).toEqual({
-        data: mockResponseData.data,
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'package.json', type: 'blob' },
+                { name: 'src', type: 'tree' },
+              ],
+            },
+          },
+        },
       });
     });
 
@@ -79,57 +138,60 @@ describe('GitHubRepo', () => {
       });
     });
 
-    test('should handle missing README gracefully', async () => {
-      const mockResponseData = {
-        data: {
-          repository: {
-            stargazerCount: 42,
-            rootContents: {
-              entries: [
-                { name: 'package.json', type: 'blob' as const },
-              ],
-            },
-            readme: null,
-            readmeAlternative: null,
-            readmeTxt: null,
-            readmeRst: null,
-          },
-        },
-      };
-
+    test('should handle HTTP errors', async () => {
       mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockResponseData,
+        ok: false,
+        status: 401,
+        statusText: 'Unauthorized',
       } as any);
 
       const result = await githubRepo.metadata();
 
       expect(result).toEqual({
-        data: mockResponseData.data,
+        error: 'GitHub GraphQL API returned 401: Unauthorized',
       });
     });
 
-    test('should handle empty repository contents', async () => {
-      const mockResponseData = {
+    test('should handle network errors', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Network failure'));
+
+      const result = await githubRepo.metadata();
+
+      expect(result).toEqual({
+        error: 'Network error: Network failure',
+      });
+    });
+
+    test('should include authorization header when token is provided', async () => {
+      process.env.GITHUB_TOKEN = 'test-token';
+
+      const mockResponse = {
         data: {
           repository: {
-            stargazerCount: 0,
-            rootContents: null,
-            readme: null,
+            stargazerCount: 42,
+            rootContents: { entries: [] },
           },
         },
       };
 
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: async () => mockResponseData,
+        json: async () => mockResponse,
       } as any);
 
-      const result = await githubRepo.metadata();
+      await githubRepo.metadata();
 
-      expect(result).toEqual({
-        data: mockResponseData.data,
+      expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'cdk-construct-analyzer',
+          'Authorization': 'Bearer test-token',
+        },
+        body: expect.stringContaining('query GetRepositoryContents'),
       });
+
+      delete process.env.GITHUB_TOKEN;
     });
   });
 });

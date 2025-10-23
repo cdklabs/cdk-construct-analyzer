@@ -36,6 +36,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
     console.warn(`GitHub fetch failed: ${error}`);
   }
 
+
   return {
     npm: npmData,
     downloads: downloadData,
@@ -53,9 +54,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
 
   const repository = rawData.github;
 
-  const readmeContent = repository.readme?.text ??
-    repository.readmeAlternative?.text ??
-    repository.readmeTxt?.text;
+  const readmeContent = repository.readmeContent;
 
   const hasReadme = Boolean(readmeContent);
 

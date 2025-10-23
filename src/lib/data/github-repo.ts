@@ -3,9 +3,10 @@ export interface GitHubApiResponse {
   error?: string;
 }
 
-export class GitHubRepo {
-  private static readonly MAX_COMMITS_TO_FETCH = 100;
+/** Maximum commits to fetch per GitHub API request (GitHub API limit: 100) */
+const MAX_COMMITS_TO_FETCH = 100;
 
+export class GitHubRepo {
   private readonly baseUrl: string;
 
   constructor(readonly owner: string, readonly repo: string) {
@@ -21,7 +22,7 @@ export class GitHubRepo {
     return this.fetchWithErrorHandling(url);
   }
 
-  async commits(since?: string, perPage: number = GitHubRepo.MAX_COMMITS_TO_FETCH): Promise<GitHubApiResponse> {
+  async commits(since?: string, perPage: number = MAX_COMMITS_TO_FETCH): Promise<GitHubApiResponse> {
     let url = `${this.baseUrl}/commits?per_page=${perPage}`;
     if (since) {
       url += `&since=${since}`;

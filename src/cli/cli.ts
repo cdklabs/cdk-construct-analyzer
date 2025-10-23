@@ -3,13 +3,17 @@ import { hideBin } from 'yargs/helpers';
 import { ConstructAnalyzer } from '../lib/analyzer';
 
 /**
- * Converts snake_case signal names to Display Name format
- * Example: "weeklyDownloads" -> "Weekly Downloads"
+ * Converts signal names to Display Name format
+ * Examples:
+ * - "weeklyDownloads" -> "Weekly Downloads"
+ * - "numberOfContributors(Maintenance)" -> "Number Of Contributors (Maintenance)"
  */
 function convertToDisplayName(signalName: string): string {
   return signalName
-    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters everywhere
+    .replace(/\s*\(/g, ' (') // Add single space before opening parenthesis, removing any existing spaces
     .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+    .replace(/\s+/g, ' ') // Clean up multiple spaces
     .trim();
 }
 

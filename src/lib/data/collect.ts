@@ -38,7 +38,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   try {
     repoInfo = extractRepoInfo(npmData.repository.url);
   } catch (error) {
-    console.warn(`Failed to parse repository URL for ${packageName}: ${error}`);
+    console.warn(`Failed to parse repository URL for ${packageName}: ${error}. Is the repository private?`);
     return {
       npm: npmData,
       downloads: downloadData,
@@ -96,17 +96,17 @@ function processPackageData(rawData: RawPackageData): PackageData {
   const contributorsLastMonth = processContributorsData(contributorsData);
 
   return {
-    version: rawData.npm.version,
-    numberOfContributorsMaintenance: contributorsLastMonth,
-    documentationCompleteness: {
+    'version': rawData.npm.version,
+    'numberOfContributors(Maintenance)': contributorsLastMonth,
+    'documentationCompleteness': {
       hasReadme,
       hasApiDocs,
       hasExample,
       multipleExamples,
     },
-    weeklyDownloads: rawData.downloads.downloads,
-    githubStars: repoData.stargazers_count ?? 0,
-    numberOfContributorsPopularity: contributorsLastMonth,
+    'weeklyDownloads': rawData.downloads.downloads,
+    'githubStars': repoData.stargazers_count ?? 0,
+    'numberOfContributors(Popularity)': contributorsLastMonth,
   };
 }
 

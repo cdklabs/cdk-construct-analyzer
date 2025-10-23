@@ -27,7 +27,7 @@ export class GitHubCollector {
       repoData,
       repoContents,
       ...(readmeContent && { readmeContent }),
-      ...(contributorsData && { contributorsData }),
+      contributorsData,
     };
   }
 
@@ -70,7 +70,7 @@ export class GitHubCollector {
     }
   }
 
-  private async fetchContributorsLastMonth(githubRepo: GitHubRepo): Promise<any[] | undefined> {
+  private async fetchContributorsLastMonth(githubRepo: GitHubRepo): Promise<any[]> {
     try {
       const oneMonthAgo = new Date();
       oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
@@ -80,13 +80,13 @@ export class GitHubCollector {
 
       if (response.error) {
         console.warn(`Failed to fetch commits: ${response.error}`);
-        return undefined;
+        return [];
       }
 
       return response.data as any[];
     } catch (error) {
       console.warn(`Failed to fetch contributors: ${error}`);
-      return undefined;
+      return [];
     }
   }
 

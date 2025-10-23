@@ -11,10 +11,10 @@ export const CONFIG: Config = {
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
-          name: 'numberOfContributorsMaintenance',
+          name: 'numberOfContributors(Maintenance)',
           weight: 2,
-          description: 'Number of Contributors in the past month',
-          benchmarks: (contributors: number) => categorizeByBuckets([4, 3, 1, 1], contributors),
+          description: 'Number of Contributors in the past year',
+          benchmarks: (contributors: number) => categorizeByBuckets([8, 2, 1, 1], contributors),
         },
       ],
     },
@@ -54,10 +54,10 @@ export const CONFIG: Config = {
           benchmarks: (stars: number) => categorizeByBuckets([638, 28, 4, 1], stars),
         },
         {
-          name: 'numberOfContributorsPopularity',
+          name: 'numberOfContributors(Popularity)',
           weight: 1,
-          description: 'Number of Contributors in the past month',
-          benchmarks: (contributors: number) => categorizeByBuckets([4, 3, 1, 1], contributors),
+          description: 'Number of Contributors in the past year',
+          benchmarks: (contributors: number) => categorizeByBuckets([8, 2, 1, 1], contributors),
         },
       ],
     },

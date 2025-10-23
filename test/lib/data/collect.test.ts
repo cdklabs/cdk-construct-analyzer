@@ -89,17 +89,17 @@ describe('collectPackageData', () => {
     );
 
     expect(result).toEqual({
-      version: '1.0.0',
-      numberOfContributorsMaintenance: 2,
-      documentationCompleteness: {
+      'version': '1.0.0',
+      'numberOfContributors(Maintenance)': 2,
+      'documentationCompleteness': {
         hasReadme: true,
         hasApiDocs: true,
         hasExample: true,
         multipleExamples: true,
       },
-      weeklyDownloads: 10000,
-      githubStars: 500,
-      numberOfContributorsPopularity: 2,
+      'weeklyDownloads': 10000,
+      'githubStars': 500,
+      'numberOfContributors(Popularity)': 2,
     });
   });
 

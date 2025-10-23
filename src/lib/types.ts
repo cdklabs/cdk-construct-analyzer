@@ -42,12 +42,12 @@ export interface ChecklistItem {
 }
 
 export type PackageData = {
-  readonly version: string;
-  readonly numberOfContributorsMaintenance?: number;
-  readonly documentationCompleteness?: DocumentationCompleteness;
-  readonly weeklyDownloads?: number;
-  readonly githubStars?: number;
-  readonly numberOfContributorsPopularity?: number;
+  readonly 'version': string;
+  readonly 'numberOfContributors(Maintenance)'?: number;
+  readonly 'documentationCompleteness'?: DocumentationCompleteness;
+  readonly 'weeklyDownloads'?: number;
+  readonly 'githubStars'?: number;
+  readonly 'numberOfContributors(Popularity)'?: number;
 } & Record<string, any>;
 
 export type DocumentationCompleteness = {

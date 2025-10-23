@@ -1,6 +1,10 @@
+import { config } from 'dotenv';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { ConstructAnalyzer } from '../lib/analyzer';
+
+// Load environment variables from .env file
+config();
 
 /**
  * Converts snake_case signal names to Display Name format

@@ -8,7 +8,7 @@ const project = new CdklabsTypeScriptProject({
   projenrcTs: true,
   release: false,
   jest: true,
-  deps: ['yargs'], /* Runtime dependencies of this module. */
+  deps: ['yargs', 'dotenv'], /* Runtime dependencies of this module. */
   bin: {
     'cdk-construct-analyzer': './bin/cdk-construct-analyzer',
   },

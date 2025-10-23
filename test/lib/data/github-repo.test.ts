@@ -1,7 +1,7 @@
 import { GitHubRepo } from '../../../src/lib/data/github-repo';
 
-const mockedFetch = jest.fn();
-global.fetch = mockedFetch;
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 describe('GitHubRepo', () => {
   let githubRepo: GitHubRepo;
@@ -19,79 +19,116 @@ describe('GitHubRepo', () => {
   });
 
   describe('metadata', () => {
-    test('should fetch repository metadata successfully', async () => {
-      const mockData = { id: 123, name: 'test-repo', stargazers_count: 42 };
-      mockedFetch.mockResolvedValueOnce({
+    test('should fetch essential repository data successfully', async () => {
+      const mockResponseData = {
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'README.md', type: 'blob' as const },
+                { name: 'package.json', type: 'blob' as const },
+                { name: 'docs', type: 'tree' as const },
+              ],
+            },
+            readme: {
+              text: '# Test Repository\n\n```js\nconsole.log("example");\n```',
+            },
+          },
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce({
         ok: true,
-        status: 200,
-        json: async () => mockData,
-      } as Response);
+        json: async () => mockResponseData,
+      } as any);
 
       const result = await githubRepo.metadata();
 
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo');
+      expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'cdk-construct-analyzer',
+        },
+        body: expect.stringContaining('query GetRepositoryEssentials'),
+      });
+
+      const callArgs = mockFetch.mock.calls[0];
+      const body = JSON.parse(callArgs[1].body);
+      expect(body.variables).toEqual({ owner: 'cdklabs', name: 'test-repo' });
       expect(result).toEqual({
-        data: mockData,
+        data: mockResponseData.data,
       });
     });
 
-    test('should handle API errors gracefully', async () => {
-      mockedFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-      } as Response);
+    test('should handle GraphQL errors gracefully', async () => {
+      const mockResponseData = {
+        errors: [{ message: 'Repository not found' }],
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponseData,
+      } as any);
 
       const result = await githubRepo.metadata();
 
       expect(result).toEqual({
-        error: 'GitHub API returned 404 for https://api.github.com/repos/cdklabs/test-repo',
+        error: 'GraphQL errors: Repository not found',
       });
     });
-  });
 
-  describe('contents', () => {
-    test('should fetch root directory contents by default', async () => {
-      const mockData = [{ name: 'README.md', type: 'file' }];
-      mockedFetch.mockResolvedValueOnce({
+    test('should handle missing README gracefully', async () => {
+      const mockResponseData = {
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'package.json', type: 'blob' as const },
+              ],
+            },
+            readme: null,
+            readmeAlternative: null,
+            readmeTxt: null,
+            readmeRst: null,
+          },
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce({
         ok: true,
-        status: 200,
-        json: async () => mockData,
-      } as Response);
+        json: async () => mockResponseData,
+      } as any);
 
-      const result = await githubRepo.contents();
+      const result = await githubRepo.metadata();
 
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo/contents/');
       expect(result).toEqual({
-        data: mockData,
+        data: mockResponseData.data,
       });
     });
 
-    test('should fetch specific directory contents', async () => {
-      const mockData = [{ name: 'index.ts', type: 'file' }];
-      mockedFetch.mockResolvedValueOnce({
+    test('should handle empty repository contents', async () => {
+      const mockResponseData = {
+        data: {
+          repository: {
+            stargazerCount: 0,
+            rootContents: null,
+            readme: null,
+          },
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce({
         ok: true,
-        status: 200,
-        json: async () => mockData,
-      } as Response);
+        json: async () => mockResponseData,
+      } as any);
 
-      const result = await githubRepo.contents('src');
-
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo/contents/src');
-      expect(result).toEqual({
-        data: mockData,
-      });
-    });
-
-    test('should handle directory not found', async () => {
-      mockedFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-      } as Response);
-
-      const result = await githubRepo.contents('nonexistent');
+      const result = await githubRepo.metadata();
 
       expect(result).toEqual({
-        error: 'GitHub API returned 404 for https://api.github.com/repos/cdklabs/test-repo/contents/nonexistent',
+        data: mockResponseData.data,
       });
     });
   });

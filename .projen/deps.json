@@ -72,6 +72,10 @@
       "type": "build"
     },
     {
+      "name": "dotenv",
+      "type": "runtime"
+    },
+    {
       "name": "yargs",
       "type": "runtime"
     }

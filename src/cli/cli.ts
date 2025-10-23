@@ -4,13 +4,13 @@ import { ConstructAnalyzer } from '../lib/analyzer';
 
 /**
  * Converts snake_case signal names to Display Name format
- * Example: "weekly_downloads" -> "Weekly Downloads"
+ * Example: "weeklyDownloads" -> "Weekly Downloads"
  */
 function convertToDisplayName(signalName: string): string {
   return signalName
-    .split('_')
-    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ');
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+    .trim();
 }
 
 export function cli() {
@@ -34,12 +34,12 @@ export function cli() {
           console.log(`LIBRARY: ${result.packageName}`);
           console.log(`VERSION: ${result.version}`);
 
-          console.log(`\nOVERALL SCORE: ${result.totalScore.toFixed(1)}/100`);
+          console.log(`\nOVERALL SCORE: ${result.totalScore}/100`);
 
           console.log('\n---');
           console.log('\nSUBSCORES');
           Object.entries(result.pillarScores).forEach(([pillar, score]) => {
-            console.log(`  ${pillar}: ${(score as number).toFixed(1)}`);
+            console.log(`  ${pillar}: ${(score as number)}`);
           });
 
           console.log('\n---');
@@ -47,7 +47,7 @@ export function cli() {
             console.log(`\n=== ${pillar} ===`);
             Object.entries(signals as Record<string, number>).forEach(([signal, score]) => {
               const display_name = convertToDisplayName(signal);
-              console.log(`  ${display_name}: ${score.toFixed(1)}`);
+              console.log(`  ${display_name}: ${score}`);
             });
           });
 

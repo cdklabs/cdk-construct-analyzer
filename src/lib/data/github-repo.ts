@@ -37,7 +37,7 @@ export class GitHubRepo {
     }
 
     const repository = contentsResult.data.repository;
-    const entries = repository.rootContents?.entries || [];
+    const entries = repository.rootContents?.entries ?? [];
 
     // Find README file (any file that starts with "readme" case-insensitive)
     const readmeFile = entries.find((entry: any) =>

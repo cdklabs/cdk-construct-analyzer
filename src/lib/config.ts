@@ -9,6 +9,7 @@ export const CONFIG: Config = {
     {
       name: 'MAINTENANCE',
       description: 'Measures how actively maintained and updated the package is',
+      weight: 0.33,
       signals: [
         {
           name: 'numberOfContributors(Maintenance)',
@@ -21,6 +22,7 @@ export const CONFIG: Config = {
     {
       name: 'QUALITY',
       description: 'Measures the overall quality and reliability of the package',
+      weight: 0.33,
       signals: [
         {
           name: 'documentationCompleteness',
@@ -40,6 +42,7 @@ export const CONFIG: Config = {
     {
       name: 'POPULARITY',
       description: 'Measures how widely adopted and used the package is',
+      weight: 0.33,
       signals: [
         {
           name: 'weeklyDownloads',

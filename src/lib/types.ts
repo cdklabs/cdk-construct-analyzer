@@ -23,6 +23,7 @@ export interface SignalConfig {
 export interface PillarConfig {
   readonly name: string;
   readonly description: string;
+  readonly weight: number;
   readonly signals: SignalConfig[];
 }
 

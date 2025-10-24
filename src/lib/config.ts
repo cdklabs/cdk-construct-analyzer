@@ -11,18 +11,18 @@ export const CONFIG: Config = {
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
-          name: 'numberOfContributors(Maintenance)',
-          weight: 2,
-          description: 'Number of Contributors in the past year',
-          benchmarks: (contributors: number) => categorizeByBuckets([8, 2, 1, 1], contributors),
-        },
-        {
           name: 'provenanceVerification',
           weight: 3,
           description: 'Ensures supply chain security through provenance verification',
           benchmarks: (verified: boolean) => categorizeByChecklist({
             versionVerified: { present: verified, value: 4 },
           }),
+        },
+        {
+          name: 'numberOfContributors(Maintenance)',
+          weight: 2,
+          description: 'Number of Contributors in the past year',
+          benchmarks: (contributors: number) => categorizeByBuckets([8, 2, 1, 1], contributors),
         },
       ],
     },

@@ -80,7 +80,6 @@ export interface GitHubCommit {
     };
     readonly email?: string;
   };
-  readonly committedDate: string;
 }
 
 export interface GitHubRepository {

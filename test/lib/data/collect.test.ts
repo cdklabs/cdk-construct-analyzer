@@ -148,14 +148,10 @@ describe('collectPackageData', () => {
     test('should count unique human contributors', () => {
       const contributorsData = [
         {
-          author: { login: 'user1' },
-          committer: { login: 'user1' },
-          commit: { message: 'Add feature' },
+          author: { user: { login: 'user1' } },
         },
         {
-          author: { login: 'user2' },
-          committer: { login: 'user2' },
-          commit: { message: 'Fix bug' },
+          author: { user: { login: 'user2' } },
         },
       ];
 
@@ -165,134 +161,94 @@ describe('collectPackageData', () => {
     test('should exclude bots from count', () => {
       const contributorsData = [
         {
-          author: { login: 'user1' },
-          committer: { login: 'user1' },
-          commit: { message: 'Add feature' },
+          author: { user: { login: 'user1' } },
         },
         {
-          author: { login: 'dependabot[bot]' },
-          committer: { login: 'dependabot[bot]' },
-          commit: { message: 'chore(deps): bump version' },
+          author: { user: { login: 'dependabot[bot]' } },
         },
         {
-          author: { login: 'github-actions[bot]' },
-          committer: { login: 'github-actions[bot]' },
-          commit: { message: 'Update docs' },
+          author: { user: { login: 'github-actions[bot]' } },
         },
       ];
 
       expect(processContributorsData(contributorsData)).toBe(1);
     });
 
-    test('should count both author and committer when different', () => {
+    test('should handle email-only authors', () => {
       const contributorsData = [
         {
-          author: { login: 'contributor' },
-          committer: { login: 'maintainer' },
-          commit: { message: 'Add feature' },
+          author: { email: 'user1@example.com' },
+        },
+        {
+          author: { user: { login: 'user2' } },
         },
       ];
 
       expect(processContributorsData(contributorsData)).toBe(2);
     });
 
-    test('should not double-count same person as author and committer', () => {
+    test('should not count duplicate contributors', () => {
       const contributorsData = [
         {
-          author: { login: 'user1' },
-          committer: { login: 'user1' },
-          commit: { message: 'Add feature' },
+          author: { user: { login: 'user1' } },
+        },
+        {
+          author: { user: { login: 'user1' } },
         },
       ];
 
       expect(processContributorsData(contributorsData)).toBe(1);
     });
 
-    test('should exclude automated commits by message pattern', () => {
+    test('should exclude bot emails', () => {
       const contributorsData = [
         {
-          author: { login: 'user1' },
-          committer: { login: 'user1' },
-          commit: { message: 'chore(deps): update dependencies' },
+          author: { email: 'user@example.com' },
         },
         {
-          author: { login: 'user2' },
-          committer: { login: 'user2' },
-          commit: { message: 'bump version to 1.2.3' },
+          author: { email: 'dependabot[bot]@users.noreply.github.com' },
         },
         {
-          author: { login: 'user3' },
-          committer: { login: 'user3' },
-          commit: { message: 'Add real feature' },
+          author: { user: { login: 'user3' } },
         },
       ];
 
-      expect(processContributorsData(contributorsData)).toBe(1);
+      expect(processContributorsData(contributorsData)).toBe(2);
     });
   });
 
   describe('isBotOrAutomated', () => {
     describe('bot username patterns', () => {
       test('should detect [bot] suffix', () => {
-        expect(isBotOrAutomated('dependabot[bot]', 'normal message')).toBe(true);
-        expect(isBotOrAutomated('github-actions[bot]', 'normal message')).toBe(true);
+        expect(isBotOrAutomated('dependabot[bot]')).toBe(true);
+        expect(isBotOrAutomated('github-actions[bot]')).toBe(true);
       });
 
       test('should detect bot suffix', () => {
-        expect(isBotOrAutomated('renovatebot', 'normal message')).toBe(true);
-        expect(isBotOrAutomated('greenkeeper-bot', 'normal message')).toBe(true);
+        expect(isBotOrAutomated('renovatebot')).toBe(true);
+        expect(isBotOrAutomated('greenkeeper-bot')).toBe(true);
       });
 
       test('should detect automation prefix', () => {
-        expect(isBotOrAutomated('automation-user', 'normal message')).toBe(true);
-        expect(isBotOrAutomated('Automation-Service', 'normal message')).toBe(true);
+        expect(isBotOrAutomated('automation-user')).toBe(true);
+        expect(isBotOrAutomated('Automation-Service')).toBe(true);
       });
 
       test('should not flag normal usernames', () => {
-        expect(isBotOrAutomated('john-doe', 'normal message')).toBe(false);
-        expect(isBotOrAutomated('contributor123', 'normal message')).toBe(false);
-        expect(isBotOrAutomated('robot-lover', 'normal message')).toBe(false); // contains 'bot' but not at end
+        expect(isBotOrAutomated('john-doe')).toBe(false);
+        expect(isBotOrAutomated('contributor123')).toBe(false);
+        expect(isBotOrAutomated('user-name')).toBe(false);
       });
     });
 
-    describe('automated commit message patterns', () => {
-      test('should detect dependency updates', () => {
-        expect(isBotOrAutomated('user', 'chore(deps): update package')).toBe(true);
-        expect(isBotOrAutomated('user', 'Chore(deps): bump version')).toBe(true);
-      });
 
-      test('should detect version bumps', () => {
-        expect(isBotOrAutomated('user', 'bump version to 1.2.3')).toBe(true);
-        expect(isBotOrAutomated('user', 'Bump Version 2.0.0')).toBe(true);
-      });
-
-      test('should detect dependency updates', () => {
-        expect(isBotOrAutomated('user', 'update dependencies')).toBe(true);
-        expect(isBotOrAutomated('user', 'Update Dependencies to latest')).toBe(true);
-      });
-
-      test('should detect auto-prefixed messages', () => {
-        expect(isBotOrAutomated('user', 'auto: regenerate docs')).toBe(true);
-        expect(isBotOrAutomated('user', 'Auto-update configuration')).toBe(true);
-      });
-
-      test('should not flag normal commit messages', () => {
-        expect(isBotOrAutomated('user', 'Add new feature')).toBe(false);
-        expect(isBotOrAutomated('user', 'Fix critical bug')).toBe(false);
-        expect(isBotOrAutomated('user', 'Refactor authentication logic')).toBe(false);
-        expect(isBotOrAutomated('user', 'Update README with examples')).toBe(false); // manual update
-      });
-    });
-
-    test('should handle empty or undefined inputs', () => {
-      expect(isBotOrAutomated('', '')).toBe(false);
-      expect(isBotOrAutomated('user', '')).toBe(false);
-      expect(isBotOrAutomated('', 'message')).toBe(false);
+    test('should handle empty inputs', () => {
+      expect(isBotOrAutomated('')).toBe(false);
     });
 
     test('should be case insensitive', () => {
-      expect(isBotOrAutomated('DEPENDABOT[BOT]', 'normal message')).toBe(true);
-      expect(isBotOrAutomated('user', 'CHORE(DEPS): update')).toBe(true);
+      expect(isBotOrAutomated('DEPENDABOT[BOT]')).toBe(true);
+      expect(isBotOrAutomated('AUTOMATION-USER')).toBe(true);
     });
   });
 });

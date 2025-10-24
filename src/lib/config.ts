@@ -1,5 +1,5 @@
 import { categorizeByBuckets, categorizeByChecklist } from './scoring';
-import type { Config, DocumentationCompleteness } from './types';
+import type { Config, DocumentationCompleteness, VersionStability } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks
@@ -34,6 +34,16 @@ export const CONFIG: Config = {
               multipleExamples: { present: docData.multipleExamples, value: 1 },
             },
           ),
+        },
+        {
+          name: 'stableVersioning',
+          weight: 2,
+          description: 'Package version stability and deprecation status',
+          benchmarks: (versionData: VersionStability) => categorizeByChecklist({
+            majorVersion: { present: versionData.majorVersion, value: 2 },
+            active: { present: !versionData.isDeprecated, value: 2 },
+            deprecated: { present: versionData.isDeprecated, value: -4 },
+          }),
         },
       ],
     },

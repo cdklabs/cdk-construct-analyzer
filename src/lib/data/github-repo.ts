@@ -42,7 +42,6 @@ export class GitHubRepo {
                       }
                       email
                     }
-                    committedDate
                   }
                 }
               }

@@ -1,4 +1,4 @@
-import { PackageData, GitHubRepository } from '../types';
+import { PackageData, GitHubRepository, GitHubCommit } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 
@@ -60,16 +60,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
   const readmeContent = repository.readmeContent;
 
   // Process contributor data
-  const commits = repository.commits ?? [];
-  const uniqueContributors = new Set();
-  commits.forEach((commit) => {
-    if (commit.author?.user?.login) {
-      uniqueContributors.add(commit.author.user.login);
-    } else if (commit.author?.email) {
-      uniqueContributors.add(commit.author.email);
-    }
-  });
-  const contributorCount = uniqueContributors.size;
+  const contributorCount = processContributorsData(repository.commits);
 
   const hasReadme = Boolean(readmeContent);
 
@@ -128,7 +119,7 @@ export function extractRepoInfo(repositoryUrl: string): { owner: string; repo: s
 /**
  * Process contributors data to count unique human contributors from the last month
  */
-export function processContributorsData(contributorsData?: any[]): number {
+export function processContributorsData(contributorsData?: GitHubCommit[]): number {
   if (!contributorsData?.length) {
     return 0;
   }
@@ -136,17 +127,10 @@ export function processContributorsData(contributorsData?: any[]): number {
   const contributors = new Set<string>();
 
   for (const commit of contributorsData) {
-    const { author, committer, commit: commitData } = commit;
-    const message = commitData?.message ?? '';
-
-    if (author?.login && !isBotOrAutomated(author.login, message)) {
-      contributors.add(author.login);
-    }
-
-    if (committer?.login &&
-      committer.login !== author?.login &&
-      !isBotOrAutomated(committer.login, message)) {
-      contributors.add(committer.login);
+    if (commit.author?.user?.login && !isBotOrAutomated(commit.author.user.login)) {
+      contributors.add(commit.author.user.login);
+    } else if (commit.author?.email && !isBotOrAutomated(commit.author.email)) {
+      contributors.add(commit.author.email);
     }
   }
 
@@ -156,25 +140,13 @@ export function processContributorsData(contributorsData?: any[]): number {
 /**
  * Check if a username or commit message indicates bot/automated activity
  */
-export function isBotOrAutomated(username: string, commitMessage: string): boolean {
+export function isBotOrAutomated(username: string): boolean {
   const botPatterns = [
-    /bot$/i,
-    /\[bot\]$/i,
+    /bot/i, // Match "bot" anywhere in the string
     /^automation/i,
   ];
 
   if (botPatterns.some(pattern => pattern.test(username))) {
-    return true;
-  }
-
-  const automatedMessagePatterns = [
-    /^chore\(deps\):/i,
-    /^bump version/i,
-    /^update dependencies/i,
-    /^auto/i,
-  ];
-
-  if (automatedMessagePatterns.some(pattern => pattern.test(commitMessage.trim()))) {
     return true;
   }
 

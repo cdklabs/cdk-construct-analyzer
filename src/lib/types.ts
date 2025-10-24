@@ -48,6 +48,7 @@ export type PackageData = {
   readonly 'weeklyDownloads'?: number;
   readonly 'githubStars'?: number;
   readonly 'numberOfContributors(Popularity)'?: number;
+  readonly 'provenanceVerification'?: boolean;
 } & Record<string, any>;
 
 export type DocumentationCompleteness = {

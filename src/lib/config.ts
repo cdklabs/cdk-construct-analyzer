@@ -11,6 +11,14 @@ export const CONFIG: Config = {
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
+          name: 'provenanceVerification',
+          weight: 3,
+          description: 'Ensures supply chain security through provenance verification',
+          benchmarks: (verified: boolean) => categorizeByChecklist({
+            versionVerified: { present: verified, value: 4 },
+          }),
+        },
+        {
           name: 'numberOfContributors(Maintenance)',
           weight: 2,
           description: 'Number of Contributors in the past year',

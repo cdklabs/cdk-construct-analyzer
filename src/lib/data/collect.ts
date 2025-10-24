@@ -52,6 +52,10 @@ function processPackageData(rawData: RawPackageData): PackageData {
     return {
       version: rawData.npm.version,
       weeklyDownloads: rawData.downloads.downloads,
+      stableVersioning: {
+        majorVersion: parseInt(rawData.npm.version.split('.')[0], 10) >= 1,
+        isDeprecated: rawData.npm.isDeprecated,
+      },
     };
   }
 
@@ -86,6 +90,10 @@ function processPackageData(rawData: RawPackageData): PackageData {
     'weeklyDownloads': rawData.downloads.downloads,
     'githubStars': repository.stargazerCount ?? 0,
     'numberOfContributors(Popularity)': contributorCount,
+    'stableVersioning': {
+      majorVersion: parseInt(rawData.npm.version.split('.')[0], 10) >= 1,
+      isDeprecated: rawData.npm.isDeprecated,
+    },
   };
 }
 

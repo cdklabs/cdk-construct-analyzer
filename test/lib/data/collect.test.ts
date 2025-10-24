@@ -16,6 +16,7 @@ describe('collectPackageData', () => {
     repository: {
       url: 'https://github.com/cdklabs/repo',
     },
+    isDeprecated: false,
   };
 
   const mockDownloadData = {
@@ -91,6 +92,10 @@ describe('collectPackageData', () => {
       'weeklyDownloads': 10000,
       'githubStars': 500,
       'numberOfContributors(Popularity)': 2,
+      'stableVersioning': {
+        majorVersion: true,
+        isDeprecated: false,
+      },
     });
   });
 
@@ -115,6 +120,10 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       version: '1.0.0',
       weeklyDownloads: 10000,
+      stableVersioning: {
+        majorVersion: true,
+        isDeprecated: false,
+      },
     });
   });
 
@@ -249,6 +258,120 @@ describe('collectPackageData', () => {
     test('should be case insensitive', () => {
       expect(isBotOrAutomated('DEPENDABOT[BOT]')).toBe(true);
       expect(isBotOrAutomated('AUTOMATION-USER')).toBe(true);
+    });
+  });
+
+  describe('stableVersioning data processing', () => {
+    test('should correctly identify stable versions (>=1.0)', async () => {
+      const mockNpmInstance = {
+        fetchPackage: jest.fn().mockResolvedValue(undefined),
+        getPackageData: jest.fn().mockReturnValue({
+          ...mockNpmData,
+          version: '2.1.3',
+          isDeprecated: false,
+        }),
+        fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      };
+
+      const mockGitHubInstance = {
+        metadata: jest.fn().mockResolvedValue({
+          data: { repository: { stargazerCount: 100 } },
+        }),
+      };
+
+      MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
+      MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
+
+      const result = await collectPackageData('test-package');
+
+      expect(result.stableVersioning).toEqual({
+        majorVersion: true,
+        isDeprecated: false,
+      });
+    });
+
+    test('should correctly identify pre-release versions (<1.0)', async () => {
+      const mockNpmInstance = {
+        fetchPackage: jest.fn().mockResolvedValue(undefined),
+        getPackageData: jest.fn().mockReturnValue({
+          ...mockNpmData,
+          version: '0.9.1',
+          isDeprecated: false,
+        }),
+        fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      };
+
+      const mockGitHubInstance = {
+        metadata: jest.fn().mockResolvedValue({
+          data: { repository: { stargazerCount: 100 } },
+        }),
+      };
+
+      MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
+      MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
+
+      const result = await collectPackageData('test-package');
+
+      expect(result.stableVersioning).toEqual({
+        majorVersion: false,
+        isDeprecated: false,
+      });
+    });
+
+    test('should correctly identify deprecated packages', async () => {
+      const mockNpmInstance = {
+        fetchPackage: jest.fn().mockResolvedValue(undefined),
+        getPackageData: jest.fn().mockReturnValue({
+          ...mockNpmData,
+          version: '1.5.0',
+          isDeprecated: true,
+        }),
+        fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      };
+
+      const mockGitHubInstance = {
+        metadata: jest.fn().mockResolvedValue({
+          data: { repository: { stargazerCount: 100 } },
+        }),
+      };
+
+      MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
+      MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
+
+      const result = await collectPackageData('test-package');
+
+      expect(result.stableVersioning).toEqual({
+        majorVersion: true,
+        isDeprecated: true,
+      });
+    });
+
+    test('should handle edge case version 1.0.0', async () => {
+      const mockNpmInstance = {
+        fetchPackage: jest.fn().mockResolvedValue(undefined),
+        getPackageData: jest.fn().mockReturnValue({
+          ...mockNpmData,
+          version: '1.0.0',
+          isDeprecated: false,
+        }),
+        fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      };
+
+      const mockGitHubInstance = {
+        metadata: jest.fn().mockResolvedValue({
+          data: { repository: { stargazerCount: 100 } },
+        }),
+      };
+
+      MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
+      MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
+
+      const result = await collectPackageData('test-package');
+
+      expect(result.stableVersioning).toEqual({
+        majorVersion: true,
+        isDeprecated: false,
+      });
     });
   });
 });

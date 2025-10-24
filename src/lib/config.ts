@@ -11,7 +11,7 @@ export const CONFIG: Config = {
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
-          name: 'time_to_first_response',
+          name: 'timeToFirstResponse',
           weight: 3,
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),

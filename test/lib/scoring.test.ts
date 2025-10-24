@@ -1,33 +1,62 @@
-import { categorizeByBuckets, categorizeByChecklist } from '../../src/lib/scoring';
+import { categorizeHigherIsBetter, categorizeLowerIsBetter, categorizeByChecklist } from '../../src/lib/scoring';
 import { ChecklistItem } from '../../src/lib/types';
 
 describe('scoring functions', () => {
-  describe('categorizeByBuckets', () => {
+  describe('categorizeHigherIsBetter', () => {
     const thresholds: [number, number, number, number] = [1000, 500, 100, 50];
 
     test('should return 5 for values above excellent threshold', () => {
-      expect(categorizeByBuckets(thresholds, 1500)).toBe(5);
-      expect(categorizeByBuckets(thresholds, 1000)).toBe(5);
+      expect(categorizeHigherIsBetter(thresholds, 1500)).toBe(5);
+      expect(categorizeHigherIsBetter(thresholds, 1000)).toBe(5);
     });
 
     test('should return 4 for values in great range', () => {
-      expect(categorizeByBuckets(thresholds, 750)).toBe(4);
-      expect(categorizeByBuckets(thresholds, 500)).toBe(4);
+      expect(categorizeHigherIsBetter(thresholds, 750)).toBe(4);
+      expect(categorizeHigherIsBetter(thresholds, 500)).toBe(4);
     });
 
     test('should return 3 for values in good range', () => {
-      expect(categorizeByBuckets(thresholds, 300)).toBe(3);
-      expect(categorizeByBuckets(thresholds, 100)).toBe(3);
+      expect(categorizeHigherIsBetter(thresholds, 300)).toBe(3);
+      expect(categorizeHigherIsBetter(thresholds, 100)).toBe(3);
     });
 
     test('should return 2 for values in fair range', () => {
-      expect(categorizeByBuckets(thresholds, 75)).toBe(2);
-      expect(categorizeByBuckets(thresholds, 50)).toBe(2);
+      expect(categorizeHigherIsBetter(thresholds, 75)).toBe(2);
+      expect(categorizeHigherIsBetter(thresholds, 50)).toBe(2);
     });
 
     test('should return 1 for values below all thresholds', () => {
-      expect(categorizeByBuckets(thresholds, 25)).toBe(1);
-      expect(categorizeByBuckets(thresholds, 0)).toBe(1);
+      expect(categorizeHigherIsBetter(thresholds, 25)).toBe(1);
+      expect(categorizeHigherIsBetter(thresholds, 0)).toBe(1);
+    });
+  });
+
+  describe('categorizeLowerIsBetter', () => {
+    const thresholds: [number, number, number, number] = [1, 5, 10, 20];
+
+    test('should return 5 for values below excellent threshold', () => {
+      expect(categorizeLowerIsBetter(thresholds, 0.5)).toBe(5);
+      expect(categorizeLowerIsBetter(thresholds, 1)).toBe(5);
+    });
+
+    test('should return 4 for values in great range', () => {
+      expect(categorizeLowerIsBetter(thresholds, 3)).toBe(4);
+      expect(categorizeLowerIsBetter(thresholds, 5)).toBe(4);
+    });
+
+    test('should return 3 for values in good range', () => {
+      expect(categorizeLowerIsBetter(thresholds, 7)).toBe(3);
+      expect(categorizeLowerIsBetter(thresholds, 10)).toBe(3);
+    });
+
+    test('should return 2 for values in fair range', () => {
+      expect(categorizeLowerIsBetter(thresholds, 15)).toBe(2);
+      expect(categorizeLowerIsBetter(thresholds, 20)).toBe(2);
+    });
+
+    test('should return 1 for values above all thresholds', () => {
+      expect(categorizeLowerIsBetter(thresholds, 25)).toBe(1);
+      expect(categorizeLowerIsBetter(thresholds, 100)).toBe(1);
     });
   });
 

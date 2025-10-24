@@ -3598,7 +3598,7 @@ pretty-format@30.2.0, pretty-format@^30.0.0:
     ansi-styles "^5.2.0"
     react-is "^18.3.1"
 
-projen@0.98.4:
+projen@^0.98.4:
   version "0.98.4"
   resolved "https://registry.yarnpkg.com/projen/-/projen-0.98.4.tgz#7ccf0014b7b2d3ff75dc1a8c406ca3c0029ef989"
   integrity sha512-v3o7ueUV+J6eRUmEZcg1UdmH1t/nRUrY737iugm9f4AH4v7GVGqDEDd4dIa80hCreIUPruXtUBpyl82h8d7NdA==
@@ -3772,6 +3772,11 @@ semver@^6.3.1:
   integrity sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==
 
 semver@^7.5.3, semver@^7.5.4, semver@^7.6.0, semver@^7.7.1, semver@^7.7.2, semver@^7.7.3:
+  version "7.7.3"
+  resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
+  integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==
+
+semver@^7.7.3:
   version "7.7.3"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.7.3.tgz#4b5f4143d007633a8dc671cd0a6ef9147b8bb946"
   integrity sha512-SdsKMrI9TdgjdweUSR9MweHA4EJ8YxHn8DFaDisvhVlUOe4BF1tLD7GAj0lIqWVl+dPb/rExr0Btby5loQm20Q==

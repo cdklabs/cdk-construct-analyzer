@@ -16,6 +16,14 @@ export const CONFIG: Config = {
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeByBuckets([8, 2, 1, 1], contributors),
         },
+        {
+          name: 'provenanceVerification',
+          weight: 3,
+          description: 'Ensures supply chain security through provenance verification',
+          benchmarks: (verified: boolean) => categorizeByChecklist({
+            versionVerified: { present: verified, value: 4 },
+          }),
+        },
       ],
     },
     {

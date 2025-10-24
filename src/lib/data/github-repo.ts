@@ -8,11 +8,15 @@ export interface GitHubApiResponse {
 export class GitHubRepo {
   private readonly graphqlUrl = 'https://api.github.com/graphql';
 
-  constructor(readonly owner: string, readonly repo: string) {}
+  constructor(readonly owner: string, readonly repo: string) { }
 
   async metadata(): Promise<GitHubApiResponse> {
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    const sinceDate = oneYearAgo.toISOString();
+
     const contentsQuery = `
-      query GetRepositoryContents($owner: String!, $name: String!) {
+      query GetRepositoryData($owner: String!, $name: String!, $since: GitTimestamp!) {
         repository(owner: $owner, name: $name) {
           stargazerCount
           
@@ -25,17 +29,40 @@ export class GitHubRepo {
               }
             }
           }
+          
+          # Get commits from the last month to count contributors
+          defaultBranchRef {
+            target {
+              ... on Commit {
+                history(first: 100, since: $since) {
+                  nodes {
+                    author {
+                      user {
+                        login
+                      }
+                      email
+                    }
+                    committedDate
+                  }
+                }
+              }
+            }
+          }
         }
       }
     `;
 
-    const contentsResult = await this.executeQuery(contentsQuery, { owner: this.owner, name: this.repo });
+    const contentsResult = await this.executeQuery(contentsQuery, {
+      owner: this.owner,
+      name: this.repo,
+      since: sinceDate,
+    });
 
     if (contentsResult.error || !contentsResult.data?.repository) {
       return contentsResult;
     }
 
-    const repository = contentsResult.data.repository;
+    const repository = contentsResult.data.repository as any;
     const entries = repository.rootContents?.entries ?? [];
 
     const readmeFile = entries.find((entry: any) =>
@@ -47,26 +74,18 @@ export class GitHubRepo {
       return {
         data: {
           repository: {
-            ...repository,
+            stargazerCount: repository.stargazerCount,
+            rootContents: repository.rootContents,
+            commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
           } as GitHubRepository,
         },
       };
     }
 
+    // Second query: Get README content only
     const readmeQuery = `
       query GetReadmeContent($owner: String!, $name: String!, $path: String!) {
         repository(owner: $owner, name: $name) {
-          stargazerCount
-          
-          rootContents: object(expression: "HEAD:") {
-            ... on Tree {
-              entries {
-                name
-                type
-              }
-            }
-          }
-          
           readme: object(expression: $path) {
             ... on Blob {
               text
@@ -86,14 +105,16 @@ export class GitHubRepo {
       return readmeResult;
     }
 
+    // Extract README text
     const readmeText = (readmeResult.data.repository as any).readme?.text;
 
     return {
       data: {
         repository: {
-          stargazerCount: readmeResult.data.repository.stargazerCount,
-          rootContents: readmeResult.data.repository.rootContents,
+          stargazerCount: repository.stargazerCount,
+          rootContents: repository.rootContents,
           readmeContent: readmeText,
+          commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
         } as GitHubRepository,
       },
     };
@@ -137,7 +158,7 @@ export class GitHubRepo {
       return { data: result.data };
     } catch (error: any) {
       return {
-        error: `Network error: ${error.message || 'Unknown error'}`,
+        error: `Network error: ${error.message ?? 'Unknown error'}`,
       };
     }
   }

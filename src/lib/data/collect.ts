@@ -19,7 +19,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
 
   await npmCollector.fetchPackage(packageName);
   const npmData = npmCollector.getPackageData();
-  const downloadData = await npmCollector.getDownloadData();
+  const downloadData = await npmCollector.fetchDownloadData();
 
   const repoInfo = extractRepoInfo(npmData.repository.url);
   const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
@@ -49,12 +49,27 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
  */
 function processPackageData(rawData: RawPackageData): PackageData {
   if (!rawData.github) {
-    return { version: rawData.npm.version };
+    return {
+      version: rawData.npm.version,
+      weeklyDownloads: rawData.downloads.downloads,
+    };
   }
 
   const repository = rawData.github;
 
   const readmeContent = repository.readmeContent;
+
+  // Process contributor data
+  const commits = repository.commits ?? [];
+  const uniqueContributors = new Set();
+  commits.forEach((commit) => {
+    if (commit.author?.user?.login) {
+      uniqueContributors.add(commit.author.user.login);
+    } else if (commit.author?.email) {
+      uniqueContributors.add(commit.author.email);
+    }
+  });
+  const contributorCount = uniqueContributors.size;
 
   const hasReadme = Boolean(readmeContent);
 
@@ -69,15 +84,17 @@ function processPackageData(rawData: RawPackageData): PackageData {
   const multipleExamples = numExamples > 1;
 
   return {
-    version: rawData.npm.version,
-    weeklyDownloads: rawData.downloads.downloads,
-    githubStars: repository.stargazerCount ?? 0,
-    documentationCompleteness: {
+    'version': rawData.npm.version,
+    'numberOfContributors(Maintenance)': contributorCount,
+    'documentationCompleteness': {
       hasReadme,
       hasApiDocs,
       hasExample,
       multipleExamples,
     },
+    'weeklyDownloads': rawData.downloads.downloads,
+    'githubStars': repository.stargazerCount ?? 0,
+    'numberOfContributors(Popularity)': contributorCount,
   };
 }
 
@@ -106,4 +123,60 @@ export function extractRepoInfo(repositoryUrl: string): { owner: string; repo: s
     }
   }
   throw new Error('Could not parse GitHub URL');
+}
+
+/**
+ * Process contributors data to count unique human contributors from the last month
+ */
+export function processContributorsData(contributorsData?: any[]): number {
+  if (!contributorsData?.length) {
+    return 0;
+  }
+
+  const contributors = new Set<string>();
+
+  for (const commit of contributorsData) {
+    const { author, committer, commit: commitData } = commit;
+    const message = commitData?.message ?? '';
+
+    if (author?.login && !isBotOrAutomated(author.login, message)) {
+      contributors.add(author.login);
+    }
+
+    if (committer?.login &&
+      committer.login !== author?.login &&
+      !isBotOrAutomated(committer.login, message)) {
+      contributors.add(committer.login);
+    }
+  }
+
+  return contributors.size;
+}
+
+/**
+ * Check if a username or commit message indicates bot/automated activity
+ */
+export function isBotOrAutomated(username: string, commitMessage: string): boolean {
+  const botPatterns = [
+    /bot$/i,
+    /\[bot\]$/i,
+    /^automation/i,
+  ];
+
+  if (botPatterns.some(pattern => pattern.test(username))) {
+    return true;
+  }
+
+  const automatedMessagePatterns = [
+    /^chore\(deps\):/i,
+    /^bump version/i,
+    /^update dependencies/i,
+    /^auto/i,
+  ];
+
+  if (automatedMessagePatterns.some(pattern => pattern.test(commitMessage.trim()))) {
+    return true;
+  }
+
+  return false;
 }

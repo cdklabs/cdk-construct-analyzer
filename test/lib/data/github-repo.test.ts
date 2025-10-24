@@ -31,6 +31,13 @@ describe('GitHubRepo', () => {
                 { name: 'docs', type: 'tree' },
               ],
             },
+            defaultBranchRef: {
+              target: {
+                history: {
+                  nodes: [],
+                },
+              },
+            },
           },
         },
       };
@@ -38,14 +45,6 @@ describe('GitHubRepo', () => {
       const mockReadmeResponse = {
         data: {
           repository: {
-            stargazerCount: 42,
-            rootContents: {
-              entries: [
-                { name: 'README.md', type: 'blob' },
-                { name: 'package.json', type: 'blob' },
-                { name: 'docs', type: 'tree' },
-              ],
-            },
             readme: {
               text: '# Test Repository\n\nThis is a test.',
             },
@@ -78,6 +77,7 @@ describe('GitHubRepo', () => {
               ],
             },
             readmeContent: '# Test Repository\n\nThis is a test.',
+            commits: [],
           },
         },
       });
@@ -93,6 +93,13 @@ describe('GitHubRepo', () => {
                 { name: 'package.json', type: 'blob' },
                 { name: 'src', type: 'tree' },
               ],
+            },
+            defaultBranchRef: {
+              target: {
+                history: {
+                  nodes: [],
+                },
+              },
             },
           },
         },
@@ -116,6 +123,7 @@ describe('GitHubRepo', () => {
                 { name: 'src', type: 'tree' },
               ],
             },
+            commits: [],
           },
         },
       });
@@ -170,6 +178,13 @@ describe('GitHubRepo', () => {
           repository: {
             stargazerCount: 42,
             rootContents: { entries: [] },
+            defaultBranchRef: {
+              target: {
+                history: {
+                  nodes: [],
+                },
+              },
+            },
           },
         },
       };
@@ -181,15 +196,15 @@ describe('GitHubRepo', () => {
 
       await githubRepo.metadata();
 
-      expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/graphql', {
+      expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/graphql', expect.objectContaining({
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'User-Agent': 'cdk-construct-analyzer',
           'Authorization': 'Bearer test-token',
         },
-        body: expect.stringContaining('query GetRepositoryContents'),
-      });
+        body: expect.stringContaining('query GetRepositoryData'),
+      }));
 
       delete process.env.GITHUB_TOKEN;
     });

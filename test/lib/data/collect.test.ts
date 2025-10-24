@@ -1,13 +1,13 @@
 import { collectPackageData, extractRepoInfo, processContributorsData, isBotOrAutomated } from '../../../src/lib/data/collect';
-import { GitHubCollector } from '../../../src/lib/data/github';
+import { GitHubRepo } from '../../../src/lib/data/github-repo';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
 // Mock the collectors
 jest.mock('../../../src/lib/data/npm');
-jest.mock('../../../src/lib/data/github');
+jest.mock('../../../src/lib/data/github-repo');
 
 const MockedNpmCollector = NpmCollector as jest.MockedClass<typeof NpmCollector>;
-const MockedGitHubCollector = GitHubCollector as jest.MockedClass<typeof GitHubCollector>;
+const MockedGitHubRepo = GitHubRepo as jest.MockedClass<typeof GitHubRepo>;
 
 describe('collectPackageData', () => {
   const mockNpmData = {
@@ -22,14 +22,14 @@ describe('collectPackageData', () => {
     downloads: 10000,
   };
 
-  const mockGitHubRawData = {
-    repoData: {
-      stargazers_count: 500,
-    },
-    repoContents: {
-      'README.md': true,
-      'docs': true,
-      'examples': true,
+  const mockGitHubData = {
+    stargazerCount: 500,
+    rootContents: {
+      entries: [
+        { name: 'README.md', type: 'blob' as const },
+        { name: 'docs', type: 'tree' as const },
+        { name: 'examples', type: 'tree' as const },
+      ],
     },
     readmeContent: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
     contributorsData: [
@@ -71,22 +71,19 @@ describe('collectPackageData', () => {
     };
 
     const mockGitHubInstance = {
-      fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getRawData: jest.fn().mockReturnValue(mockGitHubRawData),
+      metadata: jest.fn().mockResolvedValue({
+        data: { repository: mockGitHubData },
+      }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
-    MockedGitHubCollector.mockImplementation(() => mockGitHubInstance as any);
+    MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
 
     const result = await collectPackageData('test-package');
 
     expect(mockNpmInstance.fetchPackage).toHaveBeenCalledWith('test-package');
-    expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith(
-      expect.objectContaining({
-        owner: 'cdklabs',
-        repo: 'repo',
-      }),
-    );
+    expect(MockedGitHubRepo).toHaveBeenCalledWith('cdklabs', 'repo');
+    expect(mockGitHubInstance.metadata).toHaveBeenCalled();
 
     expect(result).toEqual({
       'version': '1.0.0',
@@ -119,11 +116,11 @@ describe('collectPackageData', () => {
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
-    MockedGitHubCollector.mockImplementation(() => mockGitHubInstance as any);
+    MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
 
     const result = await collectPackageData('test-package');
 
-    expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: Error: GitHub API error');
+    expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: GitHub API error');
 
     expect(result).toEqual({
       version: '1.0.0',

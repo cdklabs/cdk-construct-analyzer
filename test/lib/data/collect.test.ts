@@ -1,20 +1,20 @@
-import { collectPackageData } from '../../../src/lib/data/collect';
-import { GitHubCollector } from '../../../src/lib/data/github';
+import { collectPackageData, extractRepoInfo } from '../../../src/lib/data/collect';
+import { GitHubRepo } from '../../../src/lib/data/github-repo';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
 // Mock the collectors
 jest.mock('../../../src/lib/data/npm');
-jest.mock('../../../src/lib/data/github');
+jest.mock('../../../src/lib/data/github-repo');
 
 const MockedNpmCollector = NpmCollector as jest.MockedClass<typeof NpmCollector>;
-const MockedGitHubCollector = GitHubCollector as jest.MockedClass<typeof GitHubCollector>;
+const MockedGitHubRepo = GitHubRepo as jest.MockedClass<typeof GitHubRepo>;
 
 describe('collectPackageData', () => {
   const mockNpmData = {
     name: 'test-package',
     version: '1.0.0',
     repository: {
-      url: 'https://github.com/test/repo',
+      url: 'https://github.com/cdklabs/repo',
     },
   };
 
@@ -23,7 +23,15 @@ describe('collectPackageData', () => {
   };
 
   const mockGitHubData = {
-    stars: 500,
+    stargazerCount: 500,
+    rootContents: {
+      entries: [
+        { name: 'README.md', type: 'blob' as const },
+        { name: 'docs', type: 'tree' as const },
+        { name: 'examples', type: 'tree' as const },
+      ],
+    },
+    readmeContent: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
   };
 
   beforeEach(() => {
@@ -46,55 +54,30 @@ describe('collectPackageData', () => {
     };
 
     const mockGitHubInstance = {
-      fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue(mockGitHubData),
+      metadata: jest.fn().mockResolvedValue({
+        data: { repository: mockGitHubData },
+      }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
-    MockedGitHubCollector.mockImplementation(() => mockGitHubInstance as any);
+    MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
 
     const result = await collectPackageData('test-package');
 
     expect(mockNpmInstance.fetchPackage).toHaveBeenCalledWith('test-package');
-    expect(mockGitHubInstance.fetchPackage).toHaveBeenCalledWith('https://github.com/test/repo');
+    expect(MockedGitHubRepo).toHaveBeenCalledWith('cdklabs', 'repo');
+    expect(mockGitHubInstance.metadata).toHaveBeenCalled();
 
     expect(result).toEqual({
-      npm: mockNpmData,
-      downloads: mockDownloadData,
-      github: mockGitHubData,
-    });
-  });
-
-  test('should handle missing repository URL', async () => {
-    const npmDataWithoutRepo = {
-      name: 'test-package',
       version: '1.0.0',
-      repository: undefined,
-    };
-
-    const mockNpmInstance = {
-      fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getPackageData: jest.fn().mockReturnValue(npmDataWithoutRepo),
-      getDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
-    };
-
-    const mockGitHubInstance = {
-      fetchPackage: jest.fn().mockResolvedValue(undefined),
-      getData: jest.fn().mockReturnValue({ stars: 0 }),
-    };
-
-    MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
-    MockedGitHubCollector.mockImplementation(() => mockGitHubInstance as any);
-
-    const result = await collectPackageData('test-package');
-
-    expect(mockGitHubInstance.fetchPackage).not.toHaveBeenCalled();
-    expect(console.log).toHaveBeenCalledWith('No repository URL found in NPM data');
-
-    expect(result).toEqual({
-      npm: npmDataWithoutRepo,
-      downloads: mockDownloadData,
-      github: { stars: 0 },
+      weeklyDownloads: 10000,
+      githubStars: 500,
+      documentationCompleteness: {
+        hasReadme: true,
+        hasApiDocs: true,
+        hasExample: true,
+        multipleExamples: true,
+      },
     });
   });
 
@@ -106,23 +89,38 @@ describe('collectPackageData', () => {
     };
 
     const mockGitHubInstance = {
-      fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
-      getData: jest.fn().mockReturnValue({ stars: 0 }),
+      metadata: jest.fn().mockResolvedValue({
+        error: 'GitHub API error',
+      }),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
-    MockedGitHubCollector.mockImplementation(() => mockGitHubInstance as any);
+    MockedGitHubRepo.mockImplementation(() => mockGitHubInstance as any);
 
     const result = await collectPackageData('test-package');
 
-    expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: Error: GitHub API error');
+    expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: GitHub API error');
 
     expect(result).toEqual({
-      npm: mockNpmData,
-      downloads: mockDownloadData,
-      github: { stars: 0 },
+      version: '1.0.0',
     });
   });
 
+  describe('URL parsing helper', () => {
+    test('should parse GitHub URLs correctly', () => {
+      const repo1 = extractRepoInfo('https://github.com/test/repo');
+      expect(repo1.owner).toBe('test');
+      expect(repo1.repo).toBe('repo');
 
+      const repo2 = extractRepoInfo('git+https://github.com/facebook/react.git');
+      expect(repo2.owner).toBe('facebook');
+      expect(repo2.repo).toBe('react');
+    });
+
+    test('should throw error for invalid URLs', () => {
+      expect(() => extractRepoInfo('https://gitlab.com/test/repo')).toThrow(
+        'Could not parse GitHub URL',
+      );
+    });
+  });
 });

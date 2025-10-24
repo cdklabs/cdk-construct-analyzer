@@ -40,3 +40,39 @@ export interface ChecklistItem {
   readonly present: boolean;
   readonly value: number;
 }
+
+export type PackageData = {
+  readonly version: string;
+  readonly weeklyDownloads?: number;
+  readonly githubStars?: number;
+  readonly documentationCompleteness?: DocumentationCompleteness;
+} & Record<string, any>;
+
+export type DocumentationCompleteness = {
+  readonly hasReadme: boolean;
+  readonly hasApiDocs: boolean;
+  readonly hasExample: boolean;
+  readonly multipleExamples: boolean;
+};
+
+/**
+ * GitHub GraphQL API response types
+ */
+export interface GitHubRepositoryEntry {
+  readonly name: string;
+  readonly type: 'blob' | 'tree';
+}
+
+export interface GitHubRepositoryContents {
+  readonly entries: GitHubRepositoryEntry[];
+}
+
+export interface GitHubRepositoryBlob {
+  readonly text: string;
+}
+
+export interface GitHubRepository {
+  readonly stargazerCount: number;
+  readonly rootContents?: GitHubRepositoryContents;
+  readonly readmeContent?: string;
+}

@@ -95,10 +95,19 @@ export class ConstructAnalyzer {
   }
 
   private calculateTotalScore(pillarScores: Record<string, number>): number {
-    const scores = Object.values(pillarScores);
-    if (scores.length === 0) return 0;
+    if (Object.keys(pillarScores).length === 0) return 0;
 
-    const sum = scores.reduce((total, score) => total + score, 0);
-    return Math.round(sum / scores.length);
+    let weightedSum = 0;
+    let totalWeight = 0;
+
+    for (const [pillarName, score] of Object.entries(pillarScores)) {
+      const pillar = this.config.pillars.find(p => p.name === pillarName);
+      if (pillar) {
+        weightedSum += score * pillar.weight;
+        totalWeight += pillar.weight;
+      }
+    }
+
+    return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
   }
 }

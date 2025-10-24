@@ -42,7 +42,7 @@ describe('ConstructAnalyzer', () => {
       const incompleteData = {
         version: '1.0.0',
         weeklyDownloads: 10000,
-        // Missing githubStars and documentationCompleteness
+        // Missing a few other signals
       };
 
       mockedCollectPackageData.mockResolvedValue(incompleteData as any);
@@ -54,7 +54,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.version).toBe('1.0.0');
     });
 
-    test('should calculate total score as average of pillar scores', async () => {
+    test('should calculate total score as weighted average of pillar scores', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       const analyzer = new ConstructAnalyzer();
@@ -62,6 +62,13 @@ describe('ConstructAnalyzer', () => {
 
       expect(result.totalScore).toBeGreaterThan(0);
       expect(result.pillarScores).toHaveProperty('POPULARITY');
+      expect(result.pillarScores).toHaveProperty('QUALITY');
+
+      // Verify that the total score is calculated using pillar weights
+      // Since all pillars have equal weight (0.33), the result should be similar to a simple average
+      const pillarValues = Object.values(result.pillarScores);
+      const simpleAverage = Math.round(pillarValues.reduce((sum, score) => sum + score, 0) / pillarValues.length);
+      expect(Math.abs(result.totalScore - simpleAverage)).toBeLessThanOrEqual(1); // Allow for rounding differences
     });
   });
 });

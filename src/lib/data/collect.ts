@@ -64,9 +64,15 @@ function processPackageData(rawData: RawPackageData): PackageData {
   const uniqueContributors = new Set();
   commits.forEach((commit) => {
     if (commit.author?.user?.login) {
-      uniqueContributors.add(commit.author.user.login);
+      const login = commit.author.user.login;
+      if (!isBotOrAutomated(login)) {
+        uniqueContributors.add(login);
+      }
     } else if (commit.author?.email) {
-      uniqueContributors.add(commit.author.email);
+      const email = commit.author.email;
+      if (!isBotOrAutomated(email)) {
+        uniqueContributors.add(email);
+      }
     }
   });
   const contributorCount = uniqueContributors.size;
@@ -126,37 +132,9 @@ export function extractRepoInfo(repositoryUrl: string): { owner: string; repo: s
 }
 
 /**
- * Process contributors data to count unique human contributors from the last month
- */
-export function processContributorsData(contributorsData?: any[]): number {
-  if (!contributorsData?.length) {
-    return 0;
-  }
-
-  const contributors = new Set<string>();
-
-  for (const commit of contributorsData) {
-    const { author, committer, commit: commitData } = commit;
-    const message = commitData?.message ?? '';
-
-    if (author?.login && !isBotOrAutomated(author.login, message)) {
-      contributors.add(author.login);
-    }
-
-    if (committer?.login &&
-      committer.login !== author?.login &&
-      !isBotOrAutomated(committer.login, message)) {
-      contributors.add(committer.login);
-    }
-  }
-
-  return contributors.size;
-}
-
-/**
  * Check if a username or commit message indicates bot/automated activity
  */
-export function isBotOrAutomated(username: string, commitMessage: string): boolean {
+export function isBotOrAutomated(username: string): boolean {
   const botPatterns = [
     /bot$/i,
     /\[bot\]$/i,
@@ -166,17 +144,6 @@ export function isBotOrAutomated(username: string, commitMessage: string): boole
   if (botPatterns.some(pattern => pattern.test(username))) {
     return true;
   }
-
-  const automatedMessagePatterns = [
-    /^chore\(deps\):/i,
-    /^bump version/i,
-    /^update dependencies/i,
-    /^auto/i,
-  ];
-
-  if (automatedMessagePatterns.some(pattern => pattern.test(commitMessage.trim()))) {
-    return true;
-  }
-
+  
   return false;
 }

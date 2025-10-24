@@ -234,65 +234,25 @@ describe('collectPackageData', () => {
   describe('isBotOrAutomated', () => {
     describe('bot username patterns', () => {
       test('should detect [bot] suffix', () => {
-        expect(isBotOrAutomated('dependabot[bot]', 'normal message')).toBe(true);
-        expect(isBotOrAutomated('github-actions[bot]', 'normal message')).toBe(true);
+        expect(isBotOrAutomated('dependabot[bot]')).toBe(true);
+        expect(isBotOrAutomated('github-actions[bot]')).toBe(true);
       });
 
       test('should detect bot suffix', () => {
-        expect(isBotOrAutomated('renovatebot', 'normal message')).toBe(true);
-        expect(isBotOrAutomated('greenkeeper-bot', 'normal message')).toBe(true);
+        expect(isBotOrAutomated('renovatebot')).toBe(true);
+        expect(isBotOrAutomated('greenkeeper-bot')).toBe(true);
       });
 
       test('should detect automation prefix', () => {
-        expect(isBotOrAutomated('automation-user', 'normal message')).toBe(true);
-        expect(isBotOrAutomated('Automation-Service', 'normal message')).toBe(true);
+        expect(isBotOrAutomated('automation-user')).toBe(true);
+        expect(isBotOrAutomated('Automation-Service')).toBe(true);
       });
 
       test('should not flag normal usernames', () => {
-        expect(isBotOrAutomated('john-doe', 'normal message')).toBe(false);
-        expect(isBotOrAutomated('contributor123', 'normal message')).toBe(false);
-        expect(isBotOrAutomated('robot-lover', 'normal message')).toBe(false); // contains 'bot' but not at end
+        expect(isBotOrAutomated('john-doe')).toBe(false);
+        expect(isBotOrAutomated('contributor123')).toBe(false);
+        expect(isBotOrAutomated('robot-lover')).toBe(false); // contains 'bot' but not at end
       });
-    });
-
-    describe('automated commit message patterns', () => {
-      test('should detect dependency updates', () => {
-        expect(isBotOrAutomated('user', 'chore(deps): update package')).toBe(true);
-        expect(isBotOrAutomated('user', 'Chore(deps): bump version')).toBe(true);
-      });
-
-      test('should detect version bumps', () => {
-        expect(isBotOrAutomated('user', 'bump version to 1.2.3')).toBe(true);
-        expect(isBotOrAutomated('user', 'Bump Version 2.0.0')).toBe(true);
-      });
-
-      test('should detect dependency updates', () => {
-        expect(isBotOrAutomated('user', 'update dependencies')).toBe(true);
-        expect(isBotOrAutomated('user', 'Update Dependencies to latest')).toBe(true);
-      });
-
-      test('should detect auto-prefixed messages', () => {
-        expect(isBotOrAutomated('user', 'auto: regenerate docs')).toBe(true);
-        expect(isBotOrAutomated('user', 'Auto-update configuration')).toBe(true);
-      });
-
-      test('should not flag normal commit messages', () => {
-        expect(isBotOrAutomated('user', 'Add new feature')).toBe(false);
-        expect(isBotOrAutomated('user', 'Fix critical bug')).toBe(false);
-        expect(isBotOrAutomated('user', 'Refactor authentication logic')).toBe(false);
-        expect(isBotOrAutomated('user', 'Update README with examples')).toBe(false); // manual update
-      });
-    });
-
-    test('should handle empty or undefined inputs', () => {
-      expect(isBotOrAutomated('', '')).toBe(false);
-      expect(isBotOrAutomated('user', '')).toBe(false);
-      expect(isBotOrAutomated('', 'message')).toBe(false);
-    });
-
-    test('should be case insensitive', () => {
-      expect(isBotOrAutomated('DEPENDABOT[BOT]', 'normal message')).toBe(true);
-      expect(isBotOrAutomated('user', 'CHORE(DEPS): update')).toBe(true);
     });
   });
 });

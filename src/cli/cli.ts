@@ -11,7 +11,8 @@ import { ConstructAnalyzer } from '../lib/analyzer';
 function convertToDisplayName(signalName: string): string {
   return signalName
     .replace(/([A-Z])/g, ' $1') // Add space before capital letters everywhere
-    .replace(/\s*\(/g, ' (') // Add single space before opening parenthesis, removing any existing spaces
+    .replace(/\s*\(/g, ' (') // Add single space before opening parenthesis
+    .replace(/\( /g, '(') // Remove whitespace after opening parenthesis
     .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
     .replace(/\s+/g, ' ') // Clean up multiple spaces
     .trim();

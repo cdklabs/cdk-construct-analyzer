@@ -2,7 +2,7 @@
 export interface NpmPackageData {
   readonly name: string;
   readonly version: string;
-  readonly repository?: {
+  readonly repository: {
     type: string;
     url: string;
   };

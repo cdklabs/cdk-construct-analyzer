@@ -22,34 +22,6 @@ describe('collectPackageData', () => {
     downloads: 10000,
   };
 
-  const mockGitHubData = {
-    stargazerCount: 500,
-    rootContents: {
-      entries: [
-        { name: 'README.md', type: 'blob' as const },
-        { name: 'docs', type: 'tree' as const },
-        { name: 'examples', type: 'tree' as const },
-      ],
-    },
-    readmeContent: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
-    contributorsData: [
-      {
-        author: { login: 'user1' },
-        committer: { login: 'user1' },
-        commit: { message: 'Add new feature' },
-      },
-      {
-        author: { login: 'user2' },
-        committer: { login: 'user2' },
-        commit: { message: 'Fix bug' },
-      },
-      {
-        author: { login: 'dependabot[bot]' },
-        committer: { login: 'dependabot[bot]' },
-        commit: { message: 'chore(deps): bump version' },
-      },
-    ],
-  };
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -68,6 +40,28 @@ describe('collectPackageData', () => {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
       fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+    };
+
+    const mockGitHubData = {
+      stargazerCount: 500,
+      rootContents: {
+        entries: [
+          { name: 'README.md', type: 'blob' as const },
+          { name: 'docs', type: 'tree' as const },
+          { name: 'examples', type: 'tree' as const },
+        ],
+      },
+      readmeContent: '# Test Package\n\n```js\nconsole.log("example1");\n```\n\n```js\nconsole.log("example2");\n```',
+      commits: [
+        {
+          author: { user: { login: 'user1' }, email: 'user1@example.com' },
+          committedDate: '2024-10-01T00:00:00Z',
+        },
+        {
+          author: { user: { login: 'user2' }, email: 'user2@example.com' },
+          committedDate: '2024-10-02T00:00:00Z',
+        },
+      ],
     };
 
     const mockGitHubInstance = {
@@ -108,11 +102,7 @@ describe('collectPackageData', () => {
     };
 
     const mockGitHubInstance = {
-      fetchPackage: jest.fn().mockRejectedValue(new Error('GitHub API error')),
-      getRawData: jest.fn().mockReturnValue({
-        repoData: { stargazers_count: 0 },
-        repoContents: {},
-      }),
+      metadata: jest.fn().mockRejectedValue(new Error('GitHub API error')),
     };
 
     MockedNpmCollector.mockImplementation(() => mockNpmInstance as any);
@@ -120,7 +110,7 @@ describe('collectPackageData', () => {
 
     const result = await collectPackageData('test-package');
 
-    expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: GitHub API error');
+    expect(console.warn).toHaveBeenCalledWith('GitHub fetch failed: Error: GitHub API error');
 
     expect(result).toEqual({
       version: '1.0.0',

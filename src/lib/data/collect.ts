@@ -59,6 +59,18 @@ function processPackageData(rawData: RawPackageData): PackageData {
 
   const readmeContent = repository.readmeContent;
 
+  // Process contributor data
+  const commits = repository.commits ?? [];
+  const uniqueContributors = new Set();
+  commits.forEach((commit) => {
+    if (commit.author?.user?.login) {
+      uniqueContributors.add(commit.author.user.login);
+    } else if (commit.author?.email) {
+      uniqueContributors.add(commit.author.email);
+    }
+  });
+  const contributorCount = uniqueContributors.size;
+
   const hasReadme = Boolean(readmeContent);
 
   const hasApiDocs = repository.rootContents?.entries?.some((entry) => {
@@ -71,12 +83,9 @@ function processPackageData(rawData: RawPackageData): PackageData {
   const hasExample = numExamples > 0;
   const multipleExamples = numExamples > 1;
 
-  // Process contributors data
-  const contributorsLastMonth = processContributorsData(contributorsData);
-
   return {
     'version': rawData.npm.version,
-    'numberOfContributors(Maintenance)': contributorsLastMonth,
+    'numberOfContributors(Maintenance)': contributorCount,
     'documentationCompleteness': {
       hasReadme,
       hasApiDocs,
@@ -84,8 +93,8 @@ function processPackageData(rawData: RawPackageData): PackageData {
       multipleExamples,
     },
     'weeklyDownloads': rawData.downloads.downloads,
-    'githubStars': repoData.stargazers_count ?? 0,
-    'numberOfContributors(Popularity)': contributorsLastMonth,
+    'githubStars': repository.stargazerCount ?? 0,
+    'numberOfContributors(Popularity)': contributorCount,
   };
 }
 
@@ -130,15 +139,13 @@ export function processContributorsData(contributorsData?: any[]): number {
     const { author, committer, commit: commitData } = commit;
     const message = commitData?.message ?? '';
 
-    // Process author
     if (author?.login && !isBotOrAutomated(author.login, message)) {
       contributors.add(author.login);
     }
 
-    // Process committer if different from author
     if (committer?.login &&
-        committer.login !== author?.login &&
-        !isBotOrAutomated(committer.login, message)) {
+      committer.login !== author?.login &&
+      !isBotOrAutomated(committer.login, message)) {
       contributors.add(committer.login);
     }
   }

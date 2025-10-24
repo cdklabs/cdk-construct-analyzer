@@ -73,8 +73,19 @@ export interface GitHubRepositoryBlob {
   readonly text: string;
 }
 
+export interface GitHubCommit {
+  readonly author?: {
+    readonly user?: {
+      readonly login: string;
+    };
+    readonly email?: string;
+  };
+  readonly committedDate: string;
+}
+
 export interface GitHubRepository {
   readonly stargazerCount: number;
   readonly rootContents?: GitHubRepositoryContents;
   readonly readmeContent?: string;
+  readonly commits?: GitHubCommit[];
 }

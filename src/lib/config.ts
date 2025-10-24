@@ -1,4 +1,4 @@
-import { categorizeByBuckets, categorizeByChecklist } from './scoring';
+import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
 import type { Config, DocumentationCompleteness } from './types';
 
 /**
@@ -11,10 +11,16 @@ export const CONFIG: Config = {
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
+          name: 'timeToFirstResponse',
+          weight: 3,
+          description: 'Time to first response on issues',
+          benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
+        },
+        {
           name: 'numberOfContributors(Maintenance)',
           weight: 2,
           description: 'Number of Contributors in the past year',
-          benchmarks: (contributors: number) => categorizeByBuckets([8, 2, 1, 1], contributors),
+          benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
       ],
     },
@@ -45,19 +51,19 @@ export const CONFIG: Config = {
           name: 'weeklyDownloads',
           weight: 3,
           description: 'Weekly download count from npm',
-          benchmarks: (downloads: number) => categorizeByBuckets([2500, 251, 41, 6], downloads),
+          benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },
         {
           name: 'githubStars',
           weight: 2,
           description: 'GitHub repository stars',
-          benchmarks: (stars: number) => categorizeByBuckets([638, 28, 4, 1], stars),
+          benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
         {
           name: 'numberOfContributors(Popularity)',
           weight: 1,
           description: 'Number of Contributors in the past year',
-          benchmarks: (contributors: number) => categorizeByBuckets([8, 2, 1, 1], contributors),
+          benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
       ],
     },

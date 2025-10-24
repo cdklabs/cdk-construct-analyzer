@@ -47,6 +47,25 @@ export class GitHubRepo {
               }
             }
           }
+          
+          # Get recent issues for time to first response calculation
+          issues(first: 50, orderBy: {field: CREATED_AT, direction: DESC}) {
+            nodes {
+              number
+              createdAt
+              author {
+                login
+              }
+              comments(first: 10) {
+                nodes {
+                  createdAt
+                  author {
+                    login
+                  }
+                }
+              }
+            }
+          }
         }
       }
     `;
@@ -76,6 +95,7 @@ export class GitHubRepo {
             stargazerCount: repository.stargazerCount,
             rootContents: repository.rootContents,
             commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
+            issues: repository.issues?.nodes ?? [],
           } as GitHubRepository,
         },
       };
@@ -114,6 +134,7 @@ export class GitHubRepo {
           rootContents: repository.rootContents,
           readmeContent: readmeText,
           commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
+          issues: repository.issues?.nodes ?? [],
         } as GitHubRepository,
       },
     };

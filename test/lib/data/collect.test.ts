@@ -1,4 +1,4 @@
-import { collectPackageData, extractRepoInfo, processContributorsData, isBotOrAutomated } from '../../../src/lib/data/collect';
+import { collectPackageData, extractRepoInfo, processContributorsData, isBotOrAutomated, calculateTimeToFirstResponse } from '../../../src/lib/data/collect';
 import { GitHubRepo } from '../../../src/lib/data/github-repo';
 import { NpmCollector } from '../../../src/lib/data/npm';
 
@@ -214,6 +214,94 @@ describe('collectPackageData', () => {
       ];
 
       expect(processContributorsData(contributorsData)).toBe(2);
+    });
+  });
+
+  describe('calculateTimeToFirstResponse', () => {
+    test('should return undefined for empty issues', () => {
+      expect(calculateTimeToFirstResponse([])).toBeUndefined();
+      expect(calculateTimeToFirstResponse(undefined)).toBeUndefined();
+    });
+
+    test('should calculate average time to first response', () => {
+      const issues = [
+        {
+          number: 1,
+          createdAt: '2024-01-01T10:00:00Z',
+          author: { login: 'user1' },
+          comments: {
+            nodes: [
+              {
+                createdAt: '2024-01-11T12:00:00Z', // 10 days later
+                author: { login: 'maintainer' },
+              },
+            ],
+          },
+        },
+        {
+          number: 2,
+          createdAt: '2024-01-01T14:00:00Z',
+          author: { login: 'user2' },
+          comments: {
+            nodes: [
+              {
+                createdAt: '2024-01-01T18:00:00Z', // 4 hours later
+                author: { login: 'maintainer' },
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(calculateTimeToFirstResponse(issues)).toBe(0.7);
+    });
+
+    test('should ignore bot responses', () => {
+      const issues = [
+        {
+          number: 1,
+          createdAt: '2024-01-01T10:00:00Z',
+          author: { login: 'user1' },
+          comments: {
+            nodes: [
+              {
+                createdAt: '2024-01-01T11:00:00Z',
+                author: { login: 'github-actions[bot]' }, // Should be ignored
+              },
+              {
+                createdAt: '2024-01-01T12:00:00Z', // 2 hours later
+                author: { login: 'maintainer' },
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(calculateTimeToFirstResponse(issues)).toBe(0);
+    });
+
+    test('should ignore self-responses', () => {
+      const issues = [
+        {
+          number: 1,
+          createdAt: '2024-01-01T10:00:00Z',
+          author: { login: 'user1' },
+          comments: {
+            nodes: [
+              {
+                createdAt: '2024-01-01T11:00:00Z',
+                author: { login: 'user1' }, // Same as issue author, should be ignored
+              },
+              {
+                createdAt: '2024-01-10T12:00:00Z', // 9 days later
+                author: { login: 'maintainer' },
+              },
+            ],
+          },
+        },
+      ];
+
+      expect(calculateTimeToFirstResponse(issues)).toBe(1.3);
     });
   });
 

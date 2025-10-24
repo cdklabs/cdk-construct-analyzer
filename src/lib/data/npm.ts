@@ -50,8 +50,4 @@ export class NpmCollector {
 
     return await response.json() as NpmDownloadData;
   }
-
-  async getDownloadData(): Promise<NpmDownloadData> {
-    return this.fetchDownloadData();
-  }
 }

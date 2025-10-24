@@ -1,7 +1,7 @@
 import { GitHubRepo } from '../../../src/lib/data/github-repo';
 
-const mockedFetch = jest.fn();
-global.fetch = mockedFetch;
+const mockFetch = jest.fn();
+global.fetch = mockFetch;
 
 describe('GitHubRepo', () => {
   let githubRepo: GitHubRepo;
@@ -19,80 +19,194 @@ describe('GitHubRepo', () => {
   });
 
   describe('metadata', () => {
-    test('should fetch repository metadata successfully', async () => {
-      const mockData = { id: 123, name: 'test-repo', stargazers_count: 42 };
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => mockData,
-      } as Response);
+    test('should fetch repository data with README successfully', async () => {
+      const mockContentsResponse = {
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'README.md', type: 'blob' },
+                { name: 'package.json', type: 'blob' },
+                { name: 'docs', type: 'tree' },
+              ],
+            },
+            defaultBranchRef: {
+              target: {
+                history: {
+                  nodes: [],
+                },
+              },
+            },
+          },
+        },
+      };
+
+      const mockReadmeResponse = {
+        data: {
+          repository: {
+            readme: {
+              text: '# Test Repository\n\nThis is a test.',
+            },
+          },
+        },
+      };
+
+      mockFetch
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockContentsResponse,
+        } as any)
+        .mockResolvedValueOnce({
+          ok: true,
+          json: async () => mockReadmeResponse,
+        } as any);
 
       const result = await githubRepo.metadata();
 
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
       expect(result).toEqual({
-        data: mockData,
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'README.md', type: 'blob' },
+                { name: 'package.json', type: 'blob' },
+                { name: 'docs', type: 'tree' },
+              ],
+            },
+            readmeContent: '# Test Repository\n\nThis is a test.',
+            commits: [],
+          },
+        },
       });
     });
 
-    test('should handle API errors gracefully', async () => {
-      mockedFetch.mockResolvedValueOnce({
-        ok: false,
-        status: 404,
-      } as Response);
+    test('should handle repository with no README', async () => {
+      const mockContentsResponse = {
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'package.json', type: 'blob' },
+                { name: 'src', type: 'tree' },
+              ],
+            },
+            defaultBranchRef: {
+              target: {
+                history: {
+                  nodes: [],
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockContentsResponse,
+      } as any);
+
+      const result = await githubRepo.metadata();
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(result).toEqual({
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: {
+              entries: [
+                { name: 'package.json', type: 'blob' },
+                { name: 'src', type: 'tree' },
+              ],
+            },
+            commits: [],
+          },
+        },
+      });
+    });
+
+    test('should handle GraphQL errors gracefully', async () => {
+      const mockResponseData = {
+        errors: [{ message: 'Repository not found' }],
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponseData,
+      } as any);
 
       const result = await githubRepo.metadata();
 
       expect(result).toEqual({
-        error: 'GitHub API returned 404 for https://api.github.com/repos/cdklabs/test-repo',
-      });
-    });
-  });
-
-  describe('contents', () => {
-    test('should fetch root directory contents by default', async () => {
-      const mockData = [{ name: 'README.md', type: 'file' }];
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => mockData,
-      } as Response);
-
-      const result = await githubRepo.contents();
-
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo/contents/');
-      expect(result).toEqual({
-        data: mockData,
+        error: 'GraphQL errors: Repository not found',
       });
     });
 
-    test('should fetch specific directory contents', async () => {
-      const mockData = [{ name: 'index.ts', type: 'file' }];
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => mockData,
-      } as Response);
-
-      const result = await githubRepo.contents('src');
-
-      expect(mockedFetch).toHaveBeenCalledWith('https://api.github.com/repos/cdklabs/test-repo/contents/src');
-      expect(result).toEqual({
-        data: mockData,
-      });
-    });
-
-    test('should handle directory not found', async () => {
-      mockedFetch.mockResolvedValueOnce({
+    test('should handle HTTP errors', async () => {
+      mockFetch.mockResolvedValueOnce({
         ok: false,
-        status: 404,
-      } as Response);
+        status: 401,
+        statusText: 'Unauthorized',
+      } as any);
 
-      const result = await githubRepo.contents('nonexistent');
+      const result = await githubRepo.metadata();
 
       expect(result).toEqual({
-        error: 'GitHub API returned 404 for https://api.github.com/repos/cdklabs/test-repo/contents/nonexistent',
+        error: 'GitHub GraphQL API returned 401: Unauthorized',
       });
+    });
+
+    test('should handle network errors', async () => {
+      mockFetch.mockRejectedValueOnce(new Error('Network failure'));
+
+      const result = await githubRepo.metadata();
+
+      expect(result).toEqual({
+        error: 'Network error: Network failure',
+      });
+    });
+
+    test('should include authorization header when token is provided', async () => {
+      process.env.GITHUB_TOKEN = 'test-token';
+
+      const mockResponse = {
+        data: {
+          repository: {
+            stargazerCount: 42,
+            rootContents: { entries: [] },
+            defaultBranchRef: {
+              target: {
+                history: {
+                  nodes: [],
+                },
+              },
+            },
+          },
+        },
+      };
+
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as any);
+
+      await githubRepo.metadata();
+
+      expect(mockFetch).toHaveBeenCalledWith('https://api.github.com/graphql', expect.objectContaining({
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'User-Agent': 'cdk-construct-analyzer',
+          'Authorization': 'Bearer test-token',
+        },
+        body: expect.stringContaining('query GetRepositoryData'),
+      }));
+
+      delete process.env.GITHUB_TOKEN;
     });
   });
 });

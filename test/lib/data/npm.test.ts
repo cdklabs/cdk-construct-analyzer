@@ -88,7 +88,7 @@ describe('NpmCollector', () => {
 
   });
 
-  describe('getDownloadData', () => {
+  describe('fetchDownloadData', () => {
     test('should fetch download data successfully', async () => {
       // First mock the package fetch
       const mockPackageResponse = {
@@ -116,7 +116,7 @@ describe('NpmCollector', () => {
         json: async () => mockDownloadResponse,
       } as Response);
 
-      const result = await collector.getDownloadData();
+      const result = await collector.fetchDownloadData();
 
       expect(mockedFetch).toHaveBeenCalledWith(
         'https://api.npmjs.org/downloads/point/last-week/test-package',
@@ -125,7 +125,7 @@ describe('NpmCollector', () => {
     });
 
     test('should throw error if fetchPackage not called first', async () => {
-      await expect(collector.getDownloadData()).rejects.toThrow('Must call fetchPackage() first');
+      await expect(collector.fetchDownloadData()).rejects.toThrow('Must call fetchPackage() first');
     });
 
     test('should handle download API errors', async () => {
@@ -149,7 +149,7 @@ describe('NpmCollector', () => {
         statusText: 'Internal Server Error',
       } as Response);
 
-      await expect(collector.getDownloadData()).rejects.toThrow(
+      await expect(collector.fetchDownloadData()).rejects.toThrow(
         'NPM downloads API returned 500: Internal Server Error',
       );
     });

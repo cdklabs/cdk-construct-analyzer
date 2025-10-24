@@ -1,4 +1,4 @@
-import { categorizeByBuckets, categorizeByChecklist } from './scoring';
+import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
 import type { Config, DocumentationCompleteness } from './types';
 
 /**
@@ -6,24 +6,6 @@ import type { Config, DocumentationCompleteness } from './types';
  */
 export const CONFIG: Config = {
   pillars: [
-    {
-      name: 'POPULARITY',
-      description: 'Measures how widely adopted and used the package is',
-      signals: [
-        {
-          name: 'weeklyDownloads',
-          weight: 3,
-          description: 'Weekly download count from npm',
-          benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
-        },
-        {
-          name: 'githubStars',
-          weight: 2,
-          description: 'GitHub repository stars',
-          benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
-        },
-      ],
-    },
     {
       name: 'MAINTENANCE',
       description: 'Measures how actively maintained and updated the package is',
@@ -34,20 +16,14 @@ export const CONFIG: Config = {
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
+        {
+          name: 'numberOfContributors(Maintenance)',
+          weight: 2,
+          description: 'Number of Contributors in the past year',
+          benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
+        },
       ],
     },
-    // {
-    //   name: 'MAINTENANCE',
-    //   description: 'Measures how actively maintained and updated the package is',
-    //   signals: [
-    //     {
-    //       name: 'timeToFirstResponse',
-    //       weight: 3,
-    //       description: 'Time to first response on issues',
-    //       benchmarks: function,
-    //     },
-    //   ],
-    // },
     {
       name: 'QUALITY',
       description: 'Measures the overall quality and reliability of the package',
@@ -64,6 +40,30 @@ export const CONFIG: Config = {
               multipleExamples: { present: docData.multipleExamples, value: 1 },
             },
           ),
+        },
+      ],
+    },
+    {
+      name: 'POPULARITY',
+      description: 'Measures how widely adopted and used the package is',
+      signals: [
+        {
+          name: 'weeklyDownloads',
+          weight: 3,
+          description: 'Weekly download count from npm',
+          benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
+        },
+        {
+          name: 'githubStars',
+          weight: 2,
+          description: 'GitHub repository stars',
+          benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
+        },
+        {
+          name: 'numberOfContributors(Popularity)',
+          weight: 1,
+          description: 'Number of Contributors in the past year',
+          benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
       ],
     },

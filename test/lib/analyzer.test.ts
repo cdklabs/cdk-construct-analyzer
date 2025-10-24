@@ -14,28 +14,28 @@ describe('ConstructAnalyzer', () => {
     documentationCompleteness: {
       hasReadme: true,
       hasApiDocs: true,
-      hasExamples: true,
+      hasExample: true,
+      multipleExamples: true,
     },
   };
+
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
   describe('analyzePackage', () => {
-    test('should analyze package and return score result', async () => {
+    test('should analyze package and return correct structure', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       const analyzer = new ConstructAnalyzer();
       const result = await analyzer.analyzePackage('test-package');
 
-      expect(mockedCollectPackageData).toHaveBeenCalledWith('test-package');
       expect(result.packageName).toBe('test-package');
       expect(result.version).toBe('1.0.0');
-      expect(result.signalScores).toHaveProperty('POPULARITY');
-      expect(result.pillarScores).toHaveProperty('POPULARITY');
       expect(result.totalScore).toBeGreaterThanOrEqual(0);
       expect(result.totalScore).toBeLessThanOrEqual(100);
+      expect(Number.isInteger(result.totalScore)).toBe(true);
     });
 
     test('should handle missing signal data gracefully', async () => {

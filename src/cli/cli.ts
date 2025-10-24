@@ -3,13 +3,18 @@ import { hideBin } from 'yargs/helpers';
 import { ConstructAnalyzer } from '../lib/analyzer';
 
 /**
- * Converts snake_case signal names to Display Name format
- * Example: "weeklyDownloads" -> "Weekly Downloads"
+ * Converts signal names to Display Name format
+ * Examples:
+ * - "weeklyDownloads" -> "Weekly Downloads"
+ * - "numberOfContributors(Maintenance)" -> "Number Of Contributors (Maintenance)"
  */
 function convertToDisplayName(signalName: string): string {
   return signalName
-    .replace(/([A-Z])/g, ' $1') // Add space before capital letters
+    .replace(/([A-Z])/g, ' $1') // Add space before capital letters everywhere
+    .replace(/\s*\(/g, ' (') // Add single space before opening parenthesis
+    .replace(/\( /g, '(') // Remove whitespace after opening parenthesis
     .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
+    .replace(/\s+/g, ' ') // Clean up multiple spaces
     .trim();
 }
 
@@ -34,12 +39,12 @@ export function cli() {
           console.log(`LIBRARY: ${result.packageName}`);
           console.log(`VERSION: ${result.version}`);
 
-          console.log(`\nOVERALL SCORE: ${result.totalScore}/100`);
+          console.log(`\nOVERALL SCORE: ${Math.round(result.totalScore)}/100`);
 
           console.log('\n---');
           console.log('\nSUBSCORES');
           Object.entries(result.pillarScores).forEach(([pillar, score]) => {
-            console.log(`  ${pillar}: ${(score as number)}`);
+            console.log(`  ${pillar}: ${Math.round(score as number)}`);
           });
 
           console.log('\n---');

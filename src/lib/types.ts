@@ -42,10 +42,12 @@ export interface ChecklistItem {
 }
 
 export type PackageData = {
-  readonly version: string;
-  readonly weeklyDownloads?: number;
-  readonly githubStars?: number;
-  readonly documentationCompleteness?: DocumentationCompleteness;
+  readonly 'version': string;
+  readonly 'numberOfContributors(Maintenance)'?: number;
+  readonly 'documentationCompleteness'?: DocumentationCompleteness;
+  readonly 'weeklyDownloads'?: number;
+  readonly 'githubStars'?: number;
+  readonly 'numberOfContributors(Popularity)'?: number;
 } & Record<string, any>;
 
 export type DocumentationCompleteness = {
@@ -54,3 +56,35 @@ export type DocumentationCompleteness = {
   readonly hasExample: boolean;
   readonly multipleExamples: boolean;
 };
+
+/**
+ * GitHub GraphQL API response types
+ */
+export interface GitHubRepositoryEntry {
+  readonly name: string;
+  readonly type: 'blob' | 'tree';
+}
+
+export interface GitHubRepositoryContents {
+  readonly entries: GitHubRepositoryEntry[];
+}
+
+export interface GitHubRepositoryBlob {
+  readonly text: string;
+}
+
+export interface GitHubCommit {
+  readonly author?: {
+    readonly user?: {
+      readonly login: string;
+    };
+    readonly email?: string;
+  };
+}
+
+export interface GitHubRepository {
+  readonly stargazerCount: number;
+  readonly rootContents?: GitHubRepositoryContents;
+  readonly readmeContent?: string;
+  readonly commits?: GitHubCommit[];
+}

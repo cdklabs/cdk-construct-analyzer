@@ -4,7 +4,7 @@ import { NpmAccess } from 'projen/lib/javascript';
 const project = new CdklabsTypeScriptProject({
   defaultReleaseBranch: 'main',
   devDeps: ['cdklabs-projen-project-types', '@types/jest'],
-  name: 'cdk-construct-analyzer',
+  name: '@cdklabs/cdk-construct-analyzer',
   projenrcTs: true,
   release: false,
   jest: true,

@@ -1,5 +1,4 @@
-import { PackageData } from '../types';
-import { GitHubCollector, GitHubRawData } from './github';
+import { PackageData, GitHubRepository, GitHubCommit } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 
@@ -9,38 +8,39 @@ import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 interface RawPackageData {
   readonly npm: NpmPackageData;
   readonly downloads: NpmDownloadData;
-  readonly github?: GitHubRawData;
+  readonly github?: GitHubRepository;
 }
 
 /**
  * Phase 1: Fetch all raw data from external APIs
  */
 async function fetchAllData(packageName: string): Promise<RawPackageData> {
-  // Create collectors
   const npmCollector = new NpmCollector();
-  const githubCollector = new GitHubCollector();
 
-  // Fetch NPM data (required)
   await npmCollector.fetchPackage(packageName);
   const npmData = npmCollector.getPackageData();
-  const downloadData = await npmCollector.getDownloadData();
+  const downloadData = await npmCollector.fetchDownloadData();
 
   const repoInfo = extractRepoInfo(npmData.repository.url);
-
   const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
 
-  let githubRawData;
+  let githubData;
   try {
-    await githubCollector.fetchPackage(githubRepo);
-    githubRawData = githubCollector.getRawData();
+    const response = await githubRepo.metadata();
+    if (response.error) {
+      console.warn(`GitHub fetch failed: ${response.error}`);
+    } else if (response.data) {
+      githubData = response.data.repository;
+    }
   } catch (error) {
     console.warn(`GitHub fetch failed: ${error}`);
   }
 
+
   return {
     npm: npmData,
     downloads: downloadData,
-    ...(githubRawData && { github: githubRawData }),
+    ...(githubData && { github: githubData }),
   };
 }
 
@@ -48,39 +48,44 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
  * Phase 2: Process raw data into final structured format organized by signal names
  */
 function processPackageData(rawData: RawPackageData): PackageData {
-  // Process GitHub data directly in signals
   if (!rawData.github) {
-    return { version: rawData.npm.version };
+    return {
+      version: rawData.npm.version,
+      weeklyDownloads: rawData.downloads.downloads,
+    };
   }
 
-  const { repoData, repoContents, readmeContent } = rawData.github;
+  const repository = rawData.github;
 
-  // Process README existence - check if any file contains the word "readme", case-insensitive
+  const readmeContent = repository.readmeContent;
+
+  // Process contributor data
+  const contributorCount = processContributorsData(repository.commits);
+
   const hasReadme = Boolean(readmeContent);
 
-  // Process API documentation existence - check for docs directories and API files
-  const hasApiDocs = Object.keys(repoContents).some(path => {
-    const lowercasePath = path.toLowerCase();
-    return ['docs', 'documentation', 'api'].includes(lowercasePath);
-  });
+  const hasApiDocs = repository.rootContents?.entries?.some((entry) => {
+    const lowercaseName = entry.name.toLowerCase();
+    return ['docs', 'documentation', 'api'].includes(lowercaseName);
+  }) ?? false;
 
-  // Process examples existence - check for code blocks in README
-  const numBackticks = (rawData.github.readmeContent?.match(/```/g) ?? []).length;
-
+  const numBackticks = (readmeContent?.match(/```/g) ?? []).length;
   const numExamples = Math.floor(numBackticks / 2);
   const hasExample = numExamples > 0;
   const multipleExamples = numExamples > 1;
 
   return {
-    version: rawData.npm.version,
-    weeklyDownloads: rawData.downloads.downloads,
-    githubStars: repoData.stargazers_count ?? 0,
-    documentationCompleteness: {
+    'version': rawData.npm.version,
+    'numberOfContributors(Maintenance)': contributorCount,
+    'documentationCompleteness': {
       hasReadme,
       hasApiDocs,
       hasExample,
       multipleExamples,
     },
+    'weeklyDownloads': rawData.downloads.downloads,
+    'githubStars': repository.stargazerCount ?? 0,
+    'numberOfContributors(Popularity)': contributorCount,
   };
 }
 
@@ -109,4 +114,41 @@ export function extractRepoInfo(repositoryUrl: string): { owner: string; repo: s
     }
   }
   throw new Error('Could not parse GitHub URL');
+}
+
+/**
+ * Process contributors data to count unique human contributors from the last month
+ */
+export function processContributorsData(contributorsData?: GitHubCommit[]): number {
+  if (!contributorsData?.length) {
+    return 0;
+  }
+
+  const contributors = new Set<string>();
+
+  for (const commit of contributorsData) {
+    if (commit.author?.user?.login && !isBotOrAutomated(commit.author.user.login)) {
+      contributors.add(commit.author.user.login);
+    } else if (commit.author?.email && !isBotOrAutomated(commit.author.email)) {
+      contributors.add(commit.author.email);
+    }
+  }
+
+  return contributors.size;
+}
+
+/**
+ * Check if a username or commit message indicates bot/automated activity
+ */
+export function isBotOrAutomated(username: string): boolean {
+  const botPatterns = [
+    /bot/i, // Match "bot" anywhere in the string
+    /^automation/i,
+  ];
+
+  if (botPatterns.some(pattern => pattern.test(username))) {
+    return true;
+  }
+
+  return false;
 }

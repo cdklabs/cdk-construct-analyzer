@@ -1,5 +1,5 @@
 {
-  "name": "cdk-construct-analyzer",
+  "name": "@cdklabs/cdk-construct-analyzer",
   "repository": {
     "type": "git",
     "url": "https://github.com/cdklabs/cdk-construct-analyzer.git"

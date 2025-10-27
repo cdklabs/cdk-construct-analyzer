@@ -1,6 +1,7 @@
 import { PackageData, GitHubRepository, GitHubCommit, GitHubIssue } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
+import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness } from '../utils';
 
 /**
  * Raw data fetched from external APIs before processing
@@ -78,17 +79,12 @@ function processPackageData(rawData: RawPackageData): PackageData {
 
   return {
     'version': rawData.npm.version,
-    'numberOfContributors(Maintenance)': contributorCount,
-    'documentationCompleteness': {
-      hasReadme,
-      hasApiDocs,
-      hasExample,
-      multipleExamples,
-    },
+    'numberOfContributors(Maintenance)': processContributorsData(repository.commits),
+    'documentationCompleteness': analyzeDocumentationCompleteness(repository),
     'weeklyDownloads': rawData.downloads.downloads,
     'githubStars': repository.stargazerCount ?? 0,
-    'numberOfContributors(Popularity)': contributorCount,
     'timeToFirstResponse': timeToFirstResponse,
+    'numberOfContributors(Popularity)': processContributorsData(repository.commits),
   };
 }
 

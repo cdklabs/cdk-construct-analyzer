@@ -45,15 +45,10 @@ export class ConstructAnalyzer {
       for (const signal of pillar.signals) {
         const rawValue = packageData[signal.name];
 
-        let level: number = 1;
-        let points: number = 0;
+        const rawLevel = signal.benchmarks(rawValue);
+        const level = signal.benchmarks(rawValue) ?? 1;
 
-        if (rawValue !== undefined) {
-          level = signal.benchmarks(rawValue);
-          points = this.convertLevelToPoints(level);
-        } else {
-          console.warn(`Signal data not found: ${signal.name}, assigning score of 0`);
-        }
+        const points = this.convertLevelToPoints(rawLevel, signal.name);
 
         this.updateSignalScore(signalScores, pillar.name, signal.name, level);
         this.updatePillarScore(pillarScores, pillar.name, points, signal.weight);
@@ -63,7 +58,11 @@ export class ConstructAnalyzer {
     return { signalScores, pillarScores };
   }
 
-  private convertLevelToPoints(level: number): number {
+  private convertLevelToPoints(level: number | undefined, signalName: string): number {
+    if (level == undefined) {
+      console.warn(`Signal data not found: ${signalName}, assigning score of 0`);
+      return 0;
+    }
     return (level - 1) * 25;
   }
 

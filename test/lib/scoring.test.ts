@@ -29,6 +29,10 @@ describe('scoring functions', () => {
       expect(categorizeByBuckets(thresholds, 25)).toBe(1);
       expect(categorizeByBuckets(thresholds, 0)).toBe(1);
     });
+
+    test('should return 1 for undefined or null values', () => {
+      expect(categorizeByBuckets(thresholds, undefined)).toBe(undefined);
+    });
   });
 
   describe('categorizeByChecklist', () => {

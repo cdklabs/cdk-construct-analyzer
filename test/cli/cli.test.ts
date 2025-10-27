@@ -29,7 +29,7 @@ describe('CLI', () => {
     processExitSpy.mockRestore();
   });
 
-  test('should analyze package and display results', async () => {
+  test('should analyze package and display basic results without verbose flag', async () => {
     const mockResult = {
       packageName: 'test-package',
       version: '1.0.0',

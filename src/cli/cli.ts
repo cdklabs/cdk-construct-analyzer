@@ -33,11 +33,18 @@ export function cli() {
       '$0 <package>',
       'Analyze a CDK construct package',
       (yargsBuilder) => {
-        return yargsBuilder.positional('package', {
-          describe: 'NPM package name to analyze (e.g., "@aws-cdk/core")',
-          type: 'string',
-          demandOption: true,
-        });
+        return yargsBuilder
+          .positional('package', {
+            describe: 'NPM package name to analyze (e.g., "@aws-cdk/core")',
+            type: 'string',
+            demandOption: true,
+          })
+          .option('verbose', {
+            alias: 'v',
+            type: 'boolean',
+            default: false,
+            describe: 'Show detailed signal information',
+          });
       },
       async (argv) => {
         try {
@@ -59,27 +66,29 @@ export function cli() {
             }
           });
 
-          console.log('\n---');
+          // Only show detailed signal information if verbose flag is set
+          if (argv.verbose) {
+            console.log('\n---');
 
-          pillarOrder.forEach(pillarName => {
-            const pillarString = '\n=== ' + pillarName + ' ===';
-            console.log(`${pillarString.padEnd(54)} SCORE  WEIGHT`);
+            pillarOrder.forEach(pillarName => {
+              const pillarString = '\n=== ' + pillarName + ' ===';
+              console.log(`${pillarString.padEnd(54)} SCORE  WEIGHT`);
 
-            const pillarConfig = CONFIG.pillars.find(p => p.name === pillarName);
+              const pillarConfig = CONFIG.pillars.find(p => p.name === pillarName);
 
-            // need this because the find function can return undefined (pillar will always be defined)
-            if (pillarConfig) {
-              pillarConfig.signals.forEach(signalConfig => {
-                const signalScore = result.signalScores[pillarName][signalConfig.name];
-                const displayName = convertToDisplayName(signalConfig.name);
-                const stars = convertToStars(signalScore);
-                const dots = '.'.repeat(Math.max(1, 50 - displayName.length));
+              // need this because the find function can return undefined (pillar will always be defined)
+              if (pillarConfig) {
+                pillarConfig.signals.forEach(signalConfig => {
+                  const signalScore = result.signalScores[pillarName][signalConfig.name];
+                  const displayName = convertToDisplayName(signalConfig.name);
+                  const stars = convertToStars(signalScore);
+                  const dots = '.'.repeat(Math.max(1, 50 - displayName.length));
 
-                console.log(`— ${displayName} ${dots} ${stars}    ${signalConfig.weight}`);
-              });
-            }
-          });
-
+                  console.log(`— ${displayName} ${dots} ${stars}    ${signalConfig.weight}`);
+                });
+              }
+            });
+          }
         } catch (error) {
           console.error('Error:', error instanceof Error ? error.message : error);
           process.exit(1);

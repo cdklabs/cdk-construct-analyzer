@@ -1,13 +1,14 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { ConstructAnalyzer } from '../lib/analyzer';
+import { CONFIG } from '../lib/config';
 
-/**
- * Converts signal names to Display Name format
- * Examples:
- * - "weeklyDownloads" -> "Weekly Downloads"
- * - "numberOfContributors(Maintenance)" -> "Number Of Contributors (Maintenance)"
- */
+function convertToStars(rating: number): string {
+  const fullStars = '★'.repeat(rating);
+  const emptyStars = '☆'.repeat(5 - rating);
+  return fullStars + emptyStars;
+}
+
 function convertToDisplayName(signalName: string): string {
   return signalName
     .replace(/([A-Z])/g, ' $1') // Add space before capital letters everywhere
@@ -36,24 +37,41 @@ export function cli() {
         try {
           const result = await analyzer.analyzePackage(argv.package as string);
 
-          console.log(`LIBRARY: ${result.packageName}`);
+          console.log(`\nLIBRARY: ${result.packageName}`);
           console.log(`VERSION: ${result.version}`);
 
-          console.log(`\nOVERALL SCORE: ${Math.round(result.totalScore)}/100`);
+          console.log(`\nOVERALL SCORE: ${result.totalScore}/100`);
 
           console.log('\n---');
           console.log('\nSUBSCORES');
-          Object.entries(result.pillarScores).forEach(([pillar, score]) => {
-            console.log(`  ${pillar}: ${Math.round(score as number)}`);
+
+          const pillarOrder = ['MAINTENANCE', 'QUALITY', 'POPULARITY'];
+          pillarOrder.forEach(pillarName => {
+            if (result.pillarScores[pillarName] !== undefined) {
+              const score = result.pillarScores[pillarName];
+              console.log(`  ${pillarName.padEnd(12)}: ${score.toString().padStart(12)}/100`);
+            }
           });
 
           console.log('\n---');
-          Object.entries(result.signalScores).forEach(([pillar, signals]) => {
-            console.log(`\n=== ${pillar} ===`);
-            Object.entries(signals as Record<string, number>).forEach(([signal, score]) => {
-              const display_name = convertToDisplayName(signal);
-              console.log(`  ${display_name}: ${score}`);
-            });
+
+          pillarOrder.forEach(pillarName => {
+            const pillarString = '\n=== ' + pillarName + ' ===';
+            console.log(`${pillarString.padEnd(54)} SCORE  WEIGHT`);
+
+            const pillarConfig = CONFIG.pillars.find(p => p.name === pillarName);
+
+            // need this because the find function can return undefined (pillar will always be defined)
+            if (pillarConfig) {
+              pillarConfig.signals.forEach(signalConfig => {
+                const signalScore = result.signalScores[pillarName][signalConfig.name];
+                const displayName = convertToDisplayName(signalConfig.name);
+                const stars = convertToStars(signalScore);
+                const dots = '.'.repeat(Math.max(1, 50 - displayName.length));
+
+                console.log(`— ${displayName} ${dots} ${stars}    ${signalConfig.weight}`);
+              });
+            }
           });
 
         } catch (error) {

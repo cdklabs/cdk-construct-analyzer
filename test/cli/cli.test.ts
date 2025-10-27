@@ -60,7 +60,7 @@ describe('CLI', () => {
     } as any));
 
     // Set up argv for the command
-    process.argv = ['node', 'script', 'test-package'];
+    process.argv = ['node', 'script', 'test-package', '--verbose'];
 
     // Wait for CLI to complete
     await new Promise<void>((resolve) => {

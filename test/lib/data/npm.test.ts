@@ -96,6 +96,7 @@ describe('NpmCollector', () => {
           url: 'https://github.com/test/repo',
         },
         hasProvenance: true,
+        isDeprecated: false,
       });
     });
 
@@ -170,6 +171,7 @@ describe('NpmCollector', () => {
           type: 'git',
           url: 'https://github.com/test/deprecated-repo',
         },
+        hasProvenance: false,
         isDeprecated: true,
       });
     });
@@ -199,6 +201,7 @@ describe('NpmCollector', () => {
           type: 'git',
           url: 'https://github.com/test/repo',
         },
+        hasProvenance: false,
         isDeprecated: false,
       });
     });

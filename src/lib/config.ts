@@ -1,5 +1,5 @@
 import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
-import type { Config, DocumentationCompleteness } from './types';
+import type { Config, DocumentationCompleteness, VersionStability } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks

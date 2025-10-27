@@ -53,6 +53,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     return {
       version: rawData.npm.version,
       weeklyDownloads: rawData.downloads.downloads,
+      provenanceVerification: rawData.npm.hasProvenance,
     };
   }
 
@@ -64,6 +65,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     'documentationCompleteness': analyzeDocumentationCompleteness(repository),
     'weeklyDownloads': rawData.downloads.downloads,
     'githubStars': repository.stargazerCount ?? 0,
+    'provenanceVerification': rawData.npm.hasProvenance,
     'numberOfContributors(Popularity)': processContributorsData(repository.commits),
   };
 }

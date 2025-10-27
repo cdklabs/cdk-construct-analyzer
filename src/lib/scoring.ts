@@ -1,7 +1,7 @@
 import { ChecklistItem } from './types';
 
 /**
- * Categorizes a numeric value into quality levels (1-5) based on thresholds
+ * Categorizes a numeric value into quality levels (1-5) where higher values are better
  * @param thresholds Array of 4 numbers [excellent, great, good, fair] in descending order
  * @param value The value to categorize
  * @returns Quality level from 1 (poor) to 5 (excellent), or undefined if value is undefined
@@ -15,6 +15,22 @@ export function categorizeByBuckets(thresholds: [number, number, number, number]
   if (value >= four) return 4;
   if (value >= three) return 3;
   if (value >= two) return 2;
+  return 1; // default
+}
+
+/**
+ * Categorizes a numeric value into quality levels (1-5) where lower values are better
+ * @param thresholds Array of 4 numbers [excellent, great, good, fair] in ascending order
+ * @param value The value to categorize
+ * @returns Quality level from 1 (poor) to 5 (excellent)
+ */
+export function categorizeLowerIsBetter(thresholds: [number, number, number, number], value: number): number {
+  const [five, four, three, two] = thresholds;
+
+  if (value <= five) return 5;
+  if (value <= four) return 4;
+  if (value <= three) return 3;
+  if (value <= two) return 2;
   return 1; // default
 }
 

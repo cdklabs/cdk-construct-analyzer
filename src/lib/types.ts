@@ -23,6 +23,7 @@ export interface SignalConfig {
 export interface PillarConfig {
   readonly name: string;
   readonly description: string;
+  readonly weight: number;
   readonly signals: SignalConfig[];
 }
 
@@ -48,6 +49,8 @@ export type PackageData = {
   readonly 'weeklyDownloads'?: number;
   readonly 'githubStars'?: number;
   readonly 'numberOfContributors(Popularity)'?: number;
+  readonly 'timeToFirstResponse'?: number;
+  readonly 'provenanceVerification'?: boolean;
 } & Record<string, any>;
 
 export type DocumentationCompleteness = {
@@ -82,9 +85,28 @@ export interface GitHubCommit {
   };
 }
 
+export interface GitHubIssueComment {
+  readonly createdAt: string;
+  readonly author?: {
+    readonly login: string;
+  };
+}
+
+export interface GitHubIssue {
+  readonly number: number;
+  readonly createdAt: string;
+  readonly author?: {
+    readonly login: string;
+  };
+  readonly comments: {
+    readonly nodes: GitHubIssueComment[];
+  };
+}
+
 export interface GitHubRepository {
   readonly stargazerCount: number;
   readonly rootContents?: GitHubRepositoryContents;
   readonly readmeContent?: string;
   readonly commits?: GitHubCommit[];
+  readonly issues?: GitHubIssue[];
 }

@@ -78,6 +78,7 @@ describe('GitHubRepo', () => {
             },
             readmeContent: '# Test Repository\n\nThis is a test.',
             commits: [],
+            issues: [],
           },
         },
       });
@@ -124,6 +125,7 @@ describe('GitHubRepo', () => {
               ],
             },
             commits: [],
+            issues: [],
           },
         },
       });

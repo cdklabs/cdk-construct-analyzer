@@ -16,6 +16,7 @@ describe('collectPackageData', () => {
     repository: {
       url: 'https://github.com/cdklabs/repo',
     },
+    hasProvenance: true,
   };
 
   const mockDownloadData = {
@@ -91,6 +92,7 @@ describe('collectPackageData', () => {
       'weeklyDownloads': 10000,
       'githubStars': 500,
       'numberOfContributors(Popularity)': 2,
+      'provenanceVerification': true,
     });
   });
 
@@ -115,6 +117,7 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       version: '1.0.0',
       weeklyDownloads: 10000,
+      provenanceVerification: true,
     });
   });
 });

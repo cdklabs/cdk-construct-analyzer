@@ -17,6 +17,14 @@ export const CONFIG: Config = {
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
         {
+          name: 'provenanceVerification',
+          weight: 3,
+          description: 'Ensures supply chain security through provenance verification',
+          benchmarks: (verified: boolean) => categorizeByChecklist({
+            versionVerified: { present: verified, value: 4 },
+          }),
+        },
+        {
           name: 'numberOfContributors(Maintenance)',
           weight: 2,
           description: 'Number of Contributors in the past year',

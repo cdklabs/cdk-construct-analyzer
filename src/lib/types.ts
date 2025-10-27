@@ -49,6 +49,7 @@ export type PackageData = {
   readonly 'githubStars'?: number;
   readonly 'numberOfContributors(Popularity)'?: number;
   readonly 'timeToFirstResponse'?: number;
+  readonly 'provenanceVerification'?: boolean;
 } & Record<string, any>;
 
 export type DocumentationCompleteness = {

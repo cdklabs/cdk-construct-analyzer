@@ -9,6 +9,12 @@ function convertToStars(rating: number): string {
   return fullStars + emptyStars;
 }
 
+/**
+ * Converts signal names to Display Name format
+ * Examples:
+ * - "weeklyDownloads" -> "Weekly Downloads"
+ * - "numberOfContributors(Maintenance)" -> "Number Of Contributors (Maintenance)"
+ */
 function convertToDisplayName(signalName: string): string {
   return signalName
     .replace(/([A-Z])/g, ' $1') // Add space before capital letters everywhere

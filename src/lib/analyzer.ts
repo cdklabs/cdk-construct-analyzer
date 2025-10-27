@@ -45,12 +45,10 @@ export class ConstructAnalyzer {
       for (const signal of pillar.signals) {
         const rawValue = packageData[signal.name];
 
-        const rawLevel = signal.benchmarks(rawValue);
-        const level = signal.benchmarks(rawValue) ?? 1;
+        const level = signal.benchmarks(rawValue);
+        const points = this.convertLevelToPoints(level, signal.name);
 
-        const points = this.convertLevelToPoints(rawLevel, signal.name);
-
-        this.updateSignalScore(signalScores, pillar.name, signal.name, level);
+        this.updateSignalScore(signalScores, pillar.name, signal.name, level ?? 1);
         this.updatePillarScore(pillarScores, pillar.name, points, signal.weight);
       }
     }

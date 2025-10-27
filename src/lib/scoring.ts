@@ -6,7 +6,7 @@ import { ChecklistItem } from './types';
  * @param value The value to categorize
  * @returns Quality level from 1 (poor) to 5 (excellent), or undefined if value is undefined
  */
-export function categorizeByBuckets(thresholds: [number, number, number, number], value: number | undefined): number | undefined {
+export function categorizeHigherIsBetter(thresholds: [number, number, number, number], value: number | undefined): number | undefined {
   if (value == undefined) return undefined;
 
   const [five, four, three, two] = thresholds;

@@ -60,7 +60,7 @@ describe('scoring functions', () => {
     });
 
     test('should return 1 for undefined or null values', () => {
-      expect(categorizeByBuckets(thresholds, undefined)).toBe(undefined);
+      expect(categorizeHigherIsBetter(thresholds, undefined)).toBe(undefined);
     });
   });
 

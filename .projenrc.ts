@@ -13,6 +13,13 @@ const project = new CdklabsTypeScriptProject({
     'cdk-construct-analyzer': './bin/cdk-construct-analyzer',
   },
   npmAccess: NpmAccess.PUBLIC,
+  githubOptions: {
+    pullRequestLintOptions: {
+      semanticTitleOptions: {
+        types: ['feat', 'fix', 'chore', 'refactor', 'test', 'docs', 'revert'],
+      },
+    }
+  }
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // packageName: undefined,  /* The "name" in package.json. */
 });

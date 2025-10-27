@@ -29,7 +29,7 @@ describe('CLI', () => {
     processExitSpy.mockRestore();
   });
 
-  test('should analyze package and display results', async () => {
+  test('should analyze package and display basic results without verbose flag', async () => {
     const mockResult = {
       packageName: 'test-package',
       version: '1.0.0',
@@ -60,6 +60,45 @@ describe('CLI', () => {
     expect(consoleSpy.log).toHaveBeenCalledWith('VERSION: 1.0.0');
     expect(consoleSpy.log).toHaveBeenCalledWith('\nOVERALL SCORE: 85/100');
     expect(consoleSpy.log).toHaveBeenCalledWith('  POPULARITY: 42');
+
+    // Should NOT show detailed signal information without verbose flag
+    expect(consoleSpy.log).not.toHaveBeenCalledWith('  Weekly Downloads: 4');
+    expect(consoleSpy.log).not.toHaveBeenCalledWith('  Github Stars: 3');
+  });
+
+  test('should analyze package and display detailed results with verbose flag', async () => {
+    const mockResult = {
+      packageName: 'test-package',
+      version: '1.0.0',
+      totalScore: 85,
+      pillarScores: {
+        POPULARITY: 42,
+      },
+      signalScores: {
+        POPULARITY: {
+          weeklyDownloads: 4,
+          githubStars: 3,
+        },
+      },
+    };
+
+    const mockAnalyzePackage = jest.fn().mockResolvedValue(mockResult);
+    MockedConstructAnalyzer.mockImplementation(() => ({
+      analyzePackage: mockAnalyzePackage,
+    } as any));
+
+    // Set up argv for the command with verbose flag
+    process.argv = ['node', 'script', 'test-package', '--verbose'];
+
+    await cli();
+
+    expect(mockAnalyzePackage).toHaveBeenCalledWith('test-package');
+    expect(consoleSpy.log).toHaveBeenCalledWith('LIBRARY: test-package');
+    expect(consoleSpy.log).toHaveBeenCalledWith('VERSION: 1.0.0');
+    expect(consoleSpy.log).toHaveBeenCalledWith('\nOVERALL SCORE: 85/100');
+    expect(consoleSpy.log).toHaveBeenCalledWith('  POPULARITY: 42');
+
+    // Should show detailed signal information with verbose flag
     expect(consoleSpy.log).toHaveBeenCalledWith('  Weekly Downloads: 4');
     expect(consoleSpy.log).toHaveBeenCalledWith('  Github Stars: 3');
   });

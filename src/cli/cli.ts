@@ -26,11 +26,18 @@ export function cli() {
       '$0 <package>',
       'Analyze a CDK construct package',
       (yargsBuilder) => {
-        return yargsBuilder.positional('package', {
-          describe: 'NPM package name to analyze (e.g., "@aws-cdk/core")',
-          type: 'string',
-          demandOption: true,
-        });
+        return yargsBuilder
+          .positional('package', {
+            describe: 'NPM package name to analyze (e.g., "@aws-cdk/core")',
+            type: 'string',
+            demandOption: true,
+          })
+          .option('verbose', {
+            alias: 'v',
+            type: 'boolean',
+            default: false,
+            describe: 'Show detailed signal information',
+          });
       },
       async (argv) => {
         try {
@@ -47,14 +54,17 @@ export function cli() {
             console.log(`  ${pillar}: ${Math.round(score as number)}`);
           });
 
-          console.log('\n---');
-          Object.entries(result.signalScores).forEach(([pillar, signals]) => {
-            console.log(`\n=== ${pillar} ===`);
-            Object.entries(signals as Record<string, number>).forEach(([signal, score]) => {
-              const display_name = convertToDisplayName(signal);
-              console.log(`  ${display_name}: ${score}`);
+          // Only show detailed signal information if verbose flag is set
+          if (argv.verbose) {
+            console.log('\n---');
+            Object.entries(result.signalScores).forEach(([pillar, signals]) => {
+              console.log(`\n=== ${pillar} ===`);
+              Object.entries(signals as Record<string, number>).forEach(([signal, score]) => {
+                const display_name = convertToDisplayName(signal);
+                console.log(`  ${display_name}: ${score}`);
+              });
             });
-          });
+          }
 
         } catch (error) {
           console.error('Error:', error instanceof Error ? error.message : error);

@@ -7,6 +7,7 @@ export interface NpmPackageData {
     url: string;
   };
   readonly isDeprecated: boolean;
+  readonly hasProvenance?: boolean;
 }
 
 export interface NpmDownloadData {
@@ -26,13 +27,16 @@ export class NpmCollector {
     // Extract only the fields we need from the API response
     const response = await packageRes.json() as any;
     const latestVersion = response['dist-tags']?.latest;
+
     const versionData = response.versions?.[latestVersion];
+    const hasProvenance = Boolean(versionData?.dist?.attestations?.url);
 
     this.packageData = {
       name: response.name,
       version: latestVersion,
       repository: response.repository,
       isDeprecated: Boolean(versionData?.deprecated),
+      hasProvenance,
     };
   }
 

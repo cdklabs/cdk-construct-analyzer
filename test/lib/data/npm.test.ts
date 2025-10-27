@@ -71,6 +71,45 @@ describe('NpmCollector', () => {
           '1.0.0': {
             name: 'test-package',
             version: '1.0.0',
+            dist: {
+              attestations: {
+                url: 'https://registry.npmjs.org/-/npm/v1/attestations/test-package@1.0.0',
+              },
+            },
+          },
+        },
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as Response);
+
+      await collector.fetchPackage('test-package');
+      const result = collector.getPackageData();
+
+      expect(result).toEqual({
+        name: 'test-package',
+        version: '1.0.0',
+        repository: {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+        hasProvenance: true,
+      });
+    });
+
+    test('should return package data without provenance when attestations not present', async () => {
+      const mockResponse = {
+        'name': 'test-package',
+        'dist-tags': { latest: '1.0.0' },
+        'repository': {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+        'versions': {
+          '1.0.0': {
+            dist: {},
           },
         },
       };
@@ -91,6 +130,7 @@ describe('NpmCollector', () => {
           url: 'https://github.com/test/repo',
         },
         isDeprecated: false,
+        hasProvenance: false,
       });
     });
 

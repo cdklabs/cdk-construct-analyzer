@@ -17,6 +17,7 @@ describe('collectPackageData', () => {
       url: 'https://github.com/cdklabs/repo',
     },
     isDeprecated: false,
+    hasProvenance: true,
   };
 
   const mockDownloadData = {
@@ -96,6 +97,7 @@ describe('collectPackageData', () => {
         majorVersion: true,
         isDeprecated: false,
       },
+      'provenanceVerification': true,
     });
   });
 
@@ -124,6 +126,7 @@ describe('collectPackageData', () => {
         majorVersion: true,
         isDeprecated: false,
       },
+      provenanceVerification: true,
     });
   });
 });

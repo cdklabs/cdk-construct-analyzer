@@ -2,6 +2,7 @@ import { PackageData, GitHubRepository } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness } from '../utils';
+import { calculateTimeToFirstResponse } from '../utils/issues';
 
 /**
  * Raw data fetched from external APIs before processing
@@ -57,6 +58,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
         majorVersion: parseInt(rawData.npm.version.split('.')[0], 10) >= 1,
         isDeprecated: rawData.npm.isDeprecated,
       },
+      provenanceVerification: rawData.npm.hasProvenance,
     };
   }
 
@@ -72,6 +74,8 @@ function processPackageData(rawData: RawPackageData): PackageData {
       majorVersion: parseInt(rawData.npm.version.split('.')[0], 10) >= 1,
       isDeprecated: rawData.npm.isDeprecated,
     },
+    'timeToFirstResponse': calculateTimeToFirstResponse(repository.issues),
+    'provenanceVerification': rawData.npm.hasProvenance,
     'numberOfContributors(Popularity)': processContributorsData(repository.commits),
   };
 }
@@ -83,4 +87,3 @@ export async function collectPackageData(packageName: string): Promise<PackageDa
   const rawData = await fetchAllData(packageName);
   return processPackageData(rawData);
 }
-

@@ -120,6 +120,4 @@ describe('collectPackageData', () => {
       provenanceVerification: true,
     });
   });
-
-
 });

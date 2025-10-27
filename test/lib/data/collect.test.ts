@@ -1,4 +1,4 @@
-import { collectPackageData, extractRepoInfo, processContributorsData, isBotOrAutomated, calculateTimeToFirstResponse } from '../../../src/lib/data/collect';
+import { collectPackageData } from '../../../src/lib/data/collect';
 import { GitHubRepo } from '../../../src/lib/data/github-repo';
 import { NpmCollector } from '../../../src/lib/data/npm';
 

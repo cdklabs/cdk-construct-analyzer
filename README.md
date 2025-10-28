@@ -8,13 +8,18 @@ It calculates a single score (0–100) based on three equally weighted aspects:
 * **Quality**: Does the project have good docs, tests, linting, and hygiene?
 * **Popularity**: How widely is the library adopted in the community?
 
-Each package is scored on their latest version. Scores are unlikely to change drasically between versions.
+> [!WARNING]  
+> **Important Usage Guidelines**: This tool provides automated scoring based on publicly available metrics and should be used as **one factor** in your evaluation process, not as the sole decision making criteria. Scores reflect measurable signals but cannot capture all aspects of library quality, such as code architecture, security practices, or alignment with your specific use case. Always combine these scores with your own technical evaluation, security review, and testing before making adoption decisions.
+
+> [!NOTE]  
+> Each package is scored on their latest version. Scores are unlikely to change drasically between versions.
 
 #### CLI Usage
 
-```> cdk-construct-analyzer --help
+```
+> cdk-construct-analyzer --help
 
-Usage: cdk-construct-analyzer [package] [options]
+Usage: cdk-construct-analyzer <package> [options]
 
 Arguments:
   package   Name of the construct package to score (Scored on the latest version)
@@ -26,7 +31,8 @@ Options:
 
 You can run it locally on any library published to npm by providing its package name:
 
-```> cdk-construct-analyzer cdk-ecr-codedeploy
+```
+> cdk-construct-analyzer cdk-ecr-codedeploy
 
 LIBRARY: @cdklabs/cdk-ecr-codedeploy
 VERSION: 0.0.421
@@ -41,9 +47,11 @@ SUBSCORES
   Popularity  :            88/100
 ```
 
+##### Verbose
 Add `--verbose` for a detailed breakdown:
 
-```> cdk-construct-analyzer cdk-ecr-codedeploy --verbose
+```
+> cdk-construct-analyzer cdk-ecr-codedeploy --verbose
 
 LIBRARY: cdk-ecr-codedeploy
 VERSION: 0.0.421
@@ -72,6 +80,54 @@ SUBSCORES
 — Repo stars .................................... ★★★★☆    2
 — Contributors .................................. ★★★★☆    1
 ```
+
+#### Programmatic Access
+
+You can also use the analyzer programmatically in your TypeScript/JavaScript applications by importing the `ConstructAnalyzer` class:
+
+```typescript
+import { ConstructAnalyzer } from '@cdklabs/cdk-construct-analyzer';
+
+const analyzer = new ConstructAnalyzer();
+
+// Analyze a package and get detailed results
+const result = await analyzer.analyzePackage('cdk-ecr-codedeploy');
+
+console.log(`Package: ${result.packageName}`);
+console.log(`Version: ${result.version}`);
+console.log(`Overall Score: ${result.totalScore}/100`);
+
+// Access pillar scores
+console.log('Pillar Scores:');
+Object.entries(result.pillarScores).forEach(([pillar, score]) => {
+  console.log(`  ${pillar}: ${score}/100`);
+});
+
+// Access individual signal scores (star ratings 1-5)
+console.log('Signal Scores:');
+Object.entries(result.signalScores).forEach(([pillar, signals]) => {
+  console.log(`  ${pillar}:`);
+  Object.entries(signals).forEach(([signal, stars]) => {
+    console.log(`    ${signal}: ${'★'.repeat(stars)}${'☆'.repeat(5-stars)}`);
+  });
+});
+```
+
+##### ScoreResult Interface
+
+The `analyzePackage` method returns a `ScoreResult` object with the following structure:
+
+```typescript
+interface ScoreResult {
+  readonly packageName: string;     // "cdk-ecr-codedeploy"
+  readonly version: string;         // "0.0.421"
+  readonly totalScore: number;      // 76 (0-100)
+  readonly pillarScores: Record<string, number>;        // { "MAINTENANCE": 66, "QUALITY": 75, "POPULARITY": 88 }
+  readonly signalScores: Record<string, Record<string, number>>;  // { "MAINTENANCE": { "timeToFirstResponse": 2, "provenanceVerification": 5 } }
+}
+```
+
+The `signalScores` contain star ratings (1-5) for each individual signal, while `pillarScores` and `totalScore` are normalized to a 0-100 scale.
 
 #### Scoring Pillars and Signals
 

@@ -115,5 +115,58 @@ describe('scoring functions', () => {
 
       expect(categorizeByChecklist(checklist)).toBe(1);
     });
+
+    describe('with starting score', () => {
+      test('should use starting score of 3 with no adjustments', () => {
+        const checklist: Record<string, ChecklistItem> = {
+          item1: { present: false, value: 2 },
+          item2: { present: false, value: 1 },
+        };
+
+        expect(categorizeByChecklist(checklist, 3)).toBe(3);
+      });
+
+      test('should add +2 to starting score of 3', () => {
+        const checklist: Record<string, ChecklistItem> = {
+          verified: { present: true, value: 2 },
+        };
+
+        expect(categorizeByChecklist(checklist, 3)).toBe(5);
+      });
+
+      test('should subtract -2 from starting score of 3', () => {
+        const checklist: Record<string, ChecklistItem> = {
+          deprecated: { present: true, value: -2 },
+        };
+
+        expect(categorizeByChecklist(checklist, 3)).toBe(1);
+      });
+
+      test('should handle multiple adjustments with starting score', () => {
+        const checklist: Record<string, ChecklistItem> = {
+          majorVersion: { present: true, value: 1 },
+          deprecated: { present: true, value: -2 },
+          active: { present: false, value: 1 },
+        };
+
+        expect(categorizeByChecklist(checklist, 3)).toBe(2);
+      });
+
+      test('should ensure minimum of 1 even with negative starting adjustments', () => {
+        const checklist: Record<string, ChecklistItem> = {
+          majorPenalty: { present: true, value: -5 },
+        };
+
+        expect(categorizeByChecklist(checklist, 2)).toBe(1);
+      });
+
+      test('should cap at maximum of 5 with high starting score', () => {
+        const checklist: Record<string, ChecklistItem> = {
+          bonus: { present: true, value: 3 },
+        };
+
+        expect(categorizeByChecklist(checklist, 4)).toBe(5);
+      });
+    });
   });
 });

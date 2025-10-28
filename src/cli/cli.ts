@@ -1,7 +1,6 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { ConstructAnalyzer } from '../lib/analyzer';
-import { CONFIG } from '../lib/config';
 
 function convertToStars(rating: number): string {
   const fullStars = '★'.repeat(rating);
@@ -49,6 +48,7 @@ export function cli() {
       async (argv) => {
         try {
           const result = await analyzer.analyzePackage(argv.package as string);
+          const weights = result.signalWeights;
 
           console.log(`\nLIBRARY: ${result.packageName}`);
           console.log(`VERSION: ${result.version}`);
@@ -58,35 +58,26 @@ export function cli() {
           console.log('\n---');
           console.log('\nSUBSCORES');
 
-          const pillarOrder = ['MAINTENANCE', 'QUALITY', 'POPULARITY'];
-          pillarOrder.forEach(pillarName => {
-            if (result.pillarScores[pillarName] !== undefined) {
-              const score = result.pillarScores[pillarName];
-              console.log(`  ${pillarName.padEnd(12)}: ${score.toString().padStart(12)}/100`);
-            }
+          Object.entries(result.pillarScores).forEach(([pillar, score]) => {
+            console.log(`  ${pillar.padEnd(12)}: ${score.toString().padStart(12)}/100`);
           });
 
           // Only show detailed signal information if verbose flag is set
           if (argv.verbose) {
             console.log('\n---');
 
-            pillarOrder.forEach(pillarName => {
-              const pillarString = '\n=== ' + pillarName + ' ===';
+            Object.entries(result.signalScores).forEach(([pillar, signals]) => {
+              const pillarString = '\n=== ' + pillar + ' ===';
               console.log(`${pillarString.padEnd(54)} SCORE  WEIGHT`);
 
-              const pillarConfig = CONFIG.pillars.find(p => p.name === pillarName);
+              Object.entries(signals as Record<string, number>).forEach(([signal, score]) => {
+                const displayName = convertToDisplayName(signal);
+                const dots = '.'.repeat(Math.max(1, 50 - displayName.length));
+                const stars = convertToStars(score);
+                const signalWeight = weights[pillar][signal];
 
-              // need this because the find function can return undefined (pillar will always be defined)
-              if (pillarConfig) {
-                pillarConfig.signals.forEach(signalConfig => {
-                  const signalScore = result.signalScores[pillarName][signalConfig.name];
-                  const displayName = convertToDisplayName(signalConfig.name);
-                  const stars = convertToStars(signalScore);
-                  const dots = '.'.repeat(Math.max(1, 50 - displayName.length));
-
-                  console.log(`— ${displayName} ${dots} ${stars}    ${signalConfig.weight}`);
-                });
-              }
+                console.log(`— ${displayName} ${dots} ${stars}    ${signalWeight}`);
+              });
             });
           }
         } catch (error) {

@@ -52,6 +52,19 @@ describe('CLI', () => {
           'numberOfContributors(Popularity)': 4,
         },
       },
+      signalWeights: {
+        MAINTENANCE: {
+          'numberOfContributors(Maintenance)': 2,
+        },
+        QUALITY: {
+          documentationCompleteness: 3,
+        },
+        POPULARITY: {
+          'weeklyDownloads': 3,
+          'githubStars': 2,
+          'numberOfContributors(Popularity)': 1,
+        },
+      },
     };
 
     const mockAnalyzePackage = jest.fn().mockResolvedValue(mockResult);

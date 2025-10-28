@@ -43,7 +43,6 @@ junit.xml
 /lib
 /dist/
 !/.eslintrc.json
-!/.github/workflows/retry-automerge.yml
 !/.github/workflows/auto-queue.yml
 !/.github/workflows/upgrade-cdklabs-projen-project-types.yml
 !/.github/workflows/upgrade.yml

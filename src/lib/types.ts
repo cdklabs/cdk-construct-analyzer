@@ -46,6 +46,7 @@ export type PackageData = {
   readonly 'version': string;
   readonly 'numberOfContributors(Maintenance)'?: number;
   readonly 'documentationCompleteness'?: DocumentationCompleteness;
+  readonly 'testsChecklist'?: TestsData;
   readonly 'weeklyDownloads'?: number;
   readonly 'githubStars'?: number;
   readonly 'numberOfContributors(Popularity)'?: number;
@@ -58,6 +59,11 @@ export type DocumentationCompleteness = {
   readonly hasApiDocs: boolean;
   readonly hasExample: boolean;
   readonly multipleExamples: boolean;
+};
+
+export type TestsData = {
+  readonly hasUnitTests: boolean;
+  readonly hasSnapshotTests: boolean;
 };
 
 /**

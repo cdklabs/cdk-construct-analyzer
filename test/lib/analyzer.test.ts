@@ -17,6 +17,10 @@ describe('ConstructAnalyzer', () => {
       hasExample: true,
       multipleExamples: true,
     },
+    testsChecklist: {
+      hasUnitTests: true,
+      hasSnapshotTests: true,
+    },
   };
 
 
@@ -47,6 +51,10 @@ describe('ConstructAnalyzer', () => {
           hasApiDocs: true,
           hasExample: true,
           multipleExamples: true,
+        },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
         },
         // Missing githubStars
       };
@@ -87,6 +95,10 @@ describe('ConstructAnalyzer', () => {
           hasExample: true,
           multipleExamples: true,
         },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
+        },
         // githubStars: undefined (should also count as 0 points)
       };
 
@@ -99,6 +111,10 @@ describe('ConstructAnalyzer', () => {
           hasApiDocs: true,
           hasExample: true,
           multipleExamples: true,
+        },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
         },
       };
 

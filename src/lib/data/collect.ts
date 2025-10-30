@@ -3,6 +3,7 @@ import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
 import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness } from '../utils';
 import { calculateTimeToFirstResponse } from '../utils/issues';
+import { calculateReleaseFrequency } from '../utils/releases';
 
 /**
  * Raw data fetched from external APIs before processing
@@ -69,6 +70,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     'timeToFirstResponse': calculateTimeToFirstResponse(repository.issues),
     'provenanceVerification': rawData.npm.hasProvenance,
     'numberOfContributors(Popularity)': processContributorsData(repository.commits),
+    'releaseFrequency': calculateReleaseFrequency(repository.releases),
   };
 }
 

@@ -9,7 +9,7 @@ It calculates a single score (0–100) based on three equally weighted aspects:
 * **Popularity**: How widely is the library adopted in the community?
 
 > [!WARNING]  
-> **Important Usage Guidelines**: This tool provides automated scoring based on publicly available metrics and should be used as **one factor** in your evaluation process, not as the sole decision making criteria. Scores reflect measurable signals but cannot capture all aspects of library quality, such as code architecture, security practices, or alignment with your specific use case. Always combine these scores with your own technical evaluation, security review, and testing before making adoption decisions.
+> **Important Usage Guidelines**: This tool provides automated scoring based on publicly available metrics and can be used as **one factor** in your evaluation process, not as the sole decision making criteria. Scores reflect measurable signals but cannot capture all aspects of library quality, such as code architecture, security practices, or alignment with your specific use case. Always combine these scores with your own technical evaluation, security review, and testing before making adoption decisions.
 
 > [!NOTE]  
 > Each package is scored on their latest version. Scores are unlikely to change drasically between versions.
@@ -32,9 +32,9 @@ Options:
 You can run it locally on any library published to npm by providing its package name:
 
 ```
-> cdk-construct-analyzer cdk-ecr-codedeploy
+> cdk-construct-analyzer cdk-ecr-deployment
 
-LIBRARY: @cdklabs/cdk-ecr-codedeploy
+LIBRARY: @cdklabs/cdk-ecr-deployment
 VERSION: 0.0.421
 
 OVERALL SCORE: 76/100
@@ -51,9 +51,9 @@ SUBSCORES
 Add `--verbose` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-codedeploy --verbose
+> cdk-construct-analyzer cdk-ecr-deployment --verbose
 
-LIBRARY: cdk-ecr-codedeploy
+LIBRARY: cdk-ecr-deployment
 VERSION: 0.0.421
 
 OVERALL SCORE: 76/100
@@ -91,7 +91,7 @@ import { ConstructAnalyzer } from '@cdklabs/cdk-construct-analyzer';
 const analyzer = new ConstructAnalyzer();
 
 // Analyze a package and get detailed results
-const result = await analyzer.analyzePackage('cdk-ecr-codedeploy');
+const result = await analyzer.analyzePackage('cdk-ecr-deployment');
 
 console.log(`Package: ${result.packageName}`);
 console.log(`Version: ${result.version}`);
@@ -119,7 +119,7 @@ The `analyzePackage` method returns a `ScoreResult` object with the following st
 
 ```typescript
 interface ScoreResult {
-  readonly packageName: string;     // "cdk-ecr-codedeploy"
+  readonly packageName: string;     // "cdk-ecr-deployment"
   readonly version: string;         // "0.0.421"
   readonly totalScore: number;      // 76 (0-100)
   readonly pillarScores: Record<string, number>;        // { "MAINTENANCE": 66, "QUALITY": 75, "POPULARITY": 88 }

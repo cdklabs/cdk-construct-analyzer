@@ -56,6 +56,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
       weeklyDownloads: rawData.downloads.downloads,
       stableVersioning: {
         majorVersion: parseInt(rawData.npm.version.split('.')[0], 10) >= 1,
+        minorVersion: parseInt(rawData.npm.version.split('.')[1], 10) >= 1,
         isDeprecated: rawData.npm.isDeprecated,
       },
       provenanceVerification: rawData.npm.hasProvenance,
@@ -72,6 +73,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     'githubStars': repository.stargazerCount ?? 0,
     'stableVersioning': {
       majorVersion: parseInt(rawData.npm.version.split('.')[0], 10) >= 1,
+      minorVersion: parseInt(rawData.npm.version.split('.')[1], 10) >= 1,
       isDeprecated: rawData.npm.isDeprecated,
     },
     'timeToFirstResponse': calculateTimeToFirstResponse(repository.issues),

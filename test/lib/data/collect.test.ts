@@ -95,6 +95,7 @@ describe('collectPackageData', () => {
       'numberOfContributors(Popularity)': 2,
       'stableVersioning': {
         majorVersion: true,
+        minorVersion: false,
         isDeprecated: false,
       },
       'provenanceVerification': true,
@@ -124,6 +125,7 @@ describe('collectPackageData', () => {
       weeklyDownloads: 10000,
       stableVersioning: {
         majorVersion: true,
+        minorVersion: false,
         isDeprecated: false,
       },
       provenanceVerification: true,

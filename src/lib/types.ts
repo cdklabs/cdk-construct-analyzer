@@ -56,6 +56,7 @@ export type PackageData = {
 
 export type VersionStability = {
   readonly majorVersion: boolean;
+  readonly minorVersion: boolean;
   readonly isDeprecated: boolean;
 };
 

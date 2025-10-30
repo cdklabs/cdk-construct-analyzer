@@ -18,6 +18,12 @@ export const CONFIG: Config = {
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
         {
+          name: 'releaseFrequency',
+          weight: 3,
+          description: 'Number of releases in the past year',
+          benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
+        },
+        {
           name: 'provenanceVerification',
           weight: 3,
           description: 'Ensures supply chain security through provenance verification',

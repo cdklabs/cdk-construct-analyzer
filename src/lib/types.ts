@@ -51,6 +51,7 @@ export type PackageData = {
   readonly 'numberOfContributors(Popularity)'?: number;
   readonly 'timeToFirstResponse'?: number;
   readonly 'provenanceVerification'?: boolean;
+  readonly 'releaseFrequency'?: number;
 } & Record<string, any>;
 
 export type DocumentationCompleteness = {
@@ -103,10 +104,16 @@ export interface GitHubIssue {
   };
 }
 
+export interface GitHubRelease {
+  readonly publishedAt: string;
+  readonly tagName: string;
+}
+
 export interface GitHubRepository {
   readonly stargazerCount: number;
   readonly rootContents?: GitHubRepositoryContents;
   readonly readmeContent?: string;
   readonly commits?: GitHubCommit[];
   readonly issues?: GitHubIssue[];
+  readonly releases?: GitHubRelease[];
 }

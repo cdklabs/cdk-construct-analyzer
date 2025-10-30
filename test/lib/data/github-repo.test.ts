@@ -38,6 +38,12 @@ describe('GitHubRepo', () => {
                 },
               },
             },
+            issues: {
+              nodes: [],
+            },
+            releases: {
+              nodes: [],
+            },
           },
         },
       };
@@ -79,6 +85,7 @@ describe('GitHubRepo', () => {
             readmeContent: '# Test Repository\n\nThis is a test.',
             commits: [],
             issues: [],
+            releases: [],
           },
         },
       });
@@ -101,6 +108,12 @@ describe('GitHubRepo', () => {
                   nodes: [],
                 },
               },
+            },
+            issues: {
+              nodes: [],
+            },
+            releases: {
+              nodes: [],
             },
           },
         },
@@ -126,6 +139,7 @@ describe('GitHubRepo', () => {
             },
             commits: [],
             issues: [],
+            releases: [],
           },
         },
       });

@@ -56,10 +56,10 @@ export const CONFIG: Config = {
           weight: 2,
           description: 'Package version stability and deprecation status',
           benchmarks: (versionData: VersionStability) => categorizeByChecklist({
-            majorVersion: { present: versionData.majorVersion, value: 2 },
-            minorVersion: { present: versionData.minorVersion, value: 1 },
+            isStableMajorVersion: { present: versionData.isStableMajorVersion, value: 2 },
+            hasMinorReleases: { present: versionData.hasMinorReleases, value: 1 },
             deprecated: { present: versionData.isDeprecated, value: -4 },
-          }, 2), // Starting score of 3
+          }, 2), // Starting score of 2
         },
       ],
     },

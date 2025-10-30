@@ -94,8 +94,8 @@ describe('collectPackageData', () => {
       'githubStars': 500,
       'numberOfContributors(Popularity)': 2,
       'stableVersioning': {
-        majorVersion: true,
-        minorVersion: false,
+        isStableMajorVersion: true,
+        hasMinorReleases: false,
         isDeprecated: false,
       },
       'provenanceVerification': true,
@@ -124,8 +124,8 @@ describe('collectPackageData', () => {
       version: '1.0.0',
       weeklyDownloads: 10000,
       stableVersioning: {
-        majorVersion: true,
-        minorVersion: false,
+        isStableMajorVersion: true,
+        hasMinorReleases: false,
         isDeprecated: false,
       },
       provenanceVerification: true,

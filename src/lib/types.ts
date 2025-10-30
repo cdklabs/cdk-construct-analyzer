@@ -55,8 +55,8 @@ export type PackageData = {
 } & Record<string, any>;
 
 export type VersionStability = {
-  readonly majorVersion: boolean;
-  readonly minorVersion: boolean;
+  readonly isStableMajorVersion: boolean;
+  readonly hasMinorReleases: boolean;
   readonly isDeprecated: boolean;
 };
 

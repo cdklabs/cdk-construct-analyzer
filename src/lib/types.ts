@@ -49,10 +49,17 @@ export type PackageData = {
   readonly 'weeklyDownloads'?: number;
   readonly 'githubStars'?: number;
   readonly 'numberOfContributors(Popularity)'?: number;
+  readonly 'stableVersioning'?: VersionStability;
   readonly 'timeToFirstResponse'?: number;
   readonly 'provenanceVerification'?: boolean;
   readonly 'releaseFrequency'?: number;
 } & Record<string, any>;
+
+export type VersionStability = {
+  readonly isStableMajorVersion: boolean;
+  readonly hasMinorReleases: boolean;
+  readonly isDeprecated: boolean;
+};
 
 export type DocumentationCompleteness = {
   readonly hasReadme: boolean;

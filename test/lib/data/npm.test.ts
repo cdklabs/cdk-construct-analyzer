@@ -21,6 +21,12 @@ describe('NpmCollector', () => {
           type: 'git',
           url: 'https://github.com/test/repo',
         },
+        'versions': {
+          '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
+          },
+        },
       };
 
       mockedFetch.mockResolvedValueOnce({
@@ -63,6 +69,8 @@ describe('NpmCollector', () => {
         },
         'versions': {
           '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
             dist: {
               attestations: {
                 url: 'https://registry.npmjs.org/-/npm/v1/attestations/test-package@1.0.0',
@@ -88,6 +96,7 @@ describe('NpmCollector', () => {
           url: 'https://github.com/test/repo',
         },
         hasProvenance: true,
+        isDeprecated: false,
       });
     });
 
@@ -121,6 +130,7 @@ describe('NpmCollector', () => {
           type: 'git',
           url: 'https://github.com/test/repo',
         },
+        isDeprecated: false,
         hasProvenance: false,
       });
     });
@@ -129,7 +139,72 @@ describe('NpmCollector', () => {
       expect(() => collector.getPackageData()).toThrow('Must call fetchPackage() first');
     });
 
+    test('should detect deprecated packages', async () => {
+      const mockResponse = {
+        'name': 'deprecated-package',
+        'dist-tags': { latest: '2.0.0' },
+        'repository': {
+          type: 'git',
+          url: 'https://github.com/test/deprecated-repo',
+        },
+        'versions': {
+          '2.0.0': {
+            name: 'deprecated-package',
+            version: '2.0.0',
+            deprecated: 'This package is no longer maintained',
+          },
+        },
+      };
 
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as Response);
+
+      await collector.fetchPackage('deprecated-package');
+      const result = collector.getPackageData();
+
+      expect(result).toEqual({
+        name: 'deprecated-package',
+        version: '2.0.0',
+        repository: {
+          type: 'git',
+          url: 'https://github.com/test/deprecated-repo',
+        },
+        hasProvenance: false,
+        isDeprecated: true,
+      });
+    });
+
+    test('should handle missing versions data', async () => {
+      const mockResponse = {
+        'name': 'test-package',
+        'dist-tags': { latest: '1.0.0' },
+        'repository': {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockResponse,
+      } as Response);
+
+      await collector.fetchPackage('test-package');
+      const result = collector.getPackageData();
+
+      expect(result).toEqual({
+        name: 'test-package',
+        version: '1.0.0',
+        repository: {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+        hasProvenance: false,
+        isDeprecated: false,
+      });
+    });
   });
 
   describe('fetchDownloadData', () => {
@@ -138,6 +213,12 @@ describe('NpmCollector', () => {
       const mockPackageResponse = {
         'name': 'test-package',
         'dist-tags': { latest: '1.0.0' },
+        'versions': {
+          '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
+          },
+        },
       };
 
       mockedFetch.mockResolvedValueOnce({
@@ -177,6 +258,12 @@ describe('NpmCollector', () => {
       const mockPackageResponse = {
         'name': 'test-package',
         'dist-tags': { latest: '1.0.0' },
+        'versions': {
+          '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
+          },
+        },
       };
 
       mockedFetch.mockResolvedValueOnce({

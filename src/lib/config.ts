@@ -1,5 +1,5 @@
 import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
-import type { Config, DocumentationCompleteness } from './types';
+import type { Config, DocumentationCompleteness, VersionStability } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks
@@ -56,6 +56,16 @@ export const CONFIG: Config = {
               multipleExamples: { present: docData.multipleExamples, value: 1 },
             },
           ),
+        },
+        {
+          name: 'stableVersioning',
+          weight: 2,
+          description: 'Package version stability and deprecation status',
+          benchmarks: (versionData: VersionStability) => categorizeByChecklist({
+            isStableMajorVersion: { present: versionData.isStableMajorVersion, value: 2 },
+            hasMinorReleases: { present: versionData.hasMinorReleases, value: 1 },
+            deprecated: { present: versionData.isDeprecated, value: -4 },
+          }, 2), // Starting score of 2
         },
       ],
     },

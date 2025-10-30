@@ -16,6 +16,7 @@ describe('collectPackageData', () => {
     repository: {
       url: 'https://github.com/cdklabs/repo',
     },
+    isDeprecated: false,
     hasProvenance: true,
   };
 
@@ -97,6 +98,11 @@ describe('collectPackageData', () => {
       'weeklyDownloads': 10000,
       'githubStars': 500,
       'numberOfContributors(Popularity)': 2,
+      'stableVersioning': {
+        isStableMajorVersion: true,
+        hasMinorReleases: false,
+        isDeprecated: false,
+      },
       'provenanceVerification': true,
       'releaseFrequency': 3,
       'timeToFirstResponse': undefined,
@@ -124,6 +130,11 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       version: '1.0.0',
       weeklyDownloads: 10000,
+      stableVersioning: {
+        isStableMajorVersion: true,
+        hasMinorReleases: false,
+        isDeprecated: false,
+      },
       provenanceVerification: true,
     });
   });

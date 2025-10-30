@@ -37,15 +37,16 @@ export function categorizeLowerIsBetter(thresholds: [number, number, number, num
 /**
  * Categorizes based on a weighted checklist score
  * @param checklist Object with items and their weights
- * @param thresholds Array of 4 numbers [excellent, great, good, fair] for total scores
+ * @param startingScore Optional starting score (default: 0)
  * @returns Quality level from 1 (poor) to 5 (excellent)
  */
 export function categorizeByChecklist<T extends Record<string, ChecklistItem>>(
   checklist: T,
+  startingScore: number = 1,
 ): number {
   const totalScore = Object.values(checklist).reduce((sum, item) => {
     return sum + (item.present ? item.value : 0);
-  }, 0);
+  }, startingScore);
 
-  return Math.max(1, Math.min(totalScore + 1, 5)); // min 1, max 5
+  return Math.max(1, Math.min(totalScore, 5)); // min 1, max 5
 }

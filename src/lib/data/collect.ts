@@ -51,10 +51,17 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
  * Phase 2: Process raw data into final structured format organized by signal names
  */
 function processPackageData(rawData: RawPackageData): PackageData {
+  const [majorVersion, minorVersion] = rawData.npm.version.split('.');
+
   if (!rawData.github) {
     return {
       version: rawData.npm.version,
       weeklyDownloads: rawData.downloads.downloads,
+      stableVersioning: {
+        isStableMajorVersion: parseInt(majorVersion, 10) >= 1,
+        hasMinorReleases: parseInt(minorVersion, 10) >= 1,
+        isDeprecated: rawData.npm.isDeprecated,
+      },
       provenanceVerification: rawData.npm.hasProvenance,
     };
   }
@@ -67,6 +74,11 @@ function processPackageData(rawData: RawPackageData): PackageData {
     'documentationCompleteness': analyzeDocumentationCompleteness(repository),
     'weeklyDownloads': rawData.downloads.downloads,
     'githubStars': repository.stargazerCount ?? 0,
+    'stableVersioning': {
+      isStableMajorVersion: parseInt(majorVersion, 10) >= 1,
+      hasMinorReleases: parseInt(minorVersion, 10) >= 1,
+      isDeprecated: rawData.npm.isDeprecated,
+    },
     'timeToFirstResponse': calculateTimeToFirstResponse(repository.issues),
     'provenanceVerification': rawData.npm.hasProvenance,
     'numberOfContributors(Popularity)': processContributorsData(repository.commits),

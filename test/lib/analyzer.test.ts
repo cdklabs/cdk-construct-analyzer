@@ -114,5 +114,53 @@ describe('ConstructAnalyzer', () => {
       // because undefined signals contribute as 0 points
       expect(resultWithMissing.totalScore).toEqual(resultWithAll.totalScore);
     });
+
+    test('should use custom weights when provided', async () => {
+      mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
+
+      const analyzer = new ConstructAnalyzer();
+
+      // First, get result with default weights
+      const defaultResult = await analyzer.analyzePackage('test-package');
+
+      // Then, get result with custom weights that heavily favor weeklyDownloads
+      const customWeights = {
+        weeklyDownloads: 10, // Much higher than default
+        githubStars: 1, // Much lower than default
+      };
+
+      const customResult = await analyzer.analyzePackage('test-package', customWeights);
+
+      // Verify that custom weights are reflected in the result
+      expect(customResult.signalWeights.POPULARITY.weeklyDownloads).toBe(10);
+      expect(customResult.signalWeights.POPULARITY.githubStars).toBe(1);
+
+      // The scores should be different due to different weights
+      expect(customResult.pillarScores.POPULARITY).not.toBe(defaultResult.pillarScores.POPULARITY);
+    });
+
+    test('should fall back to default weights for missing custom weights', async () => {
+      mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
+
+      const analyzer = new ConstructAnalyzer();
+
+      // Provide partial custom weights (only for some signals)
+      const partialCustomWeights = {
+        weeklyDownloads: 5, // Custom weight
+        // githubStars: missing, should use default
+        // documentationCompleteness: missing, should use default
+      };
+
+      const result = await analyzer.analyzePackage('test-package', partialCustomWeights);
+
+      // Should use custom weight for weeklyDownloads
+      expect(result.signalWeights.POPULARITY.weeklyDownloads).toBe(5);
+
+      // Should use default weight for githubStars (which is 2 from config)
+      expect(result.signalWeights.POPULARITY.githubStars).toBe(2);
+
+      // Should use default weights for all QUALITY signals
+      expect(result.signalWeights.QUALITY).toBeDefined();
+    });
   });
 });

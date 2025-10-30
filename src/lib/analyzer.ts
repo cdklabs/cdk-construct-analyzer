@@ -1,6 +1,6 @@
 import { CONFIG } from './config';
 import { collectPackageData } from './data/collect';
-import type { Config, PackageData } from './types';
+import type { Config, PackageData, CustomSignalWeights } from './types';
 
 /**
  * Properties analyzer result
@@ -21,14 +21,14 @@ export class ConstructAnalyzer {
     this.config = CONFIG;
   }
 
-  public async analyzePackage(packageName: string): Promise<ScoreResult> {
+  public async analyzePackage(packageName: string, customWeights?: CustomSignalWeights): Promise<ScoreResult> {
     const packageData = await collectPackageData(packageName);
     const version = packageData.version;
 
-    const { signalScores, pillarScores } = await this.calculateSignalScores(packageData);
-    const normalizedPillarScores = this.normalizePillarScores(pillarScores);
+    const { signalScores, pillarScores } = await this.calculateSignalScores(packageData, customWeights);
+    const normalizedPillarScores = this.normalizePillarScores(pillarScores, customWeights);
     const totalScore = this.calculateTotalScore(normalizedPillarScores);
-    const signalWeights = this.getSignalWeights();
+    const signalWeights = this.getSignalWeights(customWeights);
 
     return {
       packageName,
@@ -40,7 +40,7 @@ export class ConstructAnalyzer {
     };
   }
 
-  private async calculateSignalScores(packageData: PackageData) {
+  private async calculateSignalScores(packageData: PackageData, customWeights?: CustomSignalWeights) {
     const signalScores: Record<string, Record<string, number>> = {};
     const pillarScores: Record<string, number> = {};
 
@@ -51,8 +51,11 @@ export class ConstructAnalyzer {
         const level = signal.benchmarks(rawValue);
         const points = this.convertLevelToPoints(level, signal.name);
 
+        // Use custom weight if provided, otherwise use default weight
+        const weight = customWeights?.[signal.name] ?? signal.weight;
+
         this.updateSignalScore(signalScores, pillar.name, signal.name, level ?? 1);
-        this.updatePillarScore(pillarScores, pillar.name, points, signal.weight);
+        this.updatePillarScore(pillarScores, pillar.name, points, weight);
       }
     }
 
@@ -76,12 +79,12 @@ export class ConstructAnalyzer {
     pillarScores[pillar] = (pillarScores[pillar] ?? 0) + weightedScore;
   }
 
-  private normalizePillarScores(pillarScores: Record<string, number>): Record<string, number> {
+  private normalizePillarScores(pillarScores: Record<string, number>, customWeights?: CustomSignalWeights): Record<string, number> {
     const normalizedScores: Record<string, number> = {};
 
     const pillarEntries = Object.entries(pillarScores);
     for (const [pillar, weightedSum] of pillarEntries) {
-      const totalWeight = this.getTotalWeightForPillar(pillar);
+      const totalWeight = this.getTotalWeightForPillar(pillar, customWeights);
       const normalizedScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
       normalizedScores[pillar] = Math.round(normalizedScore);
     }
@@ -89,11 +92,14 @@ export class ConstructAnalyzer {
     return normalizedScores;
   }
 
-  private getTotalWeightForPillar(pillarName: string): number {
+  private getTotalWeightForPillar(pillarName: string, customWeights?: CustomSignalWeights): number {
     const pillar = this.config.pillars.find(p => p.name === pillarName);
     if (!pillar) return 0;
 
-    return pillar.signals.reduce((sum, signal) => sum + signal.weight, 0);
+    return pillar.signals.reduce((sum, signal) => {
+      const weight = customWeights?.[signal.name] ?? signal.weight;
+      return sum + weight;
+    }, 0);
   }
 
   private calculateTotalScore(pillarScores: Record<string, number>): number {
@@ -115,13 +121,15 @@ export class ConstructAnalyzer {
 
   /**
    * Extract signal weights from config in the same structure as signalScores
+   * Uses custom weights when provided, otherwise falls back to default weights
    */
-  private getSignalWeights(): Record<string, Record<string, number>> {
+  private getSignalWeights(customWeights?: CustomSignalWeights): Record<string, Record<string, number>> {
     const signalWeights: Record<string, Record<string, number>> = {};
 
     for (const pillar of this.config.pillars) {
       for (const signal of pillar.signals) {
-        (signalWeights[pillar.name] ??= {})[signal.name] = signal.weight;
+        const weight = customWeights?.[signal.name] ?? signal.weight;
+        (signalWeights[pillar.name] ??= {})[signal.name] = weight;
       }
     }
 

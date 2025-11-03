@@ -11,6 +11,7 @@ export interface ScoreResult {
   readonly totalScore: number; // 85
   readonly pillarScores: Record<string, number>; // { "popularity": 42 }
   readonly signalScores: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 4, "githubStars": 2 } }
+  readonly signalWeights: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 3, "githubStars": 2 } }
 }
 
 export class ConstructAnalyzer {
@@ -27,6 +28,7 @@ export class ConstructAnalyzer {
     const { signalScores, pillarScores } = await this.calculateSignalScores(packageData);
     const normalizedPillarScores = this.normalizePillarScores(pillarScores);
     const totalScore = this.calculateTotalScore(normalizedPillarScores);
+    const signalWeights = this.getSignalWeights();
 
     return {
       packageName,
@@ -34,6 +36,7 @@ export class ConstructAnalyzer {
       totalScore,
       pillarScores: normalizedPillarScores,
       signalScores,
+      signalWeights,
     };
   }
 
@@ -108,5 +111,20 @@ export class ConstructAnalyzer {
     }
 
     return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
+  }
+
+  /**
+   * Extract signal weights from config in the same structure as signalScores
+   */
+  private getSignalWeights(): Record<string, Record<string, number>> {
+    const signalWeights: Record<string, Record<string, number>> = {};
+
+    for (const pillar of this.config.pillars) {
+      for (const signal of pillar.signals) {
+        (signalWeights[pillar.name] ??= {})[signal.name] = signal.weight;
+      }
+    }
+
+    return signalWeights;
   }
 }

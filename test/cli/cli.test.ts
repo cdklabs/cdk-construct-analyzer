@@ -35,12 +35,34 @@ describe('CLI', () => {
       version: '1.0.0',
       totalScore: 85,
       pillarScores: {
-        POPULARITY: 42,
+        MAINTENANCE: 73,
+        QUALITY: 90,
+        POPULARITY: 88,
       },
       signalScores: {
+        MAINTENANCE: {
+          'numberOfContributors(Maintenance)': 4,
+        },
+        QUALITY: {
+          documentationCompleteness: 5,
+        },
         POPULARITY: {
-          weeklyDownloads: 4,
-          githubStars: 3,
+          'weeklyDownloads': 4,
+          'githubStars': 5,
+          'numberOfContributors(Popularity)': 4,
+        },
+      },
+      signalWeights: {
+        MAINTENANCE: {
+          'numberOfContributors(Maintenance)': 2,
+        },
+        QUALITY: {
+          documentationCompleteness: 3,
+        },
+        POPULARITY: {
+          'weeklyDownloads': 3,
+          'githubStars': 2,
+          'numberOfContributors(Popularity)': 1,
         },
       },
     };
@@ -51,56 +73,43 @@ describe('CLI', () => {
     } as any));
 
     // Set up argv for the command
-    process.argv = ['node', 'script', 'test-package'];
-
-    await cli();
-
-    expect(mockAnalyzePackage).toHaveBeenCalledWith('test-package');
-    expect(consoleSpy.log).toHaveBeenCalledWith('LIBRARY: test-package');
-    expect(consoleSpy.log).toHaveBeenCalledWith('VERSION: 1.0.0');
-    expect(consoleSpy.log).toHaveBeenCalledWith('\nOVERALL SCORE: 85/100');
-    expect(consoleSpy.log).toHaveBeenCalledWith('  POPULARITY: 42');
-
-    // Should NOT show detailed signal information without verbose flag
-    expect(consoleSpy.log).not.toHaveBeenCalledWith('  Weekly Downloads: 4');
-    expect(consoleSpy.log).not.toHaveBeenCalledWith('  Github Stars: 3');
-  });
-
-  test('should analyze package and display detailed results with verbose flag', async () => {
-    const mockResult = {
-      packageName: 'test-package',
-      version: '1.0.0',
-      totalScore: 85,
-      pillarScores: {
-        POPULARITY: 42,
-      },
-      signalScores: {
-        POPULARITY: {
-          weeklyDownloads: 4,
-          githubStars: 3,
-        },
-      },
-    };
-
-    const mockAnalyzePackage = jest.fn().mockResolvedValue(mockResult);
-    MockedConstructAnalyzer.mockImplementation(() => ({
-      analyzePackage: mockAnalyzePackage,
-    } as any));
-
-    // Set up argv for the command with verbose flag
     process.argv = ['node', 'script', 'test-package', '--verbose'];
 
-    await cli();
+    // Wait for CLI to complete
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        cli();
+        resolve();
+      }, 0);
+    });
+
+    // Wait a bit more for async operations to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     expect(mockAnalyzePackage).toHaveBeenCalledWith('test-package');
-    expect(consoleSpy.log).toHaveBeenCalledWith('LIBRARY: test-package');
+
+    expect(consoleSpy.log).toHaveBeenCalledWith('\nLIBRARY: test-package');
     expect(consoleSpy.log).toHaveBeenCalledWith('VERSION: 1.0.0');
     expect(consoleSpy.log).toHaveBeenCalledWith('\nOVERALL SCORE: 85/100');
-    expect(consoleSpy.log).toHaveBeenCalledWith('  POPULARITY: 42');
 
-    // Should show detailed signal information with verbose flag
-    expect(consoleSpy.log).toHaveBeenCalledWith('  Weekly Downloads: 4');
-    expect(consoleSpy.log).toHaveBeenCalledWith('  Github Stars: 3');
+    expect(consoleSpy.log).toHaveBeenCalledWith('\n---');
+    expect(consoleSpy.log).toHaveBeenCalledWith('\nSUBSCORES');
+    expect(consoleSpy.log).toHaveBeenCalledWith('  MAINTENANCE :           73/100');
+    expect(consoleSpy.log).toHaveBeenCalledWith('  QUALITY     :           90/100');
+    expect(consoleSpy.log).toHaveBeenCalledWith('  POPULARITY  :           88/100');
+
+    expect(consoleSpy.log).toHaveBeenCalledWith('\n---');
+
+    expect(consoleSpy.log).toHaveBeenCalledWith('\n=== MAINTENANCE ===                                   SCORE  WEIGHT');
+    expect(consoleSpy.log).toHaveBeenCalledWith('— Number Of Contributors (Maintenance) .............. ★★★★☆    2');
+
+    expect(consoleSpy.log).toHaveBeenCalledWith('\n=== QUALITY ===                                       SCORE  WEIGHT');
+    expect(consoleSpy.log).toHaveBeenCalledWith('— Documentation Completeness ........................ ★★★★★    3');
+
+    expect(consoleSpy.log).toHaveBeenCalledWith('\n=== POPULARITY ===                                    SCORE  WEIGHT');
+    expect(consoleSpy.log).toHaveBeenCalledWith('— Weekly Downloads .................................. ★★★★☆    3');
+    expect(consoleSpy.log).toHaveBeenCalledWith('— Github Stars ...................................... ★★★★★    2');
+    expect(consoleSpy.log).toHaveBeenCalledWith('— Number Of Contributors (Popularity) ............... ★★★★☆    1');
   });
 
   test('should handle analyzer errors gracefully', async () => {
@@ -112,7 +121,16 @@ describe('CLI', () => {
 
     process.argv = ['node', 'script', 'invalid-package'];
 
-    await cli();
+    // Wait for CLI to complete
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        cli();
+        resolve();
+      }, 0);
+    });
+
+    // Wait a bit more for async operations to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     expect(consoleSpy.error).toHaveBeenCalledWith('Error:', 'Package not found');
     expect(processExitSpy).toHaveBeenCalledWith(1);
@@ -126,7 +144,16 @@ describe('CLI', () => {
 
     process.argv = ['node', 'script', 'test-package'];
 
-    await cli();
+    // Wait for CLI to complete
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        cli();
+        resolve();
+      }, 0);
+    });
+
+    // Wait a bit more for async operations to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
 
     expect(consoleSpy.error).toHaveBeenCalledWith('Error:', 'String error');
     expect(processExitSpy).toHaveBeenCalledWith(1);

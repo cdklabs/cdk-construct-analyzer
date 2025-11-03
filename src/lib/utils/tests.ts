@@ -1,4 +1,4 @@
-import type { GitHubRepository, TestsData } from '../types';
+import type { GitHubRepository, GitHubRepositoryEntry, TestsData } from '../types';
 
 /**
  * Analyze repository contents to detect presence of unit tests and snapshot tests
@@ -6,42 +6,37 @@ import type { GitHubRepository, TestsData } from '../types';
 export function analyzeTestsPresence(repository: GitHubRepository): TestsData {
   const entries = repository.rootContents?.entries ?? [];
 
-  console.log(entries);
-  const hasTestDirectory = entries.some(entry =>
-    entry.type === 'tree' && isTestDirectory(entry.name),
-  );
-
-  const hasTestFiles = entries.some(entry =>
-    entry.type === 'blob' && entry.name.includes('.test.'),
-  );
-
-  // Basic heuristic: if we have test directories or test files, assume unit tests exist
-  const hasUnitTests = hasTestDirectory || hasTestFiles;
-
-  const hasSnapshotTests = checkForSnapshotTests(repository);
-
   return {
-    hasUnitTests,
-    hasSnapshotTests,
+    hasUnitTests: hasUnitTests(entries),
+    hasSnapshotTests: hasSnapshotTests(entries),
   };
 }
 
-/**
- * Check if a directory name indicates it contains tests
- */
-function isTestDirectory(name: string): boolean {
-  const lowerName = name.toLowerCase();
-  return lowerName.includes('test');
+function hasUnitTests(entries: GitHubRepositoryEntry[]): boolean {
+  return entries.some(entry =>
+    entry.name.toLowerCase().includes('test') ||
+    (entry.type === 'tree' && entry.object?.entries?.some(file =>
+      file.type === 'blob' && file.name.includes('test'),
+    )),
+  );
 }
 
-/**
- * Check for snapshot tests using simple heuristics
- */
-function checkForSnapshotTests(repository: GitHubRepository): boolean {
-  const entries = repository.rootContents?.entries ?? [];
+function hasSnapshotTests(entries: GitHubRepositoryEntry[], depth = 0): boolean {
+  // GitHubRepositoryEntry also only stores contents up to 4 layers deep so this depths parameter
+  // has no use for now, but I think it's good to have
+  if (depth > 3) return false;
 
-  // Check for direct snapshot files/directories in root
-  return entries.some(entry =>
-    entry.name.toLowerCase().includes('snapshot'),
-  );
+  return entries.some(entry => {
+    if (isSnapshotRelated(entry.name)) return true;
+
+    if (entry.type === 'tree' && entry.object?.entries) {
+      return hasSnapshotTests(entry.object.entries, depth + 1);
+    }
+
+    return false;
+  });
+}
+
+function isSnapshotRelated(name: string): boolean {
+  return name.toLowerCase().includes('snapshot') || name.endsWith('.snap');
 }

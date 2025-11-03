@@ -72,6 +72,7 @@ export type TestsData = {
 export interface GitHubRepositoryEntry {
   readonly name: string;
   readonly type: 'blob' | 'tree';
+  readonly object?: GitHubRepositoryContents;
 }
 
 export interface GitHubRepositoryContents {

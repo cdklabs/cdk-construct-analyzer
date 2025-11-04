@@ -60,7 +60,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.version).toBe('1.0.0');
     });
 
-    test('should calculate total score as weighted average of pillar scores', async () => {
+    test('should calculate total score as weighted average using signal weights', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       const analyzer = new ConstructAnalyzer();
@@ -70,11 +70,24 @@ describe('ConstructAnalyzer', () => {
       expect(result.pillarScores).toHaveProperty('POPULARITY');
       expect(result.pillarScores).toHaveProperty('QUALITY');
 
-      // Verify that the total score is calculated using pillar weights
-      // Since all pillars have equal weight (0.33), the result should be similar to a simple average
-      const pillarValues = Object.values(result.pillarScores);
-      const simpleAverage = Math.round(pillarValues.reduce((sum, score) => sum + score, 0) / pillarValues.length);
-      expect(Math.abs(result.totalScore - simpleAverage)).toBeLessThanOrEqual(1); // Allow for rounding differences
+      // Verify that the total score is calculated using signal weights
+      // Each pillar's contribution is weighted by the sum of its signal weights
+      // MAINTENANCE: 15+15+15+10 = 55 weight
+      // QUALITY: 15 weight
+      // POPULARITY: 15+10+5 = 30 weight
+      // Total weight: 55+15+30 = 100
+      const maintenanceWeight = 55;
+      const qualityWeight = 15;
+      const popularityWeight = 30;
+      const totalWeight = maintenanceWeight + qualityWeight + popularityWeight;
+
+      const expectedScore = Math.round(
+        (result.pillarScores.MAINTENANCE * maintenanceWeight +
+         result.pillarScores.QUALITY * qualityWeight +
+         result.pillarScores.POPULARITY * popularityWeight) / totalWeight,
+      );
+
+      expect(result.totalScore).toBe(expectedScore);
     });
 
     test('should skip undefined signals and contribute 0 points', async () => {

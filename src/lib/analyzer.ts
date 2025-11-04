@@ -25,9 +25,8 @@ export class ConstructAnalyzer {
     const packageData = await collectPackageData(packageName);
     const version = packageData.version;
 
-    const { signalScores, pillarScores } = await this.calculateSignalScores(packageData);
+    const { signalScores, pillarScores, totalScore } = await this.calculateSignalScores(packageData);
     const normalizedPillarScores = this.normalizePillarScores(pillarScores);
-    const totalScore = this.calculateTotalScore(normalizedPillarScores);
     const signalWeights = this.getSignalWeights();
 
     return {
@@ -43,6 +42,8 @@ export class ConstructAnalyzer {
   private async calculateSignalScores(packageData: PackageData) {
     const signalScores: Record<string, Record<string, number>> = {};
     const pillarScores: Record<string, number> = {};
+    let totalWeightedSum = 0;
+    let totalWeight = 0;
 
     for (const pillar of this.config.pillars) {
       for (const signal of pillar.signals) {
@@ -53,10 +54,16 @@ export class ConstructAnalyzer {
 
         this.updateSignalScore(signalScores, pillar.name, signal.name, level ?? 1);
         this.updatePillarScore(pillarScores, pillar.name, points, signal.weight);
+
+        // Calculate total score components
+        totalWeightedSum += points * signal.weight;
+        totalWeight += signal.weight;
       }
     }
 
-    return { signalScores, pillarScores };
+    const totalScore = totalWeight > 0 ? Math.round(totalWeightedSum / totalWeight) : 0;
+
+    return { signalScores, pillarScores, totalScore };
   }
 
   private convertLevelToPoints(level: number | undefined, signalName: string): number {
@@ -85,7 +92,6 @@ export class ConstructAnalyzer {
       const normalizedScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
       normalizedScores[pillar] = Math.round(normalizedScore);
     }
-
     return normalizedScores;
   }
 
@@ -94,23 +100,6 @@ export class ConstructAnalyzer {
     if (!pillar) return 0;
 
     return pillar.signals.reduce((sum, signal) => sum + signal.weight, 0);
-  }
-
-  private calculateTotalScore(pillarScores: Record<string, number>): number {
-    if (Object.keys(pillarScores).length === 0) return 0;
-
-    let weightedSum = 0;
-    let totalWeight = 0;
-
-    for (const [pillarName, score] of Object.entries(pillarScores)) {
-      const pillar = this.config.pillars.find(p => p.name === pillarName);
-      if (pillar) {
-        weightedSum += score * pillar.weight;
-        totalWeight += pillar.weight;
-      }
-    }
-
-    return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
   }
 
   /**

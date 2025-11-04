@@ -48,7 +48,7 @@ export function cli() {
   void yargs(hideBin(process.argv))
     .command(
       '$0 <package>',
-      'Analyze a CDK construct package',
+      'Usage: cdk-construct-analyzer <package> [options]',
       (yargsBuilder) => {
         return yargsBuilder
           .positional('package', {

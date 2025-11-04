@@ -94,6 +94,10 @@ describe('collectPackageData', () => {
         hasExample: true,
         multipleExamples: true,
       },
+      'testsChecklist': {
+        hasUnitTests: false,
+        hasSnapshotTests: false,
+      },
       'weeklyDownloads': 10000,
       'githubStars': 500,
       'numberOfContributors(Popularity)': 2,

@@ -1,5 +1,5 @@
 import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
-import type { Config, DocumentationCompleteness } from './types';
+import type { Config, DocumentationCompleteness, TestsData } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks
@@ -56,6 +56,15 @@ export const CONFIG: Config = {
               multipleExamples: { present: docData.multipleExamples, value: 1 },
             },
           ),
+        },
+        {
+          name: 'testsChecklist',
+          weight: 3,
+          description: 'Presence of unit tests and snapshot tests',
+          benchmarks: (testsData: TestsData) => categorizeByChecklist({
+            unitTests: { present: testsData.hasUnitTests, value: 2 },
+            snapshotTests: { present: testsData.hasSnapshotTests, value: 2 },
+          }),
         },
       ],
     },

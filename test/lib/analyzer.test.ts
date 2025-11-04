@@ -17,6 +17,10 @@ describe('ConstructAnalyzer', () => {
       hasExample: true,
       multipleExamples: true,
     },
+    testsChecklist: {
+      hasUnitTests: true,
+      hasSnapshotTests: true,
+    },
   };
 
 
@@ -42,7 +46,17 @@ describe('ConstructAnalyzer', () => {
       const incompleteData = {
         version: '1.0.0',
         weeklyDownloads: 10000,
-        // Missing a few other signals
+        documentationCompleteness: {
+          hasReadme: true,
+          hasApiDocs: true,
+          hasExample: true,
+          multipleExamples: true,
+        },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
+        },
+        // Missing githubStars
       };
 
       mockedCollectPackageData.mockResolvedValue(incompleteData as any);
@@ -69,6 +83,52 @@ describe('ConstructAnalyzer', () => {
       const pillarValues = Object.values(result.pillarScores);
       const simpleAverage = Math.round(pillarValues.reduce((sum, score) => sum + score, 0) / pillarValues.length);
       expect(Math.abs(result.totalScore - simpleAverage)).toBeLessThanOrEqual(1); // Allow for rounding differences
+    });
+
+    test('should skip undefined signals and contribute 0 points', async () => {
+      const dataWithUndefinedSignal = {
+        version: '1.0.0',
+        weeklyDownloads: 1000,
+        documentationCompleteness: {
+          hasReadme: true,
+          hasApiDocs: true,
+          hasExample: true,
+          multipleExamples: true,
+        },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
+        },
+        // githubStars: undefined (should also count as 0 points)
+      };
+
+      const dataWithAllSignals = {
+        version: '1.0.0',
+        weeklyDownloads: 1000,
+        githubStars: 0, // 0 points
+        documentationCompleteness: {
+          hasReadme: true,
+          hasApiDocs: true,
+          hasExample: true,
+          multipleExamples: true,
+        },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
+        },
+      };
+
+      mockedCollectPackageData.mockResolvedValueOnce(dataWithUndefinedSignal as any);
+      const analyzer1 = new ConstructAnalyzer();
+      const resultWithMissing = await analyzer1.analyzePackage('test-package');
+
+      mockedCollectPackageData.mockResolvedValueOnce(dataWithAllSignals as any);
+      const analyzer2 = new ConstructAnalyzer();
+      const resultWithAll = await analyzer2.analyzePackage('test-package');
+
+      // The result with undefined signals should have equal scores
+      // because undefined signals contribute as 0 points
+      expect(resultWithMissing.totalScore).toEqual(resultWithAll.totalScore);
     });
   });
 });

@@ -1,5 +1,5 @@
 import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
-import type { Config, DocumentationCompleteness, VersionStability } from './types';
+import type { Config, DocumentationCompleteness, VersionStability, TestsData } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks
@@ -16,6 +16,12 @@ export const CONFIG: Config = {
           weight: 3,
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
+        },
+        {
+          name: 'releaseFrequency',
+          weight: 3,
+          description: 'Number of releases in the past year',
+          benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
         },
         {
           name: 'provenanceVerification',
@@ -50,6 +56,15 @@ export const CONFIG: Config = {
               multipleExamples: { present: docData.multipleExamples, value: 1 },
             },
           ),
+        },
+        {
+          name: 'testsChecklist',
+          weight: 3,
+          description: 'Presence of unit tests and snapshot tests',
+          benchmarks: (testsData: TestsData) => categorizeByChecklist({
+            unitTests: { present: testsData.hasUnitTests, value: 2 },
+            snapshotTests: { present: testsData.hasSnapshotTests, value: 2 },
+          }),
         },
         {
           name: 'stableVersioning',

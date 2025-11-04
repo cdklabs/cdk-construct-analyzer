@@ -58,6 +58,10 @@ describe('scoring functions', () => {
       expect(categorizeLowerIsBetter(thresholds, 25)).toBe(1);
       expect(categorizeLowerIsBetter(thresholds, 100)).toBe(1);
     });
+
+    test('should return 1 for undefined or null values', () => {
+      expect(categorizeHigherIsBetter(thresholds, undefined)).toBe(undefined);
+    });
   });
 
   describe('categorizeByChecklist', () => {

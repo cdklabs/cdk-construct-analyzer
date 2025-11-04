@@ -61,6 +61,10 @@ export class ConstructAnalyzer {
       }
     }
 
+    if (totalWeight != 100) {
+      console.warn(`Warning: Total signal weights sum to ${totalWeight} but should sum to 100.`);
+    }
+
     const totalScore = totalWeight > 0 ? Math.round(totalWeightedSum / totalWeight) : 0;
 
     return { signalScores, pillarScores, totalScore };

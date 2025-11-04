@@ -11,24 +11,24 @@ export const CONFIG: Config = {
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
-          name: 'timeToFirstResponse',
-          weight: 15,
-          description: 'Time to first response on issues',
-          benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
-        },
-        {
-          name: 'releaseFrequency',
-          weight: 15,
-          description: 'Number of releases in the past year',
-          benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
-        },
-        {
           name: 'provenanceVerification',
           weight: 15,
           description: 'Ensures supply chain security through provenance verification',
           benchmarks: (verified: boolean) => categorizeByChecklist({
             versionVerified: { present: verified, value: 4 },
           }),
+        },
+        {
+          name: 'timeToFirstResponse',
+          weight: 10,
+          description: 'Time to first response on issues',
+          benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
+        },
+        {
+          name: 'releaseFrequency',
+          weight: 10,
+          description: 'Number of releases in the past year',
+          benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
         },
         {
           name: 'numberOfContributors(Maintenance)',
@@ -44,7 +44,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'documentationCompleteness',
-          weight: 15,
+          weight: 10,
           description: 'Presence of README, API reference, and usage examples',
           benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
             {
@@ -56,23 +56,23 @@ export const CONFIG: Config = {
           ),
         },
         {
-          name: 'testsChecklist',
-          weight: 3,
-          description: 'Presence of unit tests and snapshot tests',
-          benchmarks: (testsData: TestsData) => categorizeByChecklist({
-            unitTests: { present: testsData.hasUnitTests, value: 2 },
-            snapshotTests: { present: testsData.hasSnapshotTests, value: 2 },
-          }),
-        },
-        {
           name: 'stableVersioning',
-          weight: 2,
+          weight: 5,
           description: 'Package version stability and deprecation status',
           benchmarks: (versionData: VersionStability) => categorizeByChecklist({
             isStableMajorVersion: { present: versionData.isStableMajorVersion, value: 2 },
             hasMinorReleases: { present: versionData.hasMinorReleases, value: 1 },
             deprecated: { present: versionData.isDeprecated, value: -4 },
           }, 2), // Starting score of 2
+        },
+        {
+          name: 'testsChecklist',
+          weight: 5,
+          description: 'Presence of unit tests and snapshot tests',
+          benchmarks: (testsData: TestsData) => categorizeByChecklist({
+            unitTests: { present: testsData.hasUnitTests, value: 2 },
+            snapshotTests: { present: testsData.hasSnapshotTests, value: 2 },
+          }),
         },
       ],
     },
@@ -88,7 +88,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'githubStars',
-          weight: 10,
+          weight: 15,
           description: 'GitHub repository stars',
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },

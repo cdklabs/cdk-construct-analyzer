@@ -6,6 +6,7 @@ export interface NpmPackageData {
     type: string;
     url: string;
   };
+  readonly isDeprecated: boolean;
   readonly hasProvenance?: boolean;
 }
 
@@ -27,7 +28,6 @@ export class NpmCollector {
     const response = await packageRes.json() as any;
     const latestVersion = response['dist-tags']?.latest;
 
-    // Check if the latest version has provenance attestation
     const versionData = response.versions?.[latestVersion];
     const hasProvenance = Boolean(versionData?.dist?.attestations?.url);
 
@@ -35,6 +35,7 @@ export class NpmCollector {
       name: response.name,
       version: latestVersion,
       repository: response.repository,
+      isDeprecated: Boolean(versionData?.deprecated),
       hasProvenance,
     };
   }

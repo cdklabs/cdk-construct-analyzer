@@ -17,6 +17,15 @@ describe('ConstructAnalyzer', () => {
       hasExample: true,
       multipleExamples: true,
     },
+    testsChecklist: {
+      hasUnitTests: true,
+      hasSnapshotTests: true,
+    },
+    stableVersioning: {
+      isStableMajorVersion: true,
+      hasMinorReleases: true,
+      isDeprecated: false,
+    },
   };
 
 
@@ -47,6 +56,15 @@ describe('ConstructAnalyzer', () => {
           hasApiDocs: true,
           hasExample: true,
           multipleExamples: true,
+        },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
+        },
+        stableVersioning: {
+          isStableMajorVersion: false,
+          hasMinorReleases: false,
+          isDeprecated: false,
         },
         // Missing githubStars
       };
@@ -100,6 +118,15 @@ describe('ConstructAnalyzer', () => {
           hasExample: true,
           multipleExamples: true,
         },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
+        },
+        stableVersioning: {
+          isStableMajorVersion: false,
+          hasMinorReleases: false,
+          isDeprecated: false,
+        },
         // githubStars: undefined (should also count as 0 points)
       };
 
@@ -112,6 +139,15 @@ describe('ConstructAnalyzer', () => {
           hasApiDocs: true,
           hasExample: true,
           multipleExamples: true,
+        },
+        testsChecklist: {
+          hasUnitTests: false,
+          hasSnapshotTests: false,
+        },
+        stableVersioning: {
+          isStableMajorVersion: false,
+          hasMinorReleases: false,
+          isDeprecated: false,
         },
       };
 

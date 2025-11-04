@@ -45,13 +45,21 @@ export type PackageData = {
   readonly 'version': string;
   readonly 'numberOfContributors(Maintenance)'?: number;
   readonly 'documentationCompleteness'?: DocumentationCompleteness;
+  readonly 'testsChecklist'?: TestsData;
   readonly 'weeklyDownloads'?: number;
   readonly 'githubStars'?: number;
   readonly 'numberOfContributors(Popularity)'?: number;
+  readonly 'stableVersioning'?: VersionStability;
   readonly 'timeToFirstResponse'?: number;
   readonly 'provenanceVerification'?: boolean;
   readonly 'releaseFrequency'?: number;
 } & Record<string, any>;
+
+export type VersionStability = {
+  readonly isStableMajorVersion: boolean;
+  readonly hasMinorReleases: boolean;
+  readonly isDeprecated: boolean;
+};
 
 export type DocumentationCompleteness = {
   readonly hasReadme: boolean;
@@ -60,12 +68,18 @@ export type DocumentationCompleteness = {
   readonly multipleExamples: boolean;
 };
 
+export type TestsData = {
+  readonly hasUnitTests: boolean;
+  readonly hasSnapshotTests: boolean;
+};
+
 /**
  * GitHub GraphQL API response types
  */
 export interface GitHubRepositoryEntry {
   readonly name: string;
   readonly type: 'blob' | 'tree';
+  readonly object?: GitHubRepositoryContents;
 }
 
 export interface GitHubRepositoryContents {

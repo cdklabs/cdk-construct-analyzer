@@ -20,16 +20,40 @@ export class GitHubRepo {
         repository(owner: $owner, name: $name) {
           stargazerCount
           
-          # Root directory contents (for checking docs folders and README files)
+          # Root directory contents with nested directory contents (4 levels deep)
           rootContents: object(expression: "HEAD:") {
             ... on Tree {
               entries {
                 name
                 type
+                object {
+                  ... on Tree {
+                    entries {
+                      name
+                      type
+                      object {
+                        ... on Tree {
+                          entries {
+                            name
+                            type
+                            object {
+                              ... on Tree {
+                                entries {
+                                  name
+                                  type
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
               }
             }
           }
-          
+        
           # Get commits from the last month to count contributors
           defaultBranchRef {
             target {
@@ -66,6 +90,14 @@ export class GitHubRepo {
               }
             }
           }
+          
+          # Get releases from the last year for release frequency calculation
+          releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) {
+            nodes {
+              publishedAt
+              tagName
+            }
+          }
         }
       }
     `;
@@ -96,6 +128,7 @@ export class GitHubRepo {
             rootContents: repository.rootContents,
             commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
             issues: repository.issues?.nodes ?? [],
+            releases: repository.releases?.nodes ?? [],
           } as GitHubRepository,
         },
       };
@@ -135,6 +168,7 @@ export class GitHubRepo {
           readmeContent: readmeText,
           commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
           issues: repository.issues?.nodes ?? [],
+          releases: repository.releases?.nodes ?? [],
         } as GitHubRepository,
       },
     };

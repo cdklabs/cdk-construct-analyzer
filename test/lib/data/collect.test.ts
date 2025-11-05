@@ -16,6 +16,7 @@ describe('collectPackageData', () => {
     repository: {
       url: 'https://github.com/cdklabs/repo',
     },
+    isDeprecated: false,
     hasProvenance: true,
   };
 
@@ -63,6 +64,11 @@ describe('collectPackageData', () => {
           committedDate: '2024-10-02T00:00:00Z',
         },
       ],
+      releases: [
+        { publishedAt: '2025-10-01T00:00:00Z', tagName: 'v1.0.0' },
+        { publishedAt: '2025-09-01T00:00:00Z', tagName: 'v0.9.0' },
+        { publishedAt: '2025-08-01T00:00:00Z', tagName: 'v0.8.0' },
+      ],
     };
 
     const mockGitHubInstance = {
@@ -89,10 +95,21 @@ describe('collectPackageData', () => {
         hasExample: true,
         multipleExamples: true,
       },
+      'testsChecklist': {
+        hasUnitTests: false,
+        hasSnapshotTests: false,
+      },
       'weeklyDownloads': 10000,
       'githubStars': 500,
       'numberOfContributors(Popularity)': 2,
+      'stableVersioning': {
+        isStableMajorVersion: true,
+        hasMinorReleases: false,
+        isDeprecated: false,
+      },
       'provenanceVerification': true,
+      'releaseFrequency': 3,
+      'timeToFirstResponse': undefined,
     });
   });
 
@@ -117,6 +134,11 @@ describe('collectPackageData', () => {
     expect(result).toEqual({
       version: '1.0.0',
       weeklyDownloads: 10000,
+      stableVersioning: {
+        isStableMajorVersion: true,
+        hasMinorReleases: false,
+        isDeprecated: false,
+      },
       provenanceVerification: true,
     });
   });

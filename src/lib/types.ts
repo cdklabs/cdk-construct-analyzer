@@ -47,6 +47,7 @@ export type PackageData = {
   readonly 'numberOfContributors(Maintenance)'?: number;
   readonly 'documentationCompleteness'?: DocumentationCompleteness;
   readonly 'testsChecklist'?: TestsData;
+  readonly 'changelogIncludesFeatsAndFixes'?: ChangelogData;
   readonly 'weeklyDownloads'?: number;
   readonly 'githubStars'?: number;
   readonly 'numberOfContributors(Popularity)'?: number;
@@ -72,6 +73,11 @@ export type DocumentationCompleteness = {
 export type TestsData = {
   readonly hasUnitTests: boolean;
   readonly hasSnapshotTests: boolean;
+};
+
+export type ChangelogData = {
+  readonly hasFeats: boolean;
+  readonly hasFixes: boolean;
 };
 
 /**
@@ -121,6 +127,7 @@ export interface GitHubIssue {
 export interface GitHubRelease {
   readonly publishedAt: string;
   readonly tagName: string;
+  readonly description?: string;
 }
 
 export interface GitHubRepository {

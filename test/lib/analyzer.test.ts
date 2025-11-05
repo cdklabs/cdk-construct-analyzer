@@ -21,6 +21,10 @@ describe('ConstructAnalyzer', () => {
       hasUnitTests: true,
       hasSnapshotTests: true,
     },
+    changelogIncludesFeatsAndFixes: {
+      hasFeats: true,
+      hasFixes: true,
+    },
     stableVersioning: {
       isStableMajorVersion: true,
       hasMinorReleases: true,
@@ -60,6 +64,10 @@ describe('ConstructAnalyzer', () => {
         testsChecklist: {
           hasUnitTests: false,
           hasSnapshotTests: false,
+        },
+        changelogIncludesFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
         },
         stableVersioning: {
           isStableMajorVersion: false,
@@ -109,6 +117,10 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
+        changelogIncludesFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
+        },
         stableVersioning: {
           isStableMajorVersion: false,
           hasMinorReleases: false,
@@ -130,6 +142,10 @@ describe('ConstructAnalyzer', () => {
         testsChecklist: {
           hasUnitTests: false,
           hasSnapshotTests: false,
+        },
+        changelogIncludesFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
         },
         stableVersioning: {
           isStableMajorVersion: false,

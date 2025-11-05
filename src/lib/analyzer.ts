@@ -40,7 +40,7 @@ export class ConstructAnalyzer {
     };
   }
 
-  private async calculateSignalScores(packageData: PackageData, customWeights?: CustomSignalWeights) {
+  private async calculateSignalScores(packageData: PackageData, weights?: CustomSignalWeights) {
     const signalScores: Record<string, Record<string, number>> = {};
     const pillarScores: Record<string, number> = {};
 
@@ -52,7 +52,7 @@ export class ConstructAnalyzer {
         const points = this.convertLevelToPoints(level, signal.name);
 
         // Use custom weight if provided, otherwise use default weight
-        const weight = customWeights?.[signal.name] ?? signal.weight;
+        const weight = weights?.[signal.name] ?? signal.defaultWeight;
 
         this.updateSignalScore(signalScores, pillar.name, signal.name, level ?? 1);
         this.updatePillarScore(pillarScores, pillar.name, points, weight);
@@ -97,7 +97,7 @@ export class ConstructAnalyzer {
     if (!pillar) return 0;
 
     return pillar.signals.reduce((sum, signal) => {
-      const weight = customWeights?.[signal.name] ?? signal.weight;
+      const weight = customWeights?.[signal.name] ?? signal.defaultWeight;
       return sum + weight;
     }, 0);
   }
@@ -128,7 +128,7 @@ export class ConstructAnalyzer {
 
     for (const pillar of this.config.pillars) {
       for (const signal of pillar.signals) {
-        const weight = customWeights?.[signal.name] ?? signal.weight;
+        const weight = customWeights?.[signal.name] ?? signal.defaultWeight;
         (signalWeights[pillar.name] ??= {})[signal.name] = weight;
       }
     }

@@ -12,7 +12,7 @@ export type BenchmarkFunction = (value: any) => number | undefined;
  */
 export interface SignalConfig {
   readonly name: string;
-  readonly weight: number;
+  readonly defaultWeight: number;
   readonly description: string;
   readonly benchmarks: BenchmarkFunction;
 }

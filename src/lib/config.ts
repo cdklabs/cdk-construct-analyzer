@@ -13,19 +13,19 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'timeToFirstResponse',
-          weight: 3,
+          defaultWeight: 3,
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
         {
           name: 'releaseFrequency',
-          weight: 3,
+          defaultWeight: 3,
           description: 'Number of releases in the past year',
           benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
         },
         {
           name: 'provenanceVerification',
-          weight: 3,
+          defaultWeight: 3,
           description: 'Ensures supply chain security through provenance verification',
           benchmarks: (verified: boolean) => categorizeByChecklist({
             versionVerified: { present: verified, value: 4 },
@@ -33,7 +33,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'numberOfContributors(Maintenance)',
-          weight: 2,
+          defaultWeight: 2,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
@@ -46,7 +46,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'documentationCompleteness',
-          weight: 3,
+          defaultWeight: 3,
           description: 'Presence of README, API reference, and usage examples',
           benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
             {
@@ -59,7 +59,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'testsChecklist',
-          weight: 3,
+          defaultWeight: 3,
           description: 'Presence of unit tests and snapshot tests',
           benchmarks: (testsData: TestsData) => categorizeByChecklist({
             unitTests: { present: testsData.hasUnitTests, value: 2 },
@@ -68,7 +68,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'stableVersioning',
-          weight: 2,
+          defaultWeight: 2,
           description: 'Package version stability and deprecation status',
           benchmarks: (versionData: VersionStability) => categorizeByChecklist({
             isStableMajorVersion: { present: versionData.isStableMajorVersion, value: 2 },
@@ -85,19 +85,19 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'weeklyDownloads',
-          weight: 3,
+          defaultWeight: 3,
           description: 'Weekly download count from npm',
           benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },
         {
           name: 'githubStars',
-          weight: 2,
+          defaultWeight: 2,
           description: 'GitHub repository stars',
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
         {
           name: 'numberOfContributors(Popularity)',
-          weight: 1,
+          defaultWeight: 1,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },

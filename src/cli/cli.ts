@@ -12,13 +12,12 @@ function convertToStars(rating: number): string {
  * Converts signal names to Display Name format
  * Examples:
  * - "weeklyDownloads" -> "Weekly Downloads"
- * - "numberOfContributors(Maintenance)" -> "Number Of Contributors (Maintenance)"
+ * - "numberOfContributors_Maintenance" -> "Number Of Contributors - Maintenance"
  */
 function convertToDisplayName(signalName: string): string {
   return signalName
+    .replace(/_/g, ' - ') // Convert underscore to dash with spaces
     .replace(/([A-Z])/g, ' $1') // Add space before capital letters everywhere
-    .replace(/\s*\(/g, ' (') // Add single space before opening parenthesis
-    .replace(/\( /g, '(') // Remove whitespace after opening parenthesis
     .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
     .replace(/\s+/g, ' ') // Clean up multiple spaces
     .trim();

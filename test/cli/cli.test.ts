@@ -29,7 +29,7 @@ describe('CLI', () => {
     processExitSpy.mockRestore();
   });
 
-  test('should analyze package and display basic results without verbose flag', async () => {
+  test('should analyze package and display basic results without details flag', async () => {
     const mockResult = {
       packageName: 'test-package',
       version: '1.0.0',
@@ -73,7 +73,7 @@ describe('CLI', () => {
     } as any));
 
     // Set up argv for the command
-    process.argv = ['node', 'script', 'test-package', '--verbose'];
+    process.argv = ['node', 'script', 'test-package', '--details'];
 
     // Wait for CLI to complete
     await new Promise<void>((resolve) => {

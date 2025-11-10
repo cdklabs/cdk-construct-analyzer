@@ -24,7 +24,7 @@ function convertToDisplayName(signalName: string): string {
     .trim();
 }
 
-function displayVerboseSignalInfo(signalScores: Record<string, Record<string, number>>, weights: Record<string, Record<string, number>>): void {
+function displayDetailsSignalInfo(signalScores: Record<string, Record<string, number>>, weights: Record<string, Record<string, number>>): void {
   console.log('\n---');
 
   Object.entries(signalScores).forEach(([pillar, signals]) => {
@@ -56,7 +56,7 @@ export function cli() {
             type: 'string',
             demandOption: true,
           })
-          .option('verbose', {
+          .option('details', {
             alias: 'v',
             type: 'boolean',
             default: false,
@@ -80,9 +80,9 @@ export function cli() {
             console.log(`  ${pillar.padEnd(12)}: ${score.toString().padStart(12)}/100`);
           });
 
-          // Only show detailed signal information if verbose flag is set
-          if (argv.verbose) {
-            displayVerboseSignalInfo(result.signalScores, weights);
+          // Only show detailed signal information if details flag is set
+          if (argv.details) {
+            displayDetailsSignalInfo(result.signalScores, weights);
           }
         } catch (error) {
           console.error('Error:', error instanceof Error ? error.message : error);

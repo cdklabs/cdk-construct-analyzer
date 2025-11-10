@@ -74,6 +74,7 @@ SUBSCORES
 
 === Quality ===                                   SCORE  WEIGHT
 — Documentation Completeness .................... ★★★★★    3
+— Changelog includes feats/fixes ................ ★★★★★    3
 
 === Popularity ===                                SCORE  WEIGHT
 — Weekly Downloads .............................. ★★★★★    3
@@ -146,6 +147,7 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 Signals that are visible in the repo/package that showcases quality:
 
 * Documentation Completeness: High quality documentation makes the project easier to adopt and use (README, API References, Usage Examples).
+* Changelog includes feats/fixes: Checks if there are feats/fixes published in the release notes.
 
 ##### Popularity
 

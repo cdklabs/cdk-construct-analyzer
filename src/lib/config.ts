@@ -67,6 +67,12 @@ export const CONFIG: Config = {
           }),
         },
         {
+          name: 'authorTrackRecord',
+          weight: 3,
+          description: 'Track record of strong authors',
+          benchmarks: (packageCount: number) => categorizeHigherIsBetter([20, 11, 5, 2], packageCount),
+        },
+        {
           name: 'stableVersioning',
           weight: 2,
           description: 'Package version stability and deprecation status',

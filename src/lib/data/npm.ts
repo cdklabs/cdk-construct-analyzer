@@ -8,6 +8,7 @@ export interface NpmPackageData {
   };
   readonly isDeprecated: boolean;
   readonly hasProvenance?: boolean;
+  readonly maintainers?: Array<{ name: string }>;
 }
 
 export interface NpmDownloadData {
@@ -37,6 +38,7 @@ export class NpmCollector {
       repository: response.repository,
       isDeprecated: Boolean(versionData?.deprecated),
       hasProvenance,
+      maintainers: response.maintainers,
     };
   }
 
@@ -58,5 +60,25 @@ export class NpmCollector {
     }
 
     return await response.json() as NpmDownloadData;
+  }
+
+  async fetchAuthorPackageCount(): Promise<number | undefined> {
+    // Use the first maintainer to search for their packages (libraries can have multiple maintainers)
+    const maintainer = this.packageData?.maintainers?.[0];
+    if (!maintainer?.name) {
+      return undefined;
+    }
+
+    try {
+      const response = await fetch(`https://registry.npmjs.org/-/v1/search?text=maintainer:${encodeURIComponent(maintainer.name)}&size=1`);
+      if (!response.ok) {
+        return undefined;
+      }
+
+      const data = await response.json() as any;
+      return data.total ?? 0;
+    } catch {
+      return undefined;
+    }
   }
 }

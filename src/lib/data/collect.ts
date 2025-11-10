@@ -11,6 +11,7 @@ import { calculateReleaseFrequency } from '../utils/releases';
 interface RawPackageData {
   readonly npm: NpmPackageData;
   readonly downloads: NpmDownloadData;
+  readonly authorPackageCount?: number;
   readonly github?: GitHubRepository;
 }
 
@@ -23,6 +24,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   await npmCollector.fetchPackage(packageName);
   const npmData = npmCollector.getPackageData();
   const downloadData = await npmCollector.fetchDownloadData();
+  const authorPackageCount = await npmCollector.fetchAuthorPackageCount();
 
   const repoInfo = extractRepoInfo(npmData.repository.url);
   const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
@@ -43,6 +45,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   return {
     npm: npmData,
     downloads: downloadData,
+    ...(authorPackageCount !== undefined && { authorPackageCount }),
     ...(githubData && { github: githubData }),
   };
 }
@@ -57,6 +60,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     return {
       version: rawData.npm.version,
       weeklyDownloads: rawData.downloads.downloads,
+      ...(rawData.authorPackageCount !== undefined && { authorTrackRecord: rawData.authorPackageCount }),
       stableVersioning: {
         isStableMajorVersion: parseInt(majorVersion, 10) >= 1,
         hasMinorReleases: parseInt(minorVersion, 10) >= 1,
@@ -73,6 +77,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     'numberOfContributors(Maintenance)': processContributorsData(repository.commits),
     'documentationCompleteness': analyzeDocumentationCompleteness(repository),
     'testsChecklist': analyzeTestsPresence(repository),
+    ...(rawData.authorPackageCount !== undefined && { authorTrackRecord: rawData.authorPackageCount }),
     'weeklyDownloads': rawData.downloads.downloads,
     'githubStars': repository.stargazerCount ?? 0,
     'stableVersioning': {

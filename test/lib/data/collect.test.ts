@@ -42,6 +42,7 @@ describe('collectPackageData', () => {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
       fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      fetchAuthorPackageCount: jest.fn().mockResolvedValue(42),
     };
 
     const mockGitHubData = {
@@ -99,6 +100,7 @@ describe('collectPackageData', () => {
         hasUnitTests: false,
         hasSnapshotTests: false,
       },
+      'authorTrackRecord': 42,
       'weeklyDownloads': 10000,
       'githubStars': 500,
       'numberOfContributors(Popularity)': 2,
@@ -118,6 +120,7 @@ describe('collectPackageData', () => {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
       fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      fetchAuthorPackageCount: jest.fn().mockResolvedValue(42),
     };
 
     const mockGitHubInstance = {
@@ -133,6 +136,7 @@ describe('collectPackageData', () => {
 
     expect(result).toEqual({
       version: '1.0.0',
+      authorTrackRecord: 42,
       weeklyDownloads: 10000,
       stableVersioning: {
         isStableMajorVersion: true,

@@ -74,6 +74,9 @@ SUBSCORES
 
 === Quality ===                                   SCORE  WEIGHT
 — Documentation Completeness .................... ★★★★★    3
+— Tests checklist (unit/snapshot) ............... ★★★☆☆    3
+— Author Track Record ........................... ★★★★★    3
+— Stable versioning ............................. ★★★★★    2
 
 === Popularity ===                                SCORE  WEIGHT
 — Weekly Downloads .............................. ★★★★★    3
@@ -146,6 +149,9 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 Signals that are visible in the repo/package that showcases quality:
 
 * Documentation Completeness: High quality documentation makes the project easier to adopt and use (README, API References, Usage Examples).
+* Tests checklist (unit/snapshot): Tests ensure correctness and prevent regressions.
+* Author Track Record: Measures how many packages the author has published, more published packages often indicate greater experience.
+* Stable versioning (>=1.x.x, not deprecated): Indicates API maturity and stability.
 
 ##### Popularity
 

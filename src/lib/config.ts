@@ -31,8 +31,16 @@ export const CONFIG: Config = {
           benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
         },
         {
-          name: 'numberOfContributors(Maintenance)',
-          weight: 10,
+          name: 'provenanceVerification',
+          weight: 5,
+          description: 'Ensures supply chain security through provenance verification',
+          benchmarks: (verified: boolean) => categorizeByChecklist({
+            versionVerified: { present: verified, value: 4 },
+          }),
+        },
+        {
+          name: 'numberOfContributors_Maintenance',
+          weight: 5,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
@@ -93,7 +101,7 @@ export const CONFIG: Config = {
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
         {
-          name: 'numberOfContributors(Popularity)',
+          name: 'numberOfContributors_Popularity',
           weight: 5,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),

@@ -12,19 +12,18 @@ function convertToStars(rating: number): string {
  * Converts signal names to Display Name format
  * Examples:
  * - "weeklyDownloads" -> "Weekly Downloads"
- * - "numberOfContributors(Maintenance)" -> "Number Of Contributors (Maintenance)"
+ * - "numberOfContributors_Maintenance" -> "Number Of Contributors - Maintenance"
  */
 function convertToDisplayName(signalName: string): string {
   return signalName
+    .replace(/_/g, ' - ') // Convert underscore to dash with spaces
     .replace(/([A-Z])/g, ' $1') // Add space before capital letters everywhere
-    .replace(/\s*\(/g, ' (') // Add single space before opening parenthesis
-    .replace(/\( /g, '(') // Remove whitespace after opening parenthesis
     .replace(/^./, str => str.toUpperCase()) // Capitalize first letter
     .replace(/\s+/g, ' ') // Clean up multiple spaces
     .trim();
 }
 
-function displayVerboseSignalInfo(signalScores: Record<string, Record<string, number>>, weights: Record<string, Record<string, number>>): void {
+function displayDetailsSignalInfo(signalScores: Record<string, Record<string, number>>, weights: Record<string, Record<string, number>>): void {
   console.log('\n---');
 
   Object.entries(signalScores).forEach(([pillar, signals]) => {
@@ -56,7 +55,7 @@ export function cli() {
             type: 'string',
             demandOption: true,
           })
-          .option('verbose', {
+          .option('details', {
             alias: 'v',
             type: 'boolean',
             default: false,
@@ -80,9 +79,9 @@ export function cli() {
             console.log(`  ${pillar.padEnd(12)}: ${score.toString().padStart(12)}/100`);
           });
 
-          // Only show detailed signal information if verbose flag is set
-          if (argv.verbose) {
-            displayVerboseSignalInfo(result.signalScores, weights);
+          // Only show detailed signal information if details flag is set
+          if (argv.details) {
+            displayDetailsSignalInfo(result.signalScores, weights);
           }
         } catch (error) {
           console.error('Error:', error instanceof Error ? error.message : error);

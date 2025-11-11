@@ -37,7 +37,7 @@ export interface Config {
 /**
  * Custom signal weights map: signal name -> weight
  */
-export type CustomSignalWeights = Record<string, number>;
+export type SignalWeights = Record<string, number>;
 
 /**
  * Checklist item configuration for scoring

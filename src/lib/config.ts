@@ -33,7 +33,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'numberOfContributors_Maintenance',
-          weight: 2,
+          defaultWeight: 2,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
@@ -97,7 +97,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'numberOfContributors_Popularity',
-          weight: 1,
+          defaultWeight: 1,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },

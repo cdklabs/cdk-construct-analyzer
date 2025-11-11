@@ -32,6 +32,12 @@ export const CONFIG: Config = {
           }),
         },
         {
+          name: 'openIssuesRatio',
+          weight: 2,
+          description: 'Open issues / total issues',
+          benchmarks: (ratio: number) => categorizeLowerIsBetter([25, 50, 75, 90], ratio), //ratio will be 100 if 0 total issues
+        },
+        {
           name: 'numberOfContributors(Maintenance)',
           weight: 2,
           description: 'Number of Contributors in the past year',

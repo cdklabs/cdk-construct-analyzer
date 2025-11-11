@@ -1,9 +1,15 @@
 import { PackageData, GitHubRepository } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
-import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness, analyzeTestsPresence } from '../utils';
-import { calculateTimeToFirstResponse } from '../utils/issues';
-import { calculateReleaseFrequency } from '../utils/releases';
+import {
+  extractRepoInfo,
+  processContributorsData,
+  analyzeDocumentationCompleteness,
+  analyzeTestsPresence,
+  calculateTimeToFirstResponse,
+  calculateOpenIssuesRatio,
+  calculateReleaseFrequency,
+} from '../utils';
 
 /**
  * Raw data fetched from external APIs before processing
@@ -84,6 +90,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     'provenanceVerification': rawData.npm.hasProvenance,
     'numberOfContributors(Popularity)': processContributorsData(repository.commits),
     'releaseFrequency': calculateReleaseFrequency(repository.releases),
+    'openIssuesRatio': calculateOpenIssuesRatio(repository.openIssuesCount, repository.totalIssuesCount),
   };
 }
 

@@ -91,6 +91,15 @@ export class GitHubRepo {
             }
           }
           
+          # Get issue counts for maintenance signal
+          openIssues: issues(states: OPEN) {
+            totalCount
+          }
+          
+          allIssues: issues {
+            totalCount
+          }
+          
           # Get releases from the last year for release frequency calculation
           releases(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) {
             nodes {
@@ -129,6 +138,8 @@ export class GitHubRepo {
             commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
             issues: repository.issues?.nodes ?? [],
             releases: repository.releases?.nodes ?? [],
+            openIssuesCount: repository.openIssues?.totalCount,
+            totalIssuesCount: repository.allIssues?.totalCount,
           } as GitHubRepository,
         },
       };
@@ -169,6 +180,8 @@ export class GitHubRepo {
           commits: repository.defaultBranchRef?.target?.history?.nodes ?? [],
           issues: repository.issues?.nodes ?? [],
           releases: repository.releases?.nodes ?? [],
+          openIssuesCount: repository.openIssues?.totalCount,
+          totalIssuesCount: repository.allIssues?.totalCount,
         } as GitHubRepository,
       },
     };

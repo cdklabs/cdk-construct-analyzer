@@ -1,5 +1,5 @@
 import { GitHubIssue } from '../../../src/lib/types';
-import { calculateTimeToFirstResponse } from '../../../src/lib/utils/issues';
+import { calculateTimeToFirstResponse, calculateOpenIssuesRatio } from '../../../src/lib/utils/issues';
 
 describe('calculateTimeToFirstResponse', () => {
   const createMockIssue = (
@@ -83,5 +83,57 @@ describe('calculateTimeToFirstResponse', () => {
     // Should use first valid response (3 hours)
     const result = calculateTimeToFirstResponse(issues);
     expect(result).toBeCloseTo(0.0, 1);
+  });
+});
+
+describe('calculateOpenIssuesRatio', () => {
+  test('should return undefined when openIssuesCount is undefined', () => {
+    expect(calculateOpenIssuesRatio(undefined, 100)).toBe(100.0);
+  });
+
+  test('should return undefined when totalIssuesCount is undefined', () => {
+    expect(calculateOpenIssuesRatio(10, undefined)).toBe(100.0);
+  });
+
+  test('should return undefined when both counts are undefined', () => {
+    expect(calculateOpenIssuesRatio(undefined, undefined)).toBe(100.0);
+  });
+
+  test('should return undefined when totalIssuesCount is 0', () => {
+    expect(calculateOpenIssuesRatio(0, 0)).toBe(100.0);
+  });
+
+  test('should calculate ratio correctly for 10 open out of 100 total', () => {
+    expect(calculateOpenIssuesRatio(10, 100)).toBe(10.0);
+  });
+
+  test('should calculate ratio correctly for 25 open out of 100 total', () => {
+    expect(calculateOpenIssuesRatio(25, 100)).toBe(25.0);
+  });
+
+  test('should calculate ratio correctly for 50 open out of 100 total', () => {
+    expect(calculateOpenIssuesRatio(50, 100)).toBe(50.0);
+  });
+
+  test('should calculate ratio correctly for 75 open out of 100 total', () => {
+    expect(calculateOpenIssuesRatio(75, 100)).toBe(75.0);
+  });
+
+  test('should calculate ratio correctly for all issues open', () => {
+    expect(calculateOpenIssuesRatio(100, 100)).toBe(100.0);
+  });
+
+  test('should calculate ratio correctly for no open issues', () => {
+    expect(calculateOpenIssuesRatio(0, 100)).toBe(0.0);
+  });
+
+  test('should round to 1 decimal place', () => {
+    expect(calculateOpenIssuesRatio(33, 100)).toBe(33.0);
+    expect(calculateOpenIssuesRatio(1, 3)).toBe(33.3);
+  });
+
+  test('should handle small numbers correctly', () => {
+    expect(calculateOpenIssuesRatio(1, 10)).toBe(10.0);
+    expect(calculateOpenIssuesRatio(5, 20)).toBe(25.0);
   });
 });

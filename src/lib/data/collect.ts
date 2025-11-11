@@ -73,22 +73,22 @@ function processPackageData(rawData: RawPackageData): PackageData {
   const repository = rawData.github;
 
   return {
-    'version': rawData.npm.version,
-    'numberOfContributors(Maintenance)': processContributorsData(repository.commits),
-    'documentationCompleteness': analyzeDocumentationCompleteness(repository),
-    'testsChecklist': analyzeTestsPresence(repository),
-    ...(rawData.authorPackageCount !== undefined && { authorTrackRecord: rawData.authorPackageCount }),
-    'weeklyDownloads': rawData.downloads.downloads,
-    'githubStars': repository.stargazerCount ?? 0,
-    'stableVersioning': {
+    version: rawData.npm.version,
+    numberOfContributors_Maintenance: processContributorsData(repository.commits),
+    documentationCompleteness: analyzeDocumentationCompleteness(repository),
+    testsChecklist: analyzeTestsPresence(repository),
+    authorTrackRecord: rawData.authorPackageCount,
+    weeklyDownloads: rawData.downloads.downloads,
+    githubStars: repository.stargazerCount ?? 0,
+    stableVersioning: {
       isStableMajorVersion: parseInt(majorVersion, 10) >= 1,
       hasMinorReleases: parseInt(minorVersion, 10) >= 1,
       isDeprecated: rawData.npm.isDeprecated,
     },
-    'timeToFirstResponse': calculateTimeToFirstResponse(repository.issues),
-    'provenanceVerification': rawData.npm.hasProvenance,
-    'numberOfContributors(Popularity)': processContributorsData(repository.commits),
-    'releaseFrequency': calculateReleaseFrequency(repository.releases),
+    timeToFirstResponse: calculateTimeToFirstResponse(repository.issues),
+    provenanceVerification: rawData.npm.hasProvenance,
+    numberOfContributors_Popularity: processContributorsData(repository.commits),
+    releaseFrequency: calculateReleaseFrequency(repository.releases),
   };
 }
 

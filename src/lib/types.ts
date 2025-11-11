@@ -43,17 +43,17 @@ export interface ChecklistItem {
 }
 
 export type PackageData = {
-  readonly 'version': string;
-  readonly 'numberOfContributors(Maintenance)'?: number;
-  readonly 'documentationCompleteness'?: DocumentationCompleteness;
-  readonly 'testsChecklist'?: TestsData;
-  readonly 'weeklyDownloads'?: number;
-  readonly 'githubStars'?: number;
-  readonly 'numberOfContributors(Popularity)'?: number;
-  readonly 'stableVersioning'?: VersionStability;
-  readonly 'timeToFirstResponse'?: number;
-  readonly 'provenanceVerification'?: boolean;
-  readonly 'releaseFrequency'?: number;
+  readonly version: string;
+  readonly numberOfContributors_Maintenance?: number;
+  readonly documentationCompleteness?: DocumentationCompleteness;
+  readonly testsChecklist?: TestsData;
+  readonly weeklyDownloads?: number;
+  readonly githubStars?: number;
+  readonly numberOfContributors_Popularity?: number;
+  readonly stableVersioning?: VersionStability;
+  readonly timeToFirstResponse?: number;
+  readonly provenanceVerification?: boolean;
+  readonly releaseFrequency?: number;
 } & Record<string, any>;
 
 export type VersionStability = {

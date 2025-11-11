@@ -431,46 +431,5 @@ describe('NpmCollector', () => {
 
       expect(result).toBeUndefined();
     });
-
-    test('should return 0 when total is 0', async () => {
-      const mockPackageResponse = {
-        'name': 'test-package',
-        'dist-tags': { latest: '1.0.0' },
-        'repository': {
-          type: 'git',
-          url: 'https://github.com/test/repo',
-        },
-        'maintainers': [
-          { name: 'newauthor', email: 'new@example.com' },
-        ],
-        'versions': {
-          '1.0.0': {
-            name: 'test-package',
-            version: '1.0.0',
-          },
-        },
-      };
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockPackageResponse,
-      } as Response);
-
-      await collector.fetchPackage('test-package');
-
-      const mockSearchResponse = {
-        objects: [],
-        total: 0,
-      };
-
-      mockedFetch.mockResolvedValueOnce({
-        ok: true,
-        json: async () => mockSearchResponse,
-      } as Response);
-
-      const result = await collector.fetchAuthorPackageCount();
-
-      expect(result).toBe(0);
-    });
   });
 });

@@ -24,7 +24,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   await npmCollector.fetchPackage(packageName);
   const npmData = npmCollector.getPackageData();
   const downloadData = await npmCollector.fetchDownloadData();
-  const authorPackageCount = await npmCollector.fetchAuthorPackageCount();
+  const authorPackageCountData = await npmCollector.fetchAuthorPackageCount();
 
   const repoInfo = extractRepoInfo(npmData.repository.url);
   const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
@@ -45,7 +45,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   return {
     npm: npmData,
     downloads: downloadData,
-    ...(authorPackageCount !== undefined && { authorPackageCount }),
+    authorPackageCount: authorPackageCountData,
     ...(githubData && { github: githubData }),
   };
 }
@@ -60,7 +60,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     return {
       version: rawData.npm.version,
       weeklyDownloads: rawData.downloads.downloads,
-      ...(rawData.authorPackageCount !== undefined && { authorTrackRecord: rawData.authorPackageCount }),
+      authorPackageCount: rawData.authorPackageCount,
       stableVersioning: {
         isStableMajorVersion: parseInt(majorVersion, 10) >= 1,
         hasMinorReleases: parseInt(minorVersion, 10) >= 1,
@@ -77,7 +77,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     numberOfContributors_Maintenance: processContributorsData(repository.commits),
     documentationCompleteness: analyzeDocumentationCompleteness(repository),
     testsChecklist: analyzeTestsPresence(repository),
-    authorTrackRecord: rawData.authorPackageCount,
+    authorPackageCount: rawData.authorPackageCount,
     weeklyDownloads: rawData.downloads.downloads,
     githubStars: repository.stargazerCount ?? 0,
     stableVersioning: {

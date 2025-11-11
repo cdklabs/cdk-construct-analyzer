@@ -67,9 +67,9 @@ export const CONFIG: Config = {
           }),
         },
         {
-          name: 'authorTrackRecord',
+          name: 'authorPackageCount',
           weight: 3,
-          description: 'Track record of strong authors',
+          description: 'Highest package count among authors',
           benchmarks: (packageCount: number) => categorizeHigherIsBetter([20, 11, 5, 2], packageCount),
         },
         {

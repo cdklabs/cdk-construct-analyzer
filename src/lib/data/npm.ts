@@ -63,20 +63,34 @@ export class NpmCollector {
   }
 
   async fetchAuthorPackageCount(): Promise<number | undefined> {
-    // Use the first maintainer to search for their packages (libraries can have multiple maintainers)
-    const maintainer = this.packageData?.maintainers?.[0];
-    if (!maintainer?.name) {
+    // Get the best (highest package count) maintainer
+    const maintainers = this.packageData?.maintainers;
+    if (!maintainers || maintainers.length === 0) {
       return undefined;
     }
 
     try {
-      const response = await fetch(`https://registry.npmjs.org/-/v1/search?text=maintainer:${encodeURIComponent(maintainer.name)}&size=1`);
-      if (!response.ok) {
-        return undefined;
-      }
+      const counts = await Promise.all(
+        maintainers.map(async (maintainer) => {
+          if (!maintainer?.name) {
+            return 0;
+          }
+          try {
+            const response = await fetch(`https://registry.npmjs.org/-/v1/search?text=maintainer:${encodeURIComponent(maintainer.name)}&size=1`);
+            if (!response.ok) {
+              return undefined;
+            }
+            const data = await response.json() as any;
 
-      const data = await response.json() as any;
-      return data.total ?? 0;
+            return data.total ?? 0;
+          } catch {
+            return 0;
+          }
+        }),
+      );
+      const maxCount = Math.max(...counts);
+      // Return undefined if all requests failed
+      return maxCount > 0 ? maxCount : undefined;
     } catch {
       return undefined;
     }

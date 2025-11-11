@@ -100,7 +100,7 @@ describe('collectPackageData', () => {
         hasUnitTests: false,
         hasSnapshotTests: false,
       },
-      authorTrackRecord: 42,
+      authorPackageCount: 42,
       weeklyDownloads: 10000,
       githubStars: 500,
       numberOfContributors_Popularity: 2,
@@ -136,7 +136,7 @@ describe('collectPackageData', () => {
 
     expect(result).toEqual({
       version: '1.0.0',
-      authorTrackRecord: 42,
+      authorPackageCount: 42,
       weeklyDownloads: 10000,
       stableVersioning: {
         isStableMajorVersion: true,

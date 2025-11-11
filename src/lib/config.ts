@@ -11,18 +11,18 @@ export const CONFIG: Config = {
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
-          name: 'provenanceVerification',
+          name: 'timeToFirstResponse',
           weight: 15,
+          description: 'Time to first response on issues',
+          benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
+        },
+        {
+          name: 'provenanceVerification',
+          weight: 10,
           description: 'Ensures supply chain security through provenance verification',
           benchmarks: (verified: boolean) => categorizeByChecklist({
             versionVerified: { present: verified, value: 4 },
           }),
-        },
-        {
-          name: 'timeToFirstResponse',
-          weight: 10,
-          description: 'Time to first response on issues',
-          benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
         {
           name: 'releaseFrequency',
@@ -31,16 +31,8 @@ export const CONFIG: Config = {
           benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
         },
         {
-          name: 'provenanceVerification',
-          weight: 5,
-          description: 'Ensures supply chain security through provenance verification',
-          benchmarks: (verified: boolean) => categorizeByChecklist({
-            versionVerified: { present: verified, value: 4 },
-          }),
-        },
-        {
           name: 'numberOfContributors_Maintenance',
-          weight: 5,
+          weight: 10,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },

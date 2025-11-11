@@ -62,7 +62,11 @@ export class ConstructAnalyzer {
     }
 
     if (totalWeight != 100) {
-      console.warn(`Warning: Total signal weights sum to ${totalWeight} but should sum to 100.`);
+      console.warn(
+        `Warning: Signal weights sum to ${totalWeight} instead of 100. ` +
+        `Weights should sum to 100 as it's universally understood and can be interpreted as percentages. ` +
+        `Weights will be automatically normalized.`,
+      );
     }
 
     const totalScore = totalWeight > 0 ? Math.round(totalWeightedSum / totalWeight) : 0;

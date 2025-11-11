@@ -68,17 +68,20 @@ SUBSCORES
 ---
 
 === Maintenance ===                               SCORE  WEIGHT
-— Time to first response......................... ★★☆☆☆    3
-— Provenance Verification ....................... ★★★★★    3
-— Number of Contributors ........................ ★★★★☆    2
+— Time to first response......................... ★★☆☆☆    15
+— Provenance Verification ....................... ★★★★★    10
+— Release Frequency ............................. ★★★★☆    10
+— Number of Contributors ........................ ★★★★☆    10
 
 === Quality ===                                   SCORE  WEIGHT
-— Documentation Completeness .................... ★★★★★    3
+— Documentation Completeness .................... ★★★★★    10
+— Tests checklist (unit/snapshot) ............... ★★★☆☆     5
+— Stable versioning ............................. ★★★★★     5
 
 === Popularity ===                                SCORE  WEIGHT
-— Weekly Downloads .............................. ★★★★★    3
-— Repo stars .................................... ★★★★☆    2
-— Contributors .................................. ★★★★☆    1
+— Weekly Downloads .............................. ★★★★★    15
+— Repo stars .................................... ★★★★☆    15
+— Contributors .................................. ★★★★☆     5
 ```
 
 #### Programmatic Access
@@ -139,13 +142,16 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 
 * Time to first response: Fast issue resolution reflects active, responsive maintainers.
 * Provenance Verification: Verifies package authenticity and supply chain security.
+* Release Frequency: Regular releases signal iteration, patching, and progress.
 * Number of Contributors: More contributors reduce risk of abandonment and reflect shared maintenance.
 
 ##### Quality
 
 Signals that are visible in the repo/package that showcases quality:
 
-* Documentation Completeness: High quality documentation makes the project easier to adopt and use (README, API References, Usage Examples).
+* Documentation Completeness: High quality document
+* Tests checklist (unit/snapshot): Tests ensure correctness and prevent regressions.
+* Stable versioning (>=1.x.x, not deprecated): Indicates API maturity and stability.ation makes the project easier to adopt and use (README, API References, Usage Examples).
 
 ##### Popularity
 

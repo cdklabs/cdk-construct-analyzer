@@ -38,7 +38,7 @@ export const CONFIG: Config = {
           benchmarks: (ratio: number) => categorizeLowerIsBetter([25, 50, 75, 90], ratio), //ratio will be 100 if 0 total issues
         },
         {
-          name: 'numberOfContributors(Maintenance)',
+          name: 'numberOfContributors_Maintenance',
           weight: 2,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
@@ -102,7 +102,7 @@ export const CONFIG: Config = {
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
         {
-          name: 'numberOfContributors(Popularity)',
+          name: 'numberOfContributors_Popularity',
           weight: 1,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),

@@ -29,7 +29,7 @@ describe('CLI', () => {
     processExitSpy.mockRestore();
   });
 
-  test('should analyze package and display basic results without verbose flag', async () => {
+  test('should analyze package and display basic results without details flag', async () => {
     const mockResult = {
       packageName: 'test-package',
       version: '1.0.0',
@@ -41,28 +41,28 @@ describe('CLI', () => {
       },
       signalScores: {
         MAINTENANCE: {
-          'numberOfContributors(Maintenance)': 4,
+          numberOfContributors_Maintenance: 4,
         },
         QUALITY: {
           documentationCompleteness: 5,
         },
         POPULARITY: {
-          'weeklyDownloads': 4,
-          'githubStars': 5,
-          'numberOfContributors(Popularity)': 4,
+          weeklyDownloads: 4,
+          githubStars: 5,
+          numberOfContributors_Popularity: 4,
         },
       },
       signalWeights: {
         MAINTENANCE: {
-          'numberOfContributors(Maintenance)': 2,
+          numberOfContributors_Maintenance: 2,
         },
         QUALITY: {
           documentationCompleteness: 3,
         },
         POPULARITY: {
-          'weeklyDownloads': 3,
-          'githubStars': 2,
-          'numberOfContributors(Popularity)': 1,
+          weeklyDownloads: 3,
+          githubStars: 2,
+          numberOfContributors_Popularity: 1,
         },
       },
     };
@@ -73,7 +73,7 @@ describe('CLI', () => {
     } as any));
 
     // Set up argv for the command
-    process.argv = ['node', 'script', 'test-package', '--verbose'];
+    process.argv = ['node', 'script', 'test-package', '--details'];
 
     // Wait for CLI to complete
     await new Promise<void>((resolve) => {
@@ -101,7 +101,7 @@ describe('CLI', () => {
     expect(consoleSpy.log).toHaveBeenCalledWith('\n---');
 
     expect(consoleSpy.log).toHaveBeenCalledWith('\n=== MAINTENANCE ===                                   SCORE  WEIGHT');
-    expect(consoleSpy.log).toHaveBeenCalledWith('— Number Of Contributors (Maintenance) .............. ★★★★☆    2');
+    expect(consoleSpy.log).toHaveBeenCalledWith('— Number Of Contributors - Maintenance .............. ★★★★☆    2');
 
     expect(consoleSpy.log).toHaveBeenCalledWith('\n=== QUALITY ===                                       SCORE  WEIGHT');
     expect(consoleSpy.log).toHaveBeenCalledWith('— Documentation Completeness ........................ ★★★★★    3');
@@ -109,7 +109,7 @@ describe('CLI', () => {
     expect(consoleSpy.log).toHaveBeenCalledWith('\n=== POPULARITY ===                                    SCORE  WEIGHT');
     expect(consoleSpy.log).toHaveBeenCalledWith('— Weekly Downloads .................................. ★★★★☆    3');
     expect(consoleSpy.log).toHaveBeenCalledWith('— Github Stars ...................................... ★★★★★    2');
-    expect(consoleSpy.log).toHaveBeenCalledWith('— Number Of Contributors (Popularity) ............... ★★★★☆    1');
+    expect(consoleSpy.log).toHaveBeenCalledWith('— Number Of Contributors - Popularity ............... ★★★★☆    1');
   });
 
   test('should handle analyzer errors gracefully', async () => {

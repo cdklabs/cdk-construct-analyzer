@@ -89,30 +89,30 @@ describe('collectPackageData', () => {
     expect(mockGitHubInstance.metadata).toHaveBeenCalled();
 
     expect(result).toEqual({
-      'version': '1.0.0',
-      'numberOfContributors(Maintenance)': 2,
-      'documentationCompleteness': {
+      version: '1.0.0',
+      numberOfContributors_Maintenance: 2,
+      documentationCompleteness: {
         hasReadme: true,
         hasApiDocs: true,
         hasExample: true,
         multipleExamples: true,
       },
-      'testsChecklist': {
+      testsChecklist: {
         hasUnitTests: false,
         hasSnapshotTests: false,
       },
-      'weeklyDownloads': 10000,
-      'githubStars': 500,
-      'numberOfContributors(Popularity)': 2,
-      'stableVersioning': {
+      weeklyDownloads: 10000,
+      githubStars: 500,
+      numberOfContributors_Popularity: 2,
+      stableVersioning: {
         isStableMajorVersion: true,
         hasMinorReleases: false,
         isDeprecated: false,
       },
-      'provenanceVerification': true,
-      'releaseFrequency': 3,
-      'timeToFirstResponse': undefined,
-      'openIssuesRatio': 10,
+      provenanceVerification: true,
+      releaseFrequency: 3,
+      timeToFirstResponse: undefined,
+      openIssuesRatio: 10,
     });
   });
 

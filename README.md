@@ -70,6 +70,7 @@ SUBSCORES
 === Maintenance ===                               SCORE  WEIGHT
 — Time to first response......................... ★★☆☆☆    3
 — Provenance Verification ....................... ★★★★★    3
+— Open issues / total issues .................... ★★★★★    3
 — Number of Contributors ........................ ★★★★☆    2
 
 === Quality ===                                   SCORE  WEIGHT
@@ -139,6 +140,7 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 
 * Time to first response: Fast issue resolution reflects active, responsive maintainers.
 * Provenance Verification: Verifies package authenticity and supply chain security.
+* Open issues / total issues: A lower ratio of open issues indicates backlog health and follow through normalized by repository popularity.
 * Number of Contributors: More contributors reduce risk of abandonment and reflect shared maintenance.
 
 ##### Quality

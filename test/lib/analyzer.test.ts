@@ -21,7 +21,7 @@ describe('ConstructAnalyzer', () => {
       hasUnitTests: true,
       hasSnapshotTests: true,
     },
-    changelogIncludesFeatsAndFixes: {
+    releaseNotesIncludeFeatsAndFixes: {
       hasFeats: true,
       hasFixes: true,
     },
@@ -65,7 +65,7 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
-        changelogIncludesFeatsAndFixes: {
+        releaseNotesIncludeFeatsAndFixes: {
           hasFeats: false,
           hasFixes: false,
         },
@@ -74,7 +74,7 @@ describe('ConstructAnalyzer', () => {
           hasMinorReleases: false,
           isDeprecated: false,
         },
-        // Missing githubStars
+        // Missing githubStars, releaseFrequency, numberOfContributors_Maintenance
       };
 
       mockedCollectPackageData.mockResolvedValue(incompleteData as any);
@@ -117,7 +117,7 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
-        changelogIncludesFeatsAndFixes: {
+        releaseNotesIncludeFeatsAndFixes: {
           hasFeats: false,
           hasFixes: false,
         },
@@ -143,7 +143,7 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
-        changelogIncludesFeatsAndFixes: {
+        releaseNotesIncludeFeatsAndFixes: {
           hasFeats: false,
           hasFixes: false,
         },

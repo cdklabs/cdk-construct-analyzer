@@ -1,5 +1,5 @@
 import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
-import type { Config, DocumentationCompleteness, VersionStability, TestsData, ChangelogData } from './types';
+import type { Config, DocumentationCompleteness, VersionStability, TestsData, ReleaseNotesData } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks
@@ -67,12 +67,12 @@ export const CONFIG: Config = {
           }),
         },
         {
-          name: 'changelogIncludesFeatsAndFixes',
+          name: 'releaseNotesIncludeFeatsAndFixes',
           weight: 3,
           description: 'Presence of features and fixes in release notes',
-          benchmarks: (changelogData: ChangelogData) => categorizeByChecklist({
-            hasFeats: { present: changelogData.hasFeats, value: 2 },
-            hasFixes: { present: changelogData.hasFixes, value: 2 },
+          benchmarks: (releaseNotesData: ReleaseNotesData) => categorizeByChecklist({
+            hasFeats: { present: releaseNotesData.hasFeats, value: 2 },
+            hasFixes: { present: releaseNotesData.hasFixes, value: 2 },
           }),
         },
         {

@@ -1,14 +1,14 @@
 import type { GitHubRepository } from '../../../src/lib/types';
-import { analyzeChangelogContent } from '../../../src/lib/utils/changelog';
+import { analyzeReleaseNotesContent } from '../../../src/lib/utils/releaseNotes';
 
-describe('analyzeChangelogContent', () => {
+describe('analyzeReleaseNotesContent', () => {
   test('should return false for both when no releases exist', () => {
     const repository: GitHubRepository = {
       stargazerCount: 0,
       releases: [],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(false);
     expect(result.hasFixes).toBe(false);
   });
@@ -18,7 +18,7 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(false);
     expect(result.hasFixes).toBe(false);
   });
@@ -28,14 +28,14 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: 'This release includes new features and bug fixes',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(true);
     expect(result.hasFixes).toBe(true);
   });
@@ -45,14 +45,14 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: 'feat: add new authentication system',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(true);
     expect(result.hasFixes).toBe(false);
   });
@@ -62,14 +62,14 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: 'fix: resolve memory leak issue',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(false);
     expect(result.hasFixes).toBe(true);
   });
@@ -79,14 +79,14 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: 'feat: add new authentication system\nfix: resolve memory leak issue',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(true);
     expect(result.hasFixes).toBe(true);
   });
@@ -96,14 +96,14 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: '## Features\n- Added new dashboard\n\n## Bug Fixes\n- Fixed login issue',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(true);
     expect(result.hasFixes).toBe(true);
   });
@@ -113,14 +113,14 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: 'Minor documentation updates and dependency bumps',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(false);
     expect(result.hasFixes).toBe(false);
   });
@@ -130,14 +130,14 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: '',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(false);
     expect(result.hasFixes).toBe(false);
   });
@@ -147,19 +147,19 @@ describe('analyzeChangelogContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2024-01-01T00:00:00Z',
+          publishedAt: '2025-01-01T00:00:00Z',
           tagName: 'v1.0.0',
           description: 'feat: add new dashboard',
         },
         {
-          publishedAt: '2024-01-02T00:00:00Z',
+          publishedAt: '2025-01-02T00:00:00Z',
           tagName: 'v1.0.1',
           description: 'fix: resolve login issue',
         },
       ],
     };
 
-    const result = analyzeChangelogContent(repository);
+    const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(true);
     expect(result.hasFixes).toBe(true);
   });

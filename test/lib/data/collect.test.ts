@@ -99,7 +99,7 @@ describe('collectPackageData', () => {
         hasUnitTests: false,
         hasSnapshotTests: false,
       },
-      changelogIncludesFeatsAndFixes: {
+      releaseNotesIncludeFeatsAndFixes: {
         hasFeats: true,
         hasFixes: true,
       },

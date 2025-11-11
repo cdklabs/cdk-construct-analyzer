@@ -47,7 +47,7 @@ export type PackageData = {
   readonly numberOfContributors_Maintenance?: number;
   readonly documentationCompleteness?: DocumentationCompleteness;
   readonly testsChecklist?: TestsData;
-  readonly changelogIncludesFeatsAndFixes?: ChangelogData;
+  readonly releaseNotesIncludeFeatsAndFixes?: ReleaseNotesData;
   readonly weeklyDownloads?: number;
   readonly githubStars?: number;
   readonly numberOfContributors_Popularity?: number;
@@ -75,7 +75,7 @@ export type TestsData = {
   readonly hasSnapshotTests: boolean;
 };
 
-export type ChangelogData = {
+export type ReleaseNotesData = {
   readonly hasFeats: boolean;
   readonly hasFixes: boolean;
 };

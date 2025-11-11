@@ -3,18 +3,25 @@ import { GitHubRepository } from '../types';
 /**
  * Analyzes GitHub releases to determine if they include features and fixes
  */
-export function analyzeChangelogContent(repository: GitHubRepository): { hasFeats: boolean; hasFixes: boolean } {
+export function analyzeReleaseNotesContent(repository: GitHubRepository): { hasFeats: boolean; hasFixes: boolean } {
   if (!repository.releases || repository.releases.length === 0) {
     return { hasFeats: false, hasFixes: false };
   }
 
-  // Check recent releases (last 10) for feature and fix patterns
-  const recentReleases = repository.releases.slice(0, 10);
+  // Filter releases from the past year
+  const oneYearAgo = new Date();
+  oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+
+  const releasesFromPastYear = repository.releases.filter(release => {
+    if (!release.publishedAt) return false;
+    const publishedDate = new Date(release.publishedAt);
+    return publishedDate >= oneYearAgo;
+  });
 
   let hasFeats = false;
   let hasFixes = false;
 
-  for (const release of recentReleases) {
+  for (const release of releasesFromPastYear) {
     if (release.description) {
       if (!hasFeats && hasFeatureContent(release.description)) {
         hasFeats = true;

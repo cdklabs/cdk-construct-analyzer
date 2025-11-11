@@ -32,8 +32,8 @@ export const CONFIG: Config = {
           }),
         },
         {
-          name: 'numberOfContributors(Maintenance)',
-          defaultWeight: 2,
+          name: 'numberOfContributors_Maintenance',
+          weight: 2,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
@@ -96,8 +96,8 @@ export const CONFIG: Config = {
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
         {
-          name: 'numberOfContributors(Popularity)',
-          defaultWeight: 1,
+          name: 'numberOfContributors_Popularity',
+          weight: 1,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },

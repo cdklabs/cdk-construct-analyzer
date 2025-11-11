@@ -25,7 +25,7 @@ Arguments:
   package   Name of the construct package to score (Scored on the latest version)
 
 Options:
- --verbose  Show detailed breakdown of signals
+ --details  Show detailed breakdown of signals
  --help     Show this help message
 ```
 
@@ -47,11 +47,11 @@ SUBSCORES
   Popularity  :            88/100
 ```
 
-##### Verbose
-Add `--verbose` for a detailed breakdown:
+##### Details
+Add `--details` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-deployment --verbose
+> cdk-construct-analyzer cdk-ecr-deployment --details
 
 LIBRARY: cdk-ecr-deployment
 VERSION: 0.0.421

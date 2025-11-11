@@ -64,8 +64,8 @@ export class ConstructAnalyzer {
     if (totalWeight != 100) {
       console.warn(
         `Warning: Signal weights sum to ${totalWeight} instead of 100. ` +
-        `Weights should sum to 100 as it's universally understood and can be interpreted as percentages. ` +
-        `Weights will be automatically normalized.`,
+        'Weights should sum to 100 as it\'s universally understood and can be interpreted as percentages. ' +
+        'Weights will be automatically normalized.',
       );
     }
 

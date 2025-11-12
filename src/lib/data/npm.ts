@@ -8,6 +8,7 @@ export interface NpmPackageData {
   };
   readonly isDeprecated: boolean;
   readonly hasProvenance?: boolean;
+  readonly packageJson?: any;
 }
 
 export interface NpmDownloadData {
@@ -37,6 +38,7 @@ export class NpmCollector {
       repository: response.repository,
       isDeprecated: Boolean(versionData?.deprecated),
       hasProvenance,
+      packageJson: versionData,
     };
   }
 

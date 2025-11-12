@@ -97,6 +97,15 @@ describe('NpmCollector', () => {
         },
         hasProvenance: true,
         isDeprecated: false,
+        packageJson: {
+          name: 'test-package',
+          version: '1.0.0',
+          dist: {
+            attestations: {
+              url: 'https://registry.npmjs.org/-/npm/v1/attestations/test-package@1.0.0',
+            },
+          },
+        },
       });
     });
 
@@ -132,6 +141,9 @@ describe('NpmCollector', () => {
         },
         isDeprecated: false,
         hasProvenance: false,
+        packageJson: {
+          dist: {},
+        },
       });
     });
 
@@ -173,6 +185,11 @@ describe('NpmCollector', () => {
         },
         hasProvenance: false,
         isDeprecated: true,
+        packageJson: {
+          name: 'deprecated-package',
+          version: '2.0.0',
+          deprecated: 'This package is no longer maintained',
+        },
       });
     });
 
@@ -203,6 +220,7 @@ describe('NpmCollector', () => {
         },
         hasProvenance: false,
         isDeprecated: false,
+        packageJson: undefined,
       });
     });
   });

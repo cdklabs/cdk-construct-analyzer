@@ -76,6 +76,12 @@ export const CONFIG: Config = {
             deprecated: { present: versionData.isDeprecated, value: -4 },
           }, 2), // Starting score of 2
         },
+        {
+          name: 'multiLanguageSupport',
+          weight: 3,
+          description: 'Number of programming languages supported via jsii (excluding typescript)',
+          benchmarks: (languageCount: number) => categorizeHigherIsBetter([4, 3, 2, 1], languageCount),
+        },
       ],
     },
     {

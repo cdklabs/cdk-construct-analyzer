@@ -54,6 +54,7 @@ export type PackageData = {
   readonly timeToFirstResponse?: number;
   readonly provenanceVerification?: boolean;
   readonly releaseFrequency?: number;
+  readonly multiLanguageSupport?: number;
 } & Record<string, any>;
 
 export type VersionStability = {

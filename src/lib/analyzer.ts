@@ -1,18 +1,6 @@
 import { CONFIG } from './config';
 import { collectPackageData } from './data/collect';
-import type { Config, PackageData } from './types';
-
-/**
- * Properties analyzer result
- */
-export interface ScoreResult {
-  readonly packageName: string; // "aws-cdk"
-  readonly version: string; // "1.2.3"
-  readonly totalScore: number; // 85
-  readonly pillarScores: Record<string, number>; // { "popularity": 42 }
-  readonly signalScores: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 4, "githubStars": 2 } }
-  readonly signalWeights: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 3, "githubStars": 2 } }
-}
+import type { ScoreResult, Config, PackageData, PillarScores } from './types';
 
 export class ConstructAnalyzer {
   private config: Config;
@@ -23,36 +11,30 @@ export class ConstructAnalyzer {
 
   public async analyzePackage(packageName: string): Promise<ScoreResult> {
     const packageData = await collectPackageData(packageName);
-    const version = packageData.version;
-
     const { signalScores, pillarScores } = await this.calculateSignalScores(packageData);
     const normalizedPillarScores = this.normalizePillarScores(pillarScores);
-    const totalScore = this.calculateTotalScore(normalizedPillarScores);
-    const signalWeights = this.getSignalWeights();
 
     return {
       packageName,
-      version,
-      totalScore,
+      version: packageData.version,
+      totalScore: this.calculateTotalScore(normalizedPillarScores),
       pillarScores: normalizedPillarScores,
       signalScores,
-      signalWeights,
+      signalWeights: this.getSignalWeights(),
     };
   }
 
   private async calculateSignalScores(packageData: PackageData) {
     const signalScores: Record<string, Record<string, number>> = {};
-    const pillarScores: Record<string, number> = {};
+    const pillarScores: PillarScores = { MAINTENANCE: 0, QUALITY: 0, POPULARITY: 0 };
 
     for (const pillar of this.config.pillars) {
       for (const signal of pillar.signals) {
-        const rawValue = packageData[signal.name];
-
-        const level = signal.benchmarks(rawValue);
+        const level = signal.benchmarks(packageData[signal.name]);
         const points = this.convertLevelToPoints(level, signal.name);
 
-        this.updateSignalScore(signalScores, pillar.name, signal.name, level ?? 1);
-        this.updatePillarScore(pillarScores, pillar.name, points, signal.weight);
+        (signalScores[pillar.name] ??= {})[signal.name] = level ?? 1;
+        pillarScores[pillar.name as keyof PillarScores] += points * signal.weight;
       }
     }
 
@@ -67,62 +49,44 @@ export class ConstructAnalyzer {
     return (level - 1) * 25;
   }
 
-  private updateSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {
-    (signalScores[pillar] ??= {})[signalName] = starRating;
+  private normalizePillarScores(pillarScores: PillarScores): PillarScores {
+    const normalize = (pillar: keyof PillarScores): number => {
+      const totalWeight = this.config.pillars
+        .find(p => p.name === pillar)
+        ?.signals.reduce((sum, signal) => sum + signal.weight, 0) ?? 0;
+
+      return totalWeight > 0
+        ? Math.round(Math.min(100, pillarScores[pillar] / totalWeight))
+        : 0;
+    };
+
+    return {
+      MAINTENANCE: normalize('MAINTENANCE'),
+      QUALITY: normalize('QUALITY'),
+      POPULARITY: normalize('POPULARITY'),
+    };
   }
 
-  private updatePillarScore(pillarScores: Record<string, number>, pillar: string, points: number, weight: number): void {
-    const weightedScore = points * weight;
-    pillarScores[pillar] = (pillarScores[pillar] ?? 0) + weightedScore;
-  }
-
-  private normalizePillarScores(pillarScores: Record<string, number>): Record<string, number> {
-    const normalizedScores: Record<string, number> = {};
-
-    const pillarEntries = Object.entries(pillarScores);
-    for (const [pillar, weightedSum] of pillarEntries) {
-      const totalWeight = this.getTotalWeightForPillar(pillar);
-      const normalizedScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
-      normalizedScores[pillar] = Math.round(normalizedScore);
-    }
-
-    return normalizedScores;
-  }
-
-  private getTotalWeightForPillar(pillarName: string): number {
-    const pillar = this.config.pillars.find(p => p.name === pillarName);
-    if (!pillar) return 0;
-
-    return pillar.signals.reduce((sum, signal) => sum + signal.weight, 0);
-  }
-
-  private calculateTotalScore(pillarScores: Record<string, number>): number {
-    if (Object.keys(pillarScores).length === 0) return 0;
-
+  private calculateTotalScore(pillarScores: PillarScores): number {
     let weightedSum = 0;
     let totalWeight = 0;
 
-    for (const [pillarName, score] of Object.entries(pillarScores)) {
-      const pillar = this.config.pillars.find(p => p.name === pillarName);
-      if (pillar) {
-        weightedSum += score * pillar.weight;
-        totalWeight += pillar.weight;
-      }
+    for (const pillar of this.config.pillars) {
+      const score = pillarScores[pillar.name as keyof PillarScores];
+      weightedSum += score * pillar.weight;
+      totalWeight += pillar.weight;
     }
 
     return totalWeight > 0 ? Math.round(weightedSum / totalWeight) : 0;
   }
 
-  /**
-   * Extract signal weights from config in the same structure as signalScores
-   */
   private getSignalWeights(): Record<string, Record<string, number>> {
     const signalWeights: Record<string, Record<string, number>> = {};
 
     for (const pillar of this.config.pillars) {
-      for (const signal of pillar.signals) {
-        (signalWeights[pillar.name] ??= {})[signal.name] = signal.weight;
-      }
+      signalWeights[pillar.name] = Object.fromEntries(
+        pillar.signals.map(signal => [signal.name, signal.weight]),
+      );
     }
 
     return signalWeights;

@@ -44,7 +44,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'documentationCompleteness',
-          defaultWeight: 10,
+          defaultWeight: 5,
           description: 'Presence of README, API reference, and usage examples',
           benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
             {
@@ -63,6 +63,12 @@ export const CONFIG: Config = {
             unitTests: { present: testsData.hasUnitTests, value: 2 },
             snapshotTests: { present: testsData.hasSnapshotTests, value: 2 },
           }),
+        },
+        {
+          name: 'authorPackageCount',
+          defaultWeight: 5,
+          description: 'Highest package count among authors',
+          benchmarks: (packageCount: number) => categorizeHigherIsBetter([20, 11, 5, 2], packageCount),
         },
         {
           name: 'releaseNotesIncludeFeatsAndFixes',

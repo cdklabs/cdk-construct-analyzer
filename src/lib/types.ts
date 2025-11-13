@@ -51,6 +51,7 @@ export type PackageData = {
   readonly numberOfContributors_Maintenance?: number;
   readonly documentationCompleteness?: DocumentationCompleteness;
   readonly testsChecklist?: TestsData;
+  readonly authorTrackRecord?: number;
   readonly releaseNotesIncludeFeatsAndFixes?: ReleaseNotesData;
   readonly weeklyDownloads?: number;
   readonly githubStars?: number;

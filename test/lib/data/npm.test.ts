@@ -285,4 +285,151 @@ describe('NpmCollector', () => {
       );
     });
   });
+
+  describe('fetchAuthorPackageCount', () => {
+    test('should fetch author package count successfully', async () => {
+      const mockPackageResponse = {
+        'name': 'test-package',
+        'dist-tags': { latest: '1.0.0' },
+        'repository': {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+        'maintainers': [
+          { name: 'johndoe' },
+        ],
+        'versions': {
+          '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
+          },
+        },
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPackageResponse,
+      } as Response);
+
+      await collector.fetchPackage('test-package');
+
+      const mockSearchResponse = {
+        objects: [
+          { package: { name: 'package1' } },
+          { package: { name: 'package2' } },
+        ],
+        total: 42,
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockSearchResponse,
+      } as Response);
+
+      const result = await collector.fetchAuthorPackageCount();
+
+      expect(mockedFetch).toHaveBeenCalledWith(
+        'https://registry.npmjs.org/-/v1/search?text=maintainer:johndoe&size=1',
+      );
+      expect(result).toBe(42);
+    });
+
+    test('should return undefined when no maintainers', async () => {
+      const mockPackageResponse = {
+        'name': 'test-package',
+        'dist-tags': { latest: '1.0.0' },
+        'repository': {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+        'versions': {
+          '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
+          },
+        },
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPackageResponse,
+      } as Response);
+
+      await collector.fetchPackage('test-package');
+
+      const result = await collector.fetchAuthorPackageCount();
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should return undefined when search API fails', async () => {
+      const mockPackageResponse = {
+        'name': 'test-package',
+        'dist-tags': { latest: '1.0.0' },
+        'repository': {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+        'maintainers': [
+          { name: 'johndoe' },
+        ],
+        'versions': {
+          '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
+          },
+        },
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPackageResponse,
+      } as Response);
+
+      await collector.fetchPackage('test-package');
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+      } as Response);
+
+      const result = await collector.fetchAuthorPackageCount();
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should return undefined when search API throws error', async () => {
+      const mockPackageResponse = {
+        'name': 'test-package',
+        'dist-tags': { latest: '1.0.0' },
+        'repository': {
+          type: 'git',
+          url: 'https://github.com/test/repo',
+        },
+        'maintainers': [
+          { name: 'johndoe' },
+        ],
+        'versions': {
+          '1.0.0': {
+            name: 'test-package',
+            version: '1.0.0',
+          },
+        },
+      };
+
+      mockedFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockPackageResponse,
+      } as Response);
+
+      await collector.fetchPackage('test-package');
+
+      mockedFetch.mockRejectedValueOnce(new Error('Network error'));
+
+      const result = await collector.fetchAuthorPackageCount();
+
+      expect(result).toBeUndefined();
+    });
+  });
 });

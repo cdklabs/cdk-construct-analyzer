@@ -4,3 +4,4 @@ export * from './documentation';
 export * from './tests';
 export * from './releases';
 export * from './jsii';
+export * from './releaseNotes';

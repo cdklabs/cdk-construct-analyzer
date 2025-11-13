@@ -12,7 +12,7 @@ export type BenchmarkFunction = (value: any) => number | undefined;
  */
 export interface SignalConfig {
   readonly name: string;
-  readonly weight: number;
+  readonly defaultWeight: number;
   readonly description: string;
   readonly benchmarks: BenchmarkFunction;
 }
@@ -23,7 +23,6 @@ export interface SignalConfig {
 export interface PillarConfig {
   readonly name: string;
   readonly description: string;
-  readonly weight: number;
   readonly signals: SignalConfig[];
 }
 
@@ -33,6 +32,11 @@ export interface PillarConfig {
 export interface Config {
   readonly pillars: PillarConfig[];
 }
+
+/**
+ * Custom signal weights map: signal name -> weight
+ */
+export type SignalWeights = Record<string, number>;
 
 /**
  * Checklist item configuration for scoring
@@ -47,6 +51,8 @@ export type PackageData = {
   readonly numberOfContributors_Maintenance?: number;
   readonly documentationCompleteness?: DocumentationCompleteness;
   readonly testsChecklist?: TestsData;
+  readonly authorTrackRecord?: number;
+  readonly releaseNotesIncludeFeatsAndFixes?: ReleaseNotesData;
   readonly weeklyDownloads?: number;
   readonly githubStars?: number;
   readonly numberOfContributors_Popularity?: number;
@@ -73,6 +79,11 @@ export type DocumentationCompleteness = {
 export type TestsData = {
   readonly hasUnitTests: boolean;
   readonly hasSnapshotTests: boolean;
+};
+
+export type ReleaseNotesData = {
+  readonly hasFeats: boolean;
+  readonly hasFixes: boolean;
 };
 
 /**
@@ -122,6 +133,7 @@ export interface GitHubIssue {
 export interface GitHubRelease {
   readonly publishedAt: string;
   readonly tagName: string;
+  readonly description?: string;
 }
 
 export interface GitHubRepository {

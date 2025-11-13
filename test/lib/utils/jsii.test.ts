@@ -35,8 +35,7 @@ describe('analyzeJsiiLanguageSupport', () => {
     const packageJson = {
       name: 'test-package',
       version: '1.0.0',
-      jsii: {
-      },
+      jsii: {},
     };
 
     const result = analyzeJsiiLanguageSupport(packageJson);

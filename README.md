@@ -34,17 +34,17 @@ You can run it locally on any library published to npm by providing its package 
 ```
 > cdk-construct-analyzer cdk-ecr-deployment
 
-LIBRARY: @cdklabs/cdk-ecr-deployment
-VERSION: 0.0.421
+LIBRARY: cdk-ecr-deployment
+VERSION: 4.0.3
 
 OVERALL SCORE: 76/100
 
 ---
 
 SUBSCORES
-  Maintenance :            66/100
-  Quality     :            75/100
-  Popularity  :            88/100
+  MAINTENANCE :           67/100
+  QUALITY     :           80/100
+  POPULARITY  :           88/100
 ```
 
 ##### Details
@@ -54,36 +54,37 @@ Add `--details` for a detailed breakdown:
 > cdk-construct-analyzer cdk-ecr-deployment --details
 
 LIBRARY: cdk-ecr-deployment
-VERSION: 0.0.421
+VERSION: 4.0.3
 
 OVERALL SCORE: 76/100
 
 ---
 
 SUBSCORES
-  Maintenance :            66/100
-  Quality     :            75/100
-  Popularity  :            88/100
-  
+  MAINTENANCE :           67/100
+  QUALITY     :           80/100
+  POPULARITY  :           88/100
+
 ---
 
-=== Maintenance ===                               SCORE  WEIGHT
-— Time to first response......................... ★★☆☆☆    15
-— Provenance Verification ....................... ★★★★★    10
-— Release Frequency ............................. ★★★★☆    10
-— Number of Contributors ........................ ★★★★☆    10
+=== MAINTENANCE ===                                   SCORE  WEIGHT
+— Time To First Response ............................ ★★☆☆☆    15
+— Provenance Verification ........................... ★★★★★    10
+— Release Frequency ................................. ★★★★☆    10
+— Number Of Contributors - Maintenance .............. ★★★★☆    5
+— Number Of Feats And Fixes ......................... ★★★★★    5
 
-=== Quality ===                                   SCORE  WEIGHT
-— Documentation Completeness .................... ★★★★★     5
-— Tests checklist (unit/snapshot) ............... ★★★☆☆     5
-— Author Track Record ........................... ★★★★★     5
-— Stable versioning ............................. ★★★★★     5
-— Changelog includes feats/fixes ................ ★★★★★     5
+=== QUALITY ===                                       SCORE  WEIGHT
+— Documentation Completeness ........................ ★★★★☆    5
+— Tests Checklist ................................... ★★★☆☆    5
+— Author Package Count .............................. ★★★★★    5
+— Release Notes Include Feats And Fixes ............. ★★★★★    5
+— Stable Versioning ................................. ★★★★☆    5
 
-=== Popularity ===                                SCORE  WEIGHT
-— Weekly Downloads .............................. ★★★★★    15
-— Repo stars .................................... ★★★★☆    10
-— Contributors .................................. ★★★★☆     5
+=== POPULARITY ===                                    SCORE  WEIGHT
+— Weekly Downloads .................................. ★★★★★    15
+— Github Stars ...................................... ★★★★☆    10
+— Number Of Contributors - Popularity ............... ★★★★☆    5
 ```
 
 #### Programmatic Access
@@ -146,6 +147,7 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 * Provenance Verification: Verifies package authenticity and supply chain security.
 * Release Frequency: Regular releases signal iteration, patching, and progress.
 * Number of Contributors: More contributors reduce risk of abandonment and reflect shared maintenance.
+* Number of Features and Fixes: Counts occurrences of "feat" and "fix" in release notes from the past year, indicating active development.
 
 ##### Quality
 

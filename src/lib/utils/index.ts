@@ -4,3 +4,4 @@ export * from './documentation';
 export * from './tests';
 export * from './releases';
 export * from './releaseNotes';
+export * from './issues';

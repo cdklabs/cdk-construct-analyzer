@@ -1,5 +1,5 @@
 import type { GitHubRepository } from '../../../src/lib/types';
-import { analyzeReleaseNotesContent } from '../../../src/lib/utils/releaseNotes';
+import { analyzeReleaseNotesContent, countFeatsAndFixes } from '../../../src/lib/utils/releaseNotes';
 
 describe('analyzeReleaseNotesContent', () => {
   test('should return false for both when no releases exist', () => {
@@ -162,5 +162,60 @@ describe('analyzeReleaseNotesContent', () => {
     const result = analyzeReleaseNotesContent(repository);
     expect(result.hasFeats).toBe(true);
     expect(result.hasFixes).toBe(true);
+  });
+});
+
+
+describe('countFeatsAndFixes', () => {
+  test('should return 0 when no releases are provided', () => {
+    const repository: GitHubRepository = {
+      stargazerCount: 0,
+      releases: [],
+    };
+
+    expect(countFeatsAndFixes(repository)).toBe(0);
+  });
+
+  test('should return 0 when releases is undefined', () => {
+    const repository: GitHubRepository = {
+      stargazerCount: 0,
+    };
+
+    expect(countFeatsAndFixes(repository)).toBe(0);
+  });
+
+  test('should count features and fixes in release descriptions', () => {
+    const repository: GitHubRepository = {
+      stargazerCount: 0,
+      releases: [
+        {
+          publishedAt: new Date().toISOString(),
+          tagName: 'v1.0.0',
+          description: 'feat fix',
+        },
+      ],
+    };
+
+    expect(countFeatsAndFixes(repository)).toBe(2);
+  });
+
+  test('should count across multiple releases', () => {
+    const repository: GitHubRepository = {
+      stargazerCount: 0,
+      releases: [
+        {
+          publishedAt: new Date().toISOString(),
+          tagName: 'v1.0.0',
+          description: 'feat fix',
+        },
+        {
+          publishedAt: new Date().toISOString(),
+          tagName: 'v1.1.0',
+          description: 'feat feat',
+        },
+      ],
+    };
+
+    expect(countFeatsAndFixes(repository)).toBe(4);
   });
 });

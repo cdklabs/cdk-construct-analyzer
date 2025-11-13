@@ -1,9 +1,16 @@
 import { PackageData, GitHubRepository } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
-import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness, analyzeTestsPresence, analyzeReleaseNotesContent } from '../utils';
-import { calculateTimeToFirstResponse } from '../utils/issues';
-import { calculateReleaseFrequency } from '../utils/releases';
+import {
+  extractRepoInfo,
+  processContributorsData,
+  analyzeDocumentationCompleteness,
+  analyzeTestsPresence,
+  analyzeReleaseNotesContent,
+  countFeatsAndFixes,
+  calculateTimeToFirstResponse,
+  calculateReleaseFrequency,
+} from '../utils';
 
 /**
  * Raw data fetched from external APIs before processing
@@ -90,6 +97,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     provenanceVerification: rawData.npm.hasProvenance,
     numberOfContributors_Popularity: processContributorsData(repository.commits),
     releaseFrequency: calculateReleaseFrequency(repository.releases),
+    numberOfFeatsAndFixes: countFeatsAndFixes(repository),
   };
 }
 

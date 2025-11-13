@@ -32,9 +32,15 @@ export const CONFIG: Config = {
         },
         {
           name: 'numberOfContributors_Maintenance',
-          defaultWeight: 10,
+          defaultWeight: 5,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
+        },
+        {
+          name: 'numberOfFeatsAndFixes',
+          defaultWeight: 5,
+          description: 'Number of features and bug fixes contributed to the project in the past year',
+          benchmarks: (contributors: number) => categorizeHigherIsBetter([28, 10, 2, 1], contributors),
         },
       ],
     },

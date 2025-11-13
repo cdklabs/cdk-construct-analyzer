@@ -116,7 +116,7 @@ describe('calculateOpenIssuesRatio', () => {
     expect(calculateOpenIssuesRatio(1, 3)).toBe(33.3);
   });
 
-  test('should awkward ratios correctly', () => {
+  test('should calculate awkward ratios correctly', () => {
     expect(calculateOpenIssuesRatio(6, 35)).toBe(17.1);
     expect(calculateOpenIssuesRatio(7, 23)).toBe(30.4);
   });

@@ -98,7 +98,6 @@ function processPackageData(rawData: RawPackageData): PackageData {
     numberOfContributors_Popularity: processContributorsData(repository.commits),
     releaseFrequency: calculateReleaseFrequency(repository.releases),
     openIssuesRatio: calculateOpenIssuesRatio(repository.openIssuesCount, repository.totalIssuesCount),
-
   };
 }
 

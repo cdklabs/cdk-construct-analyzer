@@ -51,7 +51,7 @@ SUBSCORES
 Add `--details` for a detailed breakdown:
 
 ```
-cdk-construct-analyzer cdk-ecr-deployment --details  
+> cdk-construct-analyzer cdk-ecr-deployment --details  
 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3

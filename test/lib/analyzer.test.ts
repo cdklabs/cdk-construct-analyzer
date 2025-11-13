@@ -78,7 +78,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.version).toBe('1.0.0');
     });
 
-    test('should calculate total score as weighted average of pillar scores', async () => {
+    test('should calculate total score as weighted average using signal weights', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       const analyzer = new ConstructAnalyzer();
@@ -88,11 +88,24 @@ describe('ConstructAnalyzer', () => {
       expect(result.pillarScores).toHaveProperty('POPULARITY');
       expect(result.pillarScores).toHaveProperty('QUALITY');
 
-      // Verify that the total score is calculated using pillar weights
-      // Since all pillars have equal weight (0.33), the result should be similar to a simple average
-      const pillarValues = Object.values(result.pillarScores);
-      const simpleAverage = Math.round(pillarValues.reduce((sum, score) => sum + score, 0) / pillarValues.length);
-      expect(Math.abs(result.totalScore - simpleAverage)).toBeLessThanOrEqual(1); // Allow for rounding differences
+      // Verify that the total score is calculated using signal weights
+      // Each pillar's contribution is weighted by the sum of its signal weights
+      // MAINTENANCE: 15+10+10+10 = 45 weight
+      // QUALITY: 10+5+5 = 20 weight
+      // POPULARITY: 15+15+5 = 35 weight
+      // Total weight: 55+15+35 = 100
+      const maintenanceWeight = 45;
+      const qualityWeight = 20;
+      const popularityWeight = 35;
+      const totalWeight = maintenanceWeight + qualityWeight + popularityWeight;
+
+      const expectedScore = Math.round(
+        (result.pillarScores.MAINTENANCE * maintenanceWeight +
+         result.pillarScores.QUALITY * qualityWeight +
+         result.pillarScores.POPULARITY * popularityWeight) / totalWeight,
+      );
+
+      expect(result.totalScore).toBe(expectedScore);
     });
 
     test('should skip undefined signals and contribute 0 points', async () => {
@@ -192,8 +205,8 @@ describe('ConstructAnalyzer', () => {
       // Should use custom weight for weeklyDownloads
       expect(result.signalWeights.POPULARITY.weeklyDownloads).toBe(5);
 
-      // Should use default weight for githubStars (which is 2 from config)
-      expect(result.signalWeights.POPULARITY.githubStars).toBe(2);
+      // Should use default weight for githubStars (which is 15 from config)
+      expect(result.signalWeights.POPULARITY.githubStars).toBe(15);
 
       // Should use default weights for all QUALITY signals
       expect(result.signalWeights.QUALITY).toBeDefined();

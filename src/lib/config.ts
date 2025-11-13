@@ -40,7 +40,7 @@ export const CONFIG: Config = {
           name: 'openIssuesRatio',
           defaultWeight: 5,
           description: 'Open issues / total issues',
-          benchmarks: (ratio: number) => categorizeLowerIsBetter([25, 50, 75, 90], ratio), 
+          benchmarks: (ratio: number) => categorizeLowerIsBetter([25, 50, 75, 90], ratio),
           // ratio will be 100 if 0 total issues
         },
       ],

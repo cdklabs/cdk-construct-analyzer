@@ -34,17 +34,17 @@ You can run it locally on any library published to npm by providing its package 
 ```
 > cdk-construct-analyzer cdk-ecr-deployment
 
-LIBRARY: @cdklabs/cdk-ecr-deployment
-VERSION: 0.0.421
+LIBRARY: cdk-ecr-deployment
+VERSION: 4.0.3
 
 OVERALL SCORE: 76/100
 
 ---
 
 SUBSCORES
-  Maintenance :            66/100
-  Quality     :            75/100
-  Popularity  :            88/100
+  MAINTENANCE :           63/100
+  QUALITY     :           83/100
+  POPULARITY  :           88/100
 ```
 
 ##### Details

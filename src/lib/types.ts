@@ -60,6 +60,7 @@ export type PackageData = {
   readonly timeToFirstResponse?: number;
   readonly provenanceVerification?: boolean;
   readonly releaseFrequency?: number;
+  readonly openIssuesRatio?: number;
 } & Record<string, any>;
 
 export type VersionStability = {
@@ -142,4 +143,6 @@ export interface GitHubRepository {
   readonly commits?: GitHubCommit[];
   readonly issues?: GitHubIssue[];
   readonly releases?: GitHubRelease[];
+  readonly openIssuesCount?: number;
+  readonly totalIssuesCount?: number;
 }

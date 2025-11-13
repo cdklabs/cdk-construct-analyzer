@@ -1,5 +1,5 @@
 import { GitHubIssue } from '../../../src/lib/types';
-import { calculateTimeToFirstResponse } from '../../../src/lib/utils/issues';
+import { calculateTimeToFirstResponse, calculateOpenIssuesRatio } from '../../../src/lib/utils/issues';
 
 describe('calculateTimeToFirstResponse', () => {
   const createMockIssue = (
@@ -83,5 +83,41 @@ describe('calculateTimeToFirstResponse', () => {
     // Should use first valid response (3 hours)
     const result = calculateTimeToFirstResponse(issues);
     expect(result).toBeCloseTo(0.0, 1);
+  });
+});
+
+describe('calculateOpenIssuesRatio', () => {
+  test('should return 100 when openIssuesCount is undefined', () => {
+    expect(calculateOpenIssuesRatio(undefined, 100)).toBe(100.0);
+  });
+
+  test('should return 100 when totalIssuesCount is undefined', () => {
+    expect(calculateOpenIssuesRatio(10, undefined)).toBe(100.0);
+  });
+
+  test('should return 100 when both counts are undefined', () => {
+    expect(calculateOpenIssuesRatio(undefined, undefined)).toBe(100.0);
+  });
+
+  test('should return 100 when totalIssuesCount is 0', () => {
+    expect(calculateOpenIssuesRatio(0, 0)).toBe(100.0);
+  });
+
+  test('should calculate ratio correctly for all issues open', () => {
+    expect(calculateOpenIssuesRatio(100, 100)).toBe(100.0);
+  });
+
+  test('should calculate ratio correctly for no open issues', () => {
+    expect(calculateOpenIssuesRatio(0, 100)).toBe(0.0);
+  });
+
+  test('should round to 1 decimal place', () => {
+    expect(calculateOpenIssuesRatio(33, 100)).toBe(33.0);
+    expect(calculateOpenIssuesRatio(1, 3)).toBe(33.3);
+  });
+
+  test('should calculate awkward ratios correctly', () => {
+    expect(calculateOpenIssuesRatio(6, 35)).toBe(17.1);
+    expect(calculateOpenIssuesRatio(7, 23)).toBe(30.4);
   });
 });

@@ -32,9 +32,16 @@ export const CONFIG: Config = {
         },
         {
           name: 'numberOfContributors_Maintenance',
-          defaultWeight: 10,
+          defaultWeight: 5,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
+        },
+        {
+          name: 'openIssuesRatio',
+          defaultWeight: 5,
+          description: 'Open issues / total issues',
+          benchmarks: (ratio: number) => categorizeLowerIsBetter([25, 50, 75, 90], ratio),
+          // ratio will be 100 if 0 total issues
         },
       ],
     },

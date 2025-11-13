@@ -51,40 +51,40 @@ SUBSCORES
 Add `--details` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-deployment --details
+./bin/cdk-construct-analyzer @mrgrain/cdk-esbuild --details
 
-LIBRARY: cdk-ecr-deployment
-VERSION: 0.0.421
+LIBRARY: @mrgrain/cdk-esbuild
+VERSION: 5.7.3
 
-OVERALL SCORE: 76/100
+OVERALL SCORE: 75/100
 
 ---
 
 SUBSCORES
-  Maintenance :            66/100
-  Quality     :            75/100
-  Popularity  :            88/100
-  
+  MAINTENANCE :           61/100
+  QUALITY     :           85/100
+  POPULARITY  :           88/100
+
 ---
 
-=== Maintenance ===                               SCORE  WEIGHT
-— Time to first response......................... ★★☆☆☆    15
-— Provenance Verification ....................... ★★★★★    10
-— Release Frequency ............................. ★★★★☆    10
-— Number of Contributors ........................ ★★★★☆     5
-— Open issues / total issues .................... ★★★★★     5
+=== MAINTENANCE ===                                   SCORE  WEIGHT
+— Time To First Response ............................ ★★☆☆☆    15
+— Provenance Verification ........................... ★★★★★    10
+— Release Frequency ................................. ★★★☆☆    10
+— Number Of Contributors - Maintenance .............. ★★★★☆    5
+— Open Issues Ratio ................................. ★★★★★    5
 
-=== Quality ===                                   SCORE  WEIGHT
-— Documentation Completeness .................... ★★★★★     5
-— Tests checklist (unit/snapshot) ............... ★★★☆☆     5
-— Author Track Record ........................... ★★★★★     5
-— Stable versioning ............................. ★★★★★     5
-— Changelog includes feats/fixes ................ ★★★★★     5
+=== QUALITY ===                                       SCORE  WEIGHT
+— Documentation Completeness ........................ ★★★★☆    5
+— Tests Checklist ................................... ★★★★★    5
+— Author Package Count .............................. ★★★☆☆    5
+— Release Notes Include Feats And Fixes ............. ★★★★★    5
+— Stable Versioning ................................. ★★★★★    5
 
-=== Popularity ===                                SCORE  WEIGHT
-— Weekly Downloads .............................. ★★★★★    15
-— Repo stars .................................... ★★★★☆    10
-— Contributors .................................. ★★★★☆     5
+=== POPULARITY ===                                    SCORE  WEIGHT
+— Weekly Downloads .................................. ★★★★★    15
+— Github Stars ...................................... ★★★★☆    10
+— Number Of Contributors - Popularity ............... ★★★★☆    5
 ```
 
 #### Programmatic Access

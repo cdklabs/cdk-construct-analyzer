@@ -87,36 +87,20 @@ describe('calculateTimeToFirstResponse', () => {
 });
 
 describe('calculateOpenIssuesRatio', () => {
-  test('should return undefined when openIssuesCount is undefined', () => {
+  test('should return 100 when openIssuesCount is undefined', () => {
     expect(calculateOpenIssuesRatio(undefined, 100)).toBe(100.0);
   });
 
-  test('should return undefined when totalIssuesCount is undefined', () => {
+  test('should return 100 when totalIssuesCount is undefined', () => {
     expect(calculateOpenIssuesRatio(10, undefined)).toBe(100.0);
   });
 
-  test('should return undefined when both counts are undefined', () => {
+  test('should return 100 when both counts are undefined', () => {
     expect(calculateOpenIssuesRatio(undefined, undefined)).toBe(100.0);
   });
 
-  test('should return undefined when totalIssuesCount is 0', () => {
+  test('should return 100 when totalIssuesCount is 0', () => {
     expect(calculateOpenIssuesRatio(0, 0)).toBe(100.0);
-  });
-
-  test('should calculate ratio correctly for 10 open out of 100 total', () => {
-    expect(calculateOpenIssuesRatio(10, 100)).toBe(10.0);
-  });
-
-  test('should calculate ratio correctly for 25 open out of 100 total', () => {
-    expect(calculateOpenIssuesRatio(25, 100)).toBe(25.0);
-  });
-
-  test('should calculate ratio correctly for 50 open out of 100 total', () => {
-    expect(calculateOpenIssuesRatio(50, 100)).toBe(50.0);
-  });
-
-  test('should calculate ratio correctly for 75 open out of 100 total', () => {
-    expect(calculateOpenIssuesRatio(75, 100)).toBe(75.0);
   });
 
   test('should calculate ratio correctly for all issues open', () => {
@@ -132,8 +116,8 @@ describe('calculateOpenIssuesRatio', () => {
     expect(calculateOpenIssuesRatio(1, 3)).toBe(33.3);
   });
 
-  test('should handle small numbers correctly', () => {
-    expect(calculateOpenIssuesRatio(1, 10)).toBe(10.0);
-    expect(calculateOpenIssuesRatio(5, 20)).toBe(25.0);
+  test('should awkward ratios correctly', () => {
+    expect(calculateOpenIssuesRatio(6, 35)).toBe(17.1);
+    expect(calculateOpenIssuesRatio(7, 23)).toBe(30.4);
   });
 });

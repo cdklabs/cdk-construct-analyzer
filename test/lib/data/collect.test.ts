@@ -66,9 +66,9 @@ describe('collectPackageData', () => {
         },
       ],
       releases: [
-        { publishedAt: '2025-10-01T00:00:00Z', tagName: 'v1.0.0' },
-        { publishedAt: '2025-09-01T00:00:00Z', tagName: 'v0.9.0' },
-        { publishedAt: '2025-08-01T00:00:00Z', tagName: 'v0.8.0' },
+        { publishedAt: '2025-10-01T00:00:00Z', tagName: 'v1.0.0', description: 'feat: add new dashboard\nfix: resolve login issue' },
+        { publishedAt: '2025-09-01T00:00:00Z', tagName: 'v0.9.0', description: 'Minor updates and documentation' },
+        { publishedAt: '2025-08-01T00:00:00Z', tagName: 'v0.8.0', description: 'Initial release' },
       ],
     };
 
@@ -101,6 +101,10 @@ describe('collectPackageData', () => {
         hasSnapshotTests: false,
       },
       authorPackageCount: 42,
+      releaseNotesIncludeFeatsAndFixes: {
+        hasFeats: true,
+        hasFixes: true,
+      },
       weeklyDownloads: 10000,
       githubStars: 500,
       numberOfContributors_Popularity: 2,

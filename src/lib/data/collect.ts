@@ -1,7 +1,7 @@
 import { PackageData, GitHubRepository } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
-import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness, analyzeTestsPresence } from '../utils';
+import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness, analyzeTestsPresence, analyzeReleaseNotesContent } from '../utils';
 import { calculateTimeToFirstResponse } from '../utils/issues';
 import { calculateReleaseFrequency } from '../utils/releases';
 
@@ -78,6 +78,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     documentationCompleteness: analyzeDocumentationCompleteness(repository),
     testsChecklist: analyzeTestsPresence(repository),
     authorPackageCount: rawData.authorPackageCount,
+    releaseNotesIncludeFeatsAndFixes: analyzeReleaseNotesContent(repository),
     weeklyDownloads: rawData.downloads.downloads,
     githubStars: repository.stargazerCount ?? 0,
     stableVersioning: {

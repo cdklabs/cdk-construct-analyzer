@@ -96,6 +96,7 @@ export class GitHubRepo {
             nodes {
               publishedAt
               tagName
+              description
             }
           }
         }

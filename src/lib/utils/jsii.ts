@@ -1,8 +1,4 @@
 /**
- * Analyzes jsii configuration to determine multi-language support
- */
-
-/**
  * Extracts the count of supported languages from jsii configuration in package.json
  */
 export function analyzeJsiiLanguageSupport(packageJson: any): number {

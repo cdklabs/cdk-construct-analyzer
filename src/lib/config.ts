@@ -32,7 +32,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'numberOfContributors_Maintenance',
-          defaultWeight: 10,
+          defaultWeight: 5,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
@@ -91,7 +91,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'multiLanguageSupport',
-          weight: 3,
+          defaultWeight: 5,
           description: 'Number of programming languages supported via jsii (excluding typescript)',
           benchmarks: (languageCount: number) => categorizeHigherIsBetter([4, 3, 2, 1], languageCount),
         },

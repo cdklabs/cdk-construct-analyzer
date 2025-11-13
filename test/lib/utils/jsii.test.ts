@@ -31,6 +31,19 @@ describe('analyzeJsiiLanguageSupport', () => {
     expect(result).toBe(4);
   });
 
+  test('should return 0 when jsii.targets does not exist', () => {
+    const packageJson = {
+      name: 'test-package',
+      version: '1.0.0',
+      jsii: {
+      },
+    };
+
+    const result = analyzeJsiiLanguageSupport(packageJson);
+
+    expect(result).toBe(0);
+  });
+
   test('should return 0 when jsii.targets is empty', () => {
     const packageJson = {
       name: 'test-package',

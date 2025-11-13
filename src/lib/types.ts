@@ -12,7 +12,7 @@ export type BenchmarkFunction = (value: any) => number | undefined;
  */
 export interface SignalConfig {
   readonly name: string;
-  readonly weight: number;
+  readonly defaultWeight: number;
   readonly description: string;
   readonly benchmarks: BenchmarkFunction;
 }
@@ -32,6 +32,11 @@ export interface PillarConfig {
 export interface Config {
   readonly pillars: PillarConfig[];
 }
+
+/**
+ * Custom signal weights map: signal name -> weight
+ */
+export type SignalWeights = Record<string, number>;
 
 /**
  * Checklist item configuration for scoring

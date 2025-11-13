@@ -12,13 +12,13 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'timeToFirstResponse',
-          weight: 15,
+          defaultWeight: 15,
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
         {
           name: 'provenanceVerification',
-          weight: 10,
+          defaultWeight: 10,
           description: 'Ensures supply chain security through provenance verification',
           benchmarks: (verified: boolean) => categorizeByChecklist({
             versionVerified: { present: verified, value: 4 },
@@ -32,7 +32,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'numberOfContributors_Maintenance',
-          weight: 10,
+          defaultWeight: 10,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
@@ -44,7 +44,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'documentationCompleteness',
-          weight: 10,
+          defaultWeight: 10,
           description: 'Presence of README, API reference, and usage examples',
           benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
             {
@@ -57,7 +57,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'stableVersioning',
-          weight: 5,
+          defaultWeight: 5,
           description: 'Package version stability and deprecation status',
           benchmarks: (versionData: VersionStability) => categorizeByChecklist({
             isStableMajorVersion: { present: versionData.isStableMajorVersion, value: 2 },
@@ -82,19 +82,19 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'weeklyDownloads',
-          weight: 15,
+          defaultWeight: 15,
           description: 'Weekly download count from npm',
           benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },
         {
           name: 'githubStars',
-          weight: 15,
+          defaultWeight: 15,
           description: 'GitHub repository stars',
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
         {
           name: 'numberOfContributors_Popularity',
-          weight: 5,
+          defaultWeight: 5,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },

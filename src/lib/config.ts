@@ -1,5 +1,5 @@
 import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBetter } from './scoring';
-import type { Config, DocumentationCompleteness, VersionStability, TestsData } from './types';
+import type { Config, DocumentationCompleteness, VersionStability, TestsData, ReleaseNotesData } from './types';
 
 /**
  * Main configuration object with all signals and their benchmarks
@@ -56,6 +56,24 @@ export const CONFIG: Config = {
           ),
         },
         {
+          name: 'testsChecklist',
+          defaultWeight: 5,
+          description: 'Presence of unit tests and snapshot tests',
+          benchmarks: (testsData: TestsData) => categorizeByChecklist({
+            unitTests: { present: testsData.hasUnitTests, value: 2 },
+            snapshotTests: { present: testsData.hasSnapshotTests, value: 2 },
+          }),
+        },
+        {
+          name: 'releaseNotesIncludeFeatsAndFixes',
+          defaultWeight: 5,
+          description: 'Presence of features and fixes in release notes',
+          benchmarks: (releaseNotesData: ReleaseNotesData) => categorizeByChecklist({
+            hasFeats: { present: releaseNotesData.hasFeats, value: 2 },
+            hasFixes: { present: releaseNotesData.hasFixes, value: 2 },
+          }),
+        },
+        {
           name: 'stableVersioning',
           defaultWeight: 5,
           description: 'Package version stability and deprecation status',
@@ -64,15 +82,6 @@ export const CONFIG: Config = {
             hasMinorReleases: { present: versionData.hasMinorReleases, value: 1 },
             deprecated: { present: versionData.isDeprecated, value: -4 },
           }, 2), // Starting score of 2
-        },
-        {
-          name: 'testsChecklist',
-          defaultWeight: 5,
-          description: 'Presence of unit tests and snapshot tests',
-          benchmarks: (testsData: TestsData) => categorizeByChecklist({
-            unitTests: { present: testsData.hasUnitTests, value: 2 },
-            snapshotTests: { present: testsData.hasSnapshotTests, value: 2 },
-          }),
         },
       ],
     },
@@ -88,7 +97,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'githubStars',
-          defaultWeight: 15,
+          defaultWeight: 10,
           description: 'GitHub repository stars',
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },

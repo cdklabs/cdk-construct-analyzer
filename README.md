@@ -74,9 +74,10 @@ SUBSCORES
 — Number of Contributors ........................ ★★★★☆    10
 
 === Quality ===                                   SCORE  WEIGHT
-— Documentation Completeness .................... ★★★★★    10
+— Documentation Completeness .................... ★★★★★     5
 — Tests checklist (unit/snapshot) ............... ★★★☆☆     5
 — Stable versioning ............................. ★★★★★     5
+— Changelog includes feats/fixes ................ ★★★★★     5
 
 === Popularity ===                                SCORE  WEIGHT
 — Weekly Downloads .............................. ★★★★★    15
@@ -151,6 +152,7 @@ Signals that are visible in the repo/package that showcases quality:
 
 * Documentation Completeness: High quality document
 * Tests checklist (unit/snapshot): Tests ensure correctness and prevent regressions.
+* Changelog includes feats/fixes: Checks if there are feats/fixes published in the release notes.
 * Stable versioning (>=1.x.x, not deprecated): Indicates API maturity and stability.ation makes the project easier to adopt and use (README, API References, Usage Examples).
 
 ##### Popularity

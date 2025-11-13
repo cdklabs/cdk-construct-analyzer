@@ -21,6 +21,10 @@ describe('ConstructAnalyzer', () => {
       hasUnitTests: true,
       hasSnapshotTests: true,
     },
+    releaseNotesIncludeFeatsAndFixes: {
+      hasFeats: true,
+      hasFixes: true,
+    },
     stableVersioning: {
       isStableMajorVersion: true,
       hasMinorReleases: true,
@@ -61,12 +65,16 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
+        releaseNotesIncludeFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
+        },
         stableVersioning: {
           isStableMajorVersion: false,
           hasMinorReleases: false,
           isDeprecated: false,
         },
-        // Missing githubStars
+        // Missing githubStars, releaseFrequency, numberOfContributors_Maintenance
       };
 
       mockedCollectPackageData.mockResolvedValue(incompleteData as any);
@@ -91,12 +99,12 @@ describe('ConstructAnalyzer', () => {
       // Verify that the total score is calculated using signal weights
       // Each pillar's contribution is weighted by the sum of its signal weights
       // MAINTENANCE: 15+10+10+10 = 45 weight
-      // QUALITY: 10+5+5 = 20 weight
-      // POPULARITY: 15+15+5 = 35 weight
-      // Total weight: 55+15+35 = 100
+      // QUALITY: 10+5+5+5 = 25 weight
+      // POPULARITY: 15+10+5 = 35 weight
+      // Total weight: 45+25+30 = 100
       const maintenanceWeight = 45;
-      const qualityWeight = 20;
-      const popularityWeight = 35;
+      const qualityWeight = 25;
+      const popularityWeight = 30;
       const totalWeight = maintenanceWeight + qualityWeight + popularityWeight;
 
       const expectedScore = Math.round(
@@ -122,6 +130,10 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
+        releaseNotesIncludeFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
+        },
         stableVersioning: {
           isStableMajorVersion: false,
           hasMinorReleases: false,
@@ -143,6 +155,10 @@ describe('ConstructAnalyzer', () => {
         testsChecklist: {
           hasUnitTests: false,
           hasSnapshotTests: false,
+        },
+        releaseNotesIncludeFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
         },
         stableVersioning: {
           isStableMajorVersion: false,
@@ -205,8 +221,8 @@ describe('ConstructAnalyzer', () => {
       // Should use custom weight for weeklyDownloads
       expect(result.signalWeights.POPULARITY.weeklyDownloads).toBe(5);
 
-      // Should use default weight for githubStars (which is 15 from config)
-      expect(result.signalWeights.POPULARITY.githubStars).toBe(15);
+      // Should use default weight for githubStars (which is 10 from config)
+      expect(result.signalWeights.POPULARITY.githubStars).toBe(10);
 
       // Should use default weights for all QUALITY signals
       expect(result.signalWeights.QUALITY).toBeDefined();

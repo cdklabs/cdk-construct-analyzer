@@ -2,6 +2,8 @@
  * Configuration type definitions for the CDK Construct Analyzer
  */
 
+import type { Pillar } from './config';
+
 /**
  * Properties analyzer result
  */
@@ -47,12 +49,13 @@ export interface Config {
 
 /**
  * Pillar scores for the three main evaluation pillars
+ * Dynamically generated from Pillar enum
  */
-export interface PillarScores {
-  MAINTENANCE: number;
-  QUALITY: number;
-  POPULARITY: number;
-}
+export type PillarScores = {
+  [K in Pillar]: number;
+};
+
+export type SignalWeights = Record<string, number>;
 
 /**
  * Checklist item configuration for scoring

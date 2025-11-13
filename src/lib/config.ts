@@ -2,6 +2,15 @@ import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBette
 import type { Config, DocumentationCompleteness, VersionStability, TestsData, ReleaseNotesData } from './types';
 
 /**
+ * Pillar enum - single source of truth for pillar names
+ */
+export enum Pillar {
+  MAINTENANCE = 'MAINTENANCE',
+  QUALITY = 'QUALITY',
+  POPULARITY = 'POPULARITY',
+}
+
+/**
  * Main configuration object with all signals and their benchmarks
  */
 export const CONFIG: Config = {

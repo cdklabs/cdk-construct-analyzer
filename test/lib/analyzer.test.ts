@@ -21,6 +21,10 @@ describe('ConstructAnalyzer', () => {
       hasUnitTests: true,
       hasSnapshotTests: true,
     },
+    releaseNotesIncludeFeatsAndFixes: {
+      hasFeats: true,
+      hasFixes: true,
+    },
     stableVersioning: {
       isStableMajorVersion: true,
       hasMinorReleases: true,
@@ -61,12 +65,16 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
+        releaseNotesIncludeFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
+        },
         stableVersioning: {
           isStableMajorVersion: false,
           hasMinorReleases: false,
           isDeprecated: false,
         },
-        // Missing githubStars
+        // Missing githubStars, releaseFrequency, numberOfContributors_Maintenance
       };
 
       mockedCollectPackageData.mockResolvedValue(incompleteData as any);
@@ -78,7 +86,7 @@ describe('ConstructAnalyzer', () => {
       expect(result.version).toBe('1.0.0');
     });
 
-    test('should calculate total score as weighted average of pillar scores', async () => {
+    test('should calculate total score as weighted average using signal weights', async () => {
       mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
 
       const analyzer = new ConstructAnalyzer();
@@ -88,11 +96,24 @@ describe('ConstructAnalyzer', () => {
       expect(result.pillarScores).toHaveProperty('POPULARITY');
       expect(result.pillarScores).toHaveProperty('QUALITY');
 
-      // Verify that the total score is calculated using pillar weights
-      // Since all pillars have equal weight (0.33), the result should be similar to a simple average
-      const pillarValues = Object.values(result.pillarScores);
-      const simpleAverage = Math.round(pillarValues.reduce((sum, score) => sum + score, 0) / pillarValues.length);
-      expect(Math.abs(result.totalScore - simpleAverage)).toBeLessThanOrEqual(1); // Allow for rounding differences
+      // Verify that the total score is calculated using signal weights
+      // Each pillar's contribution is weighted by the sum of its signal weights
+      // MAINTENANCE: 15+10+10+10 = 45 weight
+      // QUALITY: 10+5+5+5 = 25 weight
+      // POPULARITY: 15+10+5 = 35 weight
+      // Total weight: 45+25+30 = 100
+      const maintenanceWeight = 45;
+      const qualityWeight = 25;
+      const popularityWeight = 30;
+      const totalWeight = maintenanceWeight + qualityWeight + popularityWeight;
+
+      const expectedScore = Math.round(
+        (result.pillarScores.MAINTENANCE * maintenanceWeight +
+         result.pillarScores.QUALITY * qualityWeight +
+         result.pillarScores.POPULARITY * popularityWeight) / totalWeight,
+      );
+
+      expect(result.totalScore).toBe(expectedScore);
     });
 
     test('should skip undefined signals and contribute 0 points', async () => {
@@ -108,6 +129,10 @@ describe('ConstructAnalyzer', () => {
         testsChecklist: {
           hasUnitTests: false,
           hasSnapshotTests: false,
+        },
+        releaseNotesIncludeFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
         },
         stableVersioning: {
           isStableMajorVersion: false,
@@ -131,6 +156,10 @@ describe('ConstructAnalyzer', () => {
           hasUnitTests: false,
           hasSnapshotTests: false,
         },
+        releaseNotesIncludeFeatsAndFixes: {
+          hasFeats: false,
+          hasFixes: false,
+        },
         stableVersioning: {
           isStableMajorVersion: false,
           hasMinorReleases: false,
@@ -149,6 +178,54 @@ describe('ConstructAnalyzer', () => {
       // The result with undefined signals should have equal scores
       // because undefined signals contribute as 0 points
       expect(resultWithMissing.totalScore).toEqual(resultWithAll.totalScore);
+    });
+
+    test('should use custom weights when provided', async () => {
+      mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
+
+      const analyzer = new ConstructAnalyzer();
+
+      // First, get result with default weights
+      const defaultResult = await analyzer.analyzePackage('test-package');
+
+      // Then, get result with custom weights that heavily favor weeklyDownloads
+      const customWeights = {
+        weeklyDownloads: 10, // Much higher than default
+        githubStars: 1, // Much lower than default
+      };
+
+      const customResult = await analyzer.analyzePackage('test-package', customWeights);
+
+      // Verify that custom weights are reflected in the result
+      expect(customResult.signalWeights.POPULARITY.weeklyDownloads).toBe(10);
+      expect(customResult.signalWeights.POPULARITY.githubStars).toBe(1);
+
+      // The scores should be different due to different weights
+      expect(customResult.pillarScores.POPULARITY).not.toBe(defaultResult.pillarScores.POPULARITY);
+    });
+
+    test('should fall back to default weights for missing custom weights', async () => {
+      mockedCollectPackageData.mockResolvedValue(mockPackageData as any);
+
+      const analyzer = new ConstructAnalyzer();
+
+      // Provide partial custom weights (only for some signals)
+      const partialCustomWeights = {
+        weeklyDownloads: 5, // Custom weight
+        // githubStars: missing, should use default
+        // documentationCompleteness: missing, should use default
+      };
+
+      const result = await analyzer.analyzePackage('test-package', partialCustomWeights);
+
+      // Should use custom weight for weeklyDownloads
+      expect(result.signalWeights.POPULARITY.weeklyDownloads).toBe(5);
+
+      // Should use default weight for githubStars (which is 10 from config)
+      expect(result.signalWeights.POPULARITY.githubStars).toBe(10);
+
+      // Should use default weights for all QUALITY signals
+      expect(result.signalWeights.QUALITY).toBeDefined();
     });
   });
 });

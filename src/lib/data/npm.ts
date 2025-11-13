@@ -8,6 +8,7 @@ export interface NpmPackageData {
   };
   readonly isDeprecated: boolean;
   readonly hasProvenance?: boolean;
+  readonly maintainers?: Array<{ name: string }>;
 }
 
 export interface NpmDownloadData {
@@ -37,6 +38,7 @@ export class NpmCollector {
       repository: response.repository,
       isDeprecated: Boolean(versionData?.deprecated),
       hasProvenance,
+      maintainers: response.maintainers,
     };
   }
 
@@ -58,5 +60,39 @@ export class NpmCollector {
     }
 
     return await response.json() as NpmDownloadData;
+  }
+
+  async fetchAuthorPackageCount(): Promise<number | undefined> {
+    // Get the best (highest package count) maintainer
+    const maintainers = this.packageData?.maintainers;
+    if (!maintainers || maintainers.length === 0) {
+      return undefined;
+    }
+
+    try {
+      const counts = await Promise.all(
+        maintainers.map(async (maintainer) => {
+          if (!maintainer?.name) {
+            return 0;
+          }
+          try {
+            const response = await fetch(`https://registry.npmjs.org/-/v1/search?text=maintainer:${encodeURIComponent(maintainer.name)}&size=1`);
+            if (!response.ok) {
+              return undefined;
+            }
+            const data = await response.json() as any;
+
+            return data.total ?? 0;
+          } catch {
+            return 0;
+          }
+        }),
+      );
+      const maxCount = Math.max(...counts);
+      // Return undefined if all requests failed
+      return maxCount > 0 ? maxCount : undefined;
+    } catch {
+      return undefined;
+    }
   }
 }

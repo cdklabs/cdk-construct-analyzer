@@ -26,7 +26,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'releaseFrequency',
-          weight: 10,
+          defaultWeight: 10,
           description: 'Number of releases in the past year',
           benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
         },
@@ -67,7 +67,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'testsChecklist',
-          weight: 5,
+          defaultWeight: 5,
           description: 'Presence of unit tests and snapshot tests',
           benchmarks: (testsData: TestsData) => categorizeByChecklist({
             unitTests: { present: testsData.hasUnitTests, value: 2 },

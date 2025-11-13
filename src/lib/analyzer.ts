@@ -42,6 +42,8 @@ export class ConstructAnalyzer {
   private async calculateSignalScores(packageData: PackageData, weights?: SignalWeights) {
     const signalScores: Record<string, Record<string, number>> = {};
     const pillarScores: Record<string, number> = {};
+    let totalWeightedSum = 0;
+    let totalWeight = 0;
 
     for (const pillar of this.config.pillars) {
       for (const signal of pillar.signals) {
@@ -55,6 +57,9 @@ export class ConstructAnalyzer {
 
         this.updateSignalScore(signalScores, pillar.name, signal.name, level ?? 1);
         this.updatePillarScore(pillarScores, pillar.name, points, weight);
+
+        totalWeightedSum += points * signal.defaultWeight;
+        totalWeight += signal.defaultWeight;
       }
     }
 

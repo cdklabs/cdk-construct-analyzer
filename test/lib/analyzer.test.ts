@@ -205,8 +205,8 @@ describe('ConstructAnalyzer', () => {
       // Should use custom weight for weeklyDownloads
       expect(result.signalWeights.POPULARITY.weeklyDownloads).toBe(5);
 
-      // Should use default weight for githubStars (which is 2 from config)
-      expect(result.signalWeights.POPULARITY.githubStars).toBe(2);
+      // Should use default weight for githubStars (which is 15 from config)
+      expect(result.signalWeights.POPULARITY.githubStars).toBe(15);
 
       // Should use default weights for all QUALITY signals
       expect(result.signalWeights.QUALITY).toBeDefined();

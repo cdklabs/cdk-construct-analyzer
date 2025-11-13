@@ -42,6 +42,7 @@ describe('collectPackageData', () => {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
       fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      fetchAuthorPackageCount: jest.fn().mockResolvedValue(42),
     };
 
     const mockGitHubData = {
@@ -65,9 +66,9 @@ describe('collectPackageData', () => {
         },
       ],
       releases: [
-        { publishedAt: '2025-10-01T00:00:00Z', tagName: 'v1.0.0' },
-        { publishedAt: '2025-09-01T00:00:00Z', tagName: 'v0.9.0' },
-        { publishedAt: '2025-08-01T00:00:00Z', tagName: 'v0.8.0' },
+        { publishedAt: '2025-10-01T00:00:00Z', tagName: 'v1.0.0', description: 'feat: add new dashboard\nfix: resolve login issue' },
+        { publishedAt: '2025-09-01T00:00:00Z', tagName: 'v0.9.0', description: 'Minor updates and documentation' },
+        { publishedAt: '2025-08-01T00:00:00Z', tagName: 'v0.8.0', description: 'Initial release' },
       ],
     };
 
@@ -99,6 +100,11 @@ describe('collectPackageData', () => {
         hasUnitTests: false,
         hasSnapshotTests: false,
       },
+      authorPackageCount: 42,
+      releaseNotesIncludeFeatsAndFixes: {
+        hasFeats: true,
+        hasFixes: true,
+      },
       weeklyDownloads: 10000,
       githubStars: 500,
       numberOfContributors_Popularity: 2,
@@ -118,6 +124,7 @@ describe('collectPackageData', () => {
       fetchPackage: jest.fn().mockResolvedValue(undefined),
       getPackageData: jest.fn().mockReturnValue(mockNpmData),
       fetchDownloadData: jest.fn().mockResolvedValue(mockDownloadData),
+      fetchAuthorPackageCount: jest.fn().mockResolvedValue(42),
     };
 
     const mockGitHubInstance = {
@@ -133,6 +140,7 @@ describe('collectPackageData', () => {
 
     expect(result).toEqual({
       version: '1.0.0',
+      authorPackageCount: 42,
       weeklyDownloads: 10000,
       stableVersioning: {
         isStableMajorVersion: true,

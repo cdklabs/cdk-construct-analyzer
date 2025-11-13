@@ -1,7 +1,7 @@
 import { PackageData, GitHubRepository } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
-import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness, analyzeTestsPresence } from '../utils';
+import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness, analyzeTestsPresence, analyzeReleaseNotesContent } from '../utils';
 import { calculateTimeToFirstResponse } from '../utils/issues';
 import { calculateReleaseFrequency } from '../utils/releases';
 
@@ -11,6 +11,7 @@ import { calculateReleaseFrequency } from '../utils/releases';
 interface RawPackageData {
   readonly npm: NpmPackageData;
   readonly downloads: NpmDownloadData;
+  readonly authorPackageCount?: number;
   readonly github?: GitHubRepository;
 }
 
@@ -23,6 +24,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   await npmCollector.fetchPackage(packageName);
   const npmData = npmCollector.getPackageData();
   const downloadData = await npmCollector.fetchDownloadData();
+  const authorPackageCountData = await npmCollector.fetchAuthorPackageCount();
 
   const repoInfo = extractRepoInfo(npmData.repository.url);
   const githubRepo = new GitHubRepo(repoInfo.owner, repoInfo.repo);
@@ -43,6 +45,7 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
   return {
     npm: npmData,
     downloads: downloadData,
+    authorPackageCount: authorPackageCountData,
     ...(githubData && { github: githubData }),
   };
 }
@@ -57,6 +60,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     return {
       version: rawData.npm.version,
       weeklyDownloads: rawData.downloads.downloads,
+      authorPackageCount: rawData.authorPackageCount,
       stableVersioning: {
         isStableMajorVersion: parseInt(majorVersion, 10) >= 1,
         hasMinorReleases: parseInt(minorVersion, 10) >= 1,
@@ -73,6 +77,8 @@ function processPackageData(rawData: RawPackageData): PackageData {
     numberOfContributors_Maintenance: processContributorsData(repository.commits),
     documentationCompleteness: analyzeDocumentationCompleteness(repository),
     testsChecklist: analyzeTestsPresence(repository),
+    authorPackageCount: rawData.authorPackageCount,
+    releaseNotesIncludeFeatsAndFixes: analyzeReleaseNotesContent(repository),
     weeklyDownloads: rawData.downloads.downloads,
     githubStars: repository.stargazerCount ?? 0,
     stableVersioning: {

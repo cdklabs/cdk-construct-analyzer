@@ -9,7 +9,7 @@ export class ConstructAnalyzer {
     this.config = CONFIG;
   }
 
-  public async analyzePackage(packageName: string): Promise<ScoreResult> {
+  public async analyzePackage(packageName: string, weights?: SignalWeights): Promise<ScoreResult> {
     const packageData = await collectPackageData(packageName);
     const { signalScores, pillarScores } = await this.calculateSignalScores(packageData);
     const normalizedPillarScores = this.normalizePillarScores(pillarScores);
@@ -24,7 +24,7 @@ export class ConstructAnalyzer {
     };
   }
 
-  private async calculateSignalScores(packageData: PackageData) {
+  private async calculateSignalScores(packageData: PackageData, weights?: SignalWeights) {
     const signalScores: Record<string, Record<string, number>> = {};
     const pillarScores: PillarScores = { MAINTENANCE: 0, QUALITY: 0, POPULARITY: 0 };
 
@@ -38,7 +38,17 @@ export class ConstructAnalyzer {
       }
     }
 
-    return { signalScores, pillarScores };
+    if (totalWeight != 100) {
+      console.warn(
+        `Warning: Signal weights sum to ${totalWeight} instead of 100. ` +
+        'Weights should sum to 100 as it\'s universally understood and can be interpreted as percentages. ' +
+        'Weights will be automatically normalized.',
+      );
+    }
+
+    const totalScore = totalWeight > 0 ? Math.round(totalWeightedSum / totalWeight) : 0;
+
+    return { signalScores, pillarScores, totalScore };
   }
 
   private convertLevelToPoints(level: number | undefined, signalName: string): number {

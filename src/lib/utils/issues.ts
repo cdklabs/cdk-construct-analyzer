@@ -50,3 +50,23 @@ export function calculateTimeToFirstResponse(issues?: GitHubIssue[]): number | u
   const average = responseTimes.reduce((sum, time) => sum + time, 0) / responseTimes.length;
   return Math.round(average * 10) / 10; // Round to 1 decimal places for better precision
 }
+
+/**
+ * Calculate the percentage of open issues relative to total issues
+ *
+ * Returns undefined when:
+ * - openIssuesCount or totalIssuesCount is undefined
+ * - totalIssuesCount is 0 (no issues to calculate ratio)
+ */
+export function calculateOpenIssuesRatio(openIssuesCount?: number, totalIssuesCount?: number): number {
+  if (openIssuesCount === undefined || totalIssuesCount === undefined) {
+    return 100;
+  }
+
+  if (totalIssuesCount === 0) {
+    return 100;
+  }
+
+  const ratio = (openIssuesCount / totalIssuesCount) * 100;
+  return Math.round(ratio * 10) / 10; // Round to 1 decimal place
+}

@@ -51,7 +51,7 @@ SUBSCORES
 Add `--details` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-deployment --details
+> cdk-construct-analyzer cdk-ecr-deployment --details    
 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
@@ -73,6 +73,7 @@ SUBSCORES
 — Release Frequency ................................. ★★★★☆    10
 — Number Of Contributors - Maintenance .............. ★★★★☆    5
 — Number Of Feats And Fixes ......................... ★★★★★    5
+— Open Issues Ratio ................................. ★★★★★    5
 
 === QUALITY ===                                       SCORE  WEIGHT
 — Documentation Completeness ........................ ★★★★☆    5
@@ -80,6 +81,7 @@ SUBSCORES
 — Author Package Count .............................. ★★★★★    5
 — Release Notes Include Feats And Fixes ............. ★★★★★    5
 — Stable Versioning ................................. ★★★★☆    5
+— Multi Language Support ............................ ★★★★★    5
 
 === POPULARITY ===                                    SCORE  WEIGHT
 — Weekly Downloads .................................. ★★★★★    15
@@ -145,6 +147,7 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 
 * Time to first response: Fast issue resolution reflects active, responsive maintainers.
 * Provenance Verification: Verifies package authenticity and supply chain security.
+* Open issues / total issues: A lower ratio of open issues indicates backlog health and follow through normalized by repository popularity. Note: 0 total issues scores worst (100% ratio) as it suggests no community engagement.
 * Release Frequency: Regular releases signal iteration, patching, and progress.
 * Number of Contributors: More contributors reduce risk of abandonment and reflect shared maintenance.
 * Number of Features and Fixes: Counts occurrences of "feat" and "fix" in release notes from the past year, indicating active development.

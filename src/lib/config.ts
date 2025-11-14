@@ -12,7 +12,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'timeToFirstResponse',
-          defaultWeight: 15,
+          defaultWeight: 10,
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
@@ -41,6 +41,13 @@ export const CONFIG: Config = {
           defaultWeight: 5,
           description: 'Number of features and bug fixes contributed to the project in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([28, 10, 2, 1], contributors),
+        },
+        {
+          name: 'openIssuesRatio',
+          defaultWeight: 5,
+          description: 'Open issues / total issues',
+          benchmarks: (ratio: number) => categorizeLowerIsBetter([25, 50, 75, 90], ratio),
+          // ratio will be 100 if 0 total issues
         },
       ],
     },
@@ -95,6 +102,12 @@ export const CONFIG: Config = {
             deprecated: { present: versionData.isDeprecated, value: -4 },
           }, 2), // Starting score of 2
         },
+        {
+          name: 'multiLanguageSupport',
+          defaultWeight: 5,
+          description: 'Number of programming languages supported via jsii (excluding typescript)',
+          benchmarks: (languageCount: number) => categorizeHigherIsBetter([4, 3, 2, 1], languageCount),
+        },
       ],
     },
     {
@@ -103,7 +116,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'weeklyDownloads',
-          defaultWeight: 15,
+          defaultWeight: 10,
           description: 'Weekly download count from npm',
           benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },

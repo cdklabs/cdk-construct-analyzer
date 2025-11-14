@@ -10,6 +10,7 @@ import {
   calculateOpenIssuesRatio,
   calculateReleaseFrequency,
   analyzeReleaseNotesContent,
+  analyzeJsiiLanguageSupport,
 } from '../utils';
 
 /**
@@ -63,6 +64,8 @@ async function fetchAllData(packageName: string): Promise<RawPackageData> {
 function processPackageData(rawData: RawPackageData): PackageData {
   const [majorVersion, minorVersion] = rawData.npm.version.split('.');
 
+  const jsiiLanguageCount = analyzeJsiiLanguageSupport(rawData.npm.packageJson);
+
   if (!rawData.github) {
     return {
       version: rawData.npm.version,
@@ -74,6 +77,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
         isDeprecated: rawData.npm.isDeprecated,
       },
       provenanceVerification: rawData.npm.hasProvenance,
+      multiLanguageSupport: jsiiLanguageCount,
     };
   }
 
@@ -97,6 +101,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     provenanceVerification: rawData.npm.hasProvenance,
     numberOfContributors_Popularity: processContributorsData(repository.commits),
     releaseFrequency: calculateReleaseFrequency(repository.releases),
+    multiLanguageSupport: jsiiLanguageCount,
     openIssuesRatio: calculateOpenIssuesRatio(repository.openIssuesCount, repository.totalIssuesCount),
   };
 }

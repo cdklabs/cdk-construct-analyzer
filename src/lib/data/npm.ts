@@ -8,6 +8,7 @@ export interface NpmPackageData {
   };
   readonly isDeprecated: boolean;
   readonly hasProvenance?: boolean;
+  readonly packageJson?: any;
   readonly maintainers?: Array<{ name: string }>;
 }
 
@@ -38,6 +39,7 @@ export class NpmCollector {
       repository: response.repository,
       isDeprecated: Boolean(versionData?.deprecated),
       hasProvenance,
+      packageJson: versionData,
       maintainers: response.maintainers,
     };
   }

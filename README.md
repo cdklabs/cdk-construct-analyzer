@@ -34,7 +34,7 @@ You can run it locally on any library published to npm by providing its package 
 ```
 > cdk-construct-analyzer cdk-ecr-deployment
 
-LIBRARY: @cdklabs/cdk-ecr-deployment
+LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
 
 OVERALL SCORE: 76/100
@@ -43,15 +43,15 @@ OVERALL SCORE: 76/100
 
 SUBSCORES
   MAINTENANCE :           67/100
-  QUALITY     :           80/100
-  POPULARITY  :           88/100
+  QUALITY     :           83/100
+  POPULARITY  :           85/100
 ```
 
 ##### Details
 Add `--details` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-deployment --details  
+> cdk-construct-analyzer cdk-ecr-deployment --details    
 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
@@ -62,8 +62,8 @@ OVERALL SCORE: 76/100
 
 SUBSCORES
   MAINTENANCE :           67/100
-  QUALITY     :           80/100
-  POPULARITY  :           88/100
+  QUALITY     :           83/100
+  POPULARITY  :           85/100
 
 ---
 
@@ -80,6 +80,7 @@ SUBSCORES
 — Author Package Count .............................. ★★★★★    5
 — Release Notes Include Feats And Fixes ............. ★★★★★    5
 — Stable Versioning ................................. ★★★★☆    5
+— Multi Language Support ............................ ★★★★★    5
 
 === POPULARITY ===                                    SCORE  WEIGHT
 — Weekly Downloads .................................. ★★★★★    15

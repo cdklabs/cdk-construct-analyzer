@@ -118,6 +118,7 @@ describe('collectPackageData', () => {
       provenanceVerification: true,
       releaseFrequency: 3,
       timeToFirstResponse: undefined,
+      multiLanguageSupport: 0,
       openIssuesRatio: 10,
     });
   });
@@ -151,6 +152,7 @@ describe('collectPackageData', () => {
         isDeprecated: false,
       },
       provenanceVerification: true,
+      multiLanguageSupport: 0,
     });
   });
 });

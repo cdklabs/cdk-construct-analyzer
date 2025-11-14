@@ -96,6 +96,12 @@ export const CONFIG: Config = {
             deprecated: { present: versionData.isDeprecated, value: -4 },
           }, 2), // Starting score of 2
         },
+        {
+          name: 'multiLanguageSupport',
+          defaultWeight: 5,
+          description: 'Number of programming languages supported via jsii (excluding typescript)',
+          benchmarks: (languageCount: number) => categorizeHigherIsBetter([4, 3, 2, 1], languageCount),
+        },
       ],
     },
     {
@@ -104,7 +110,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'weeklyDownloads',
-          defaultWeight: 15,
+          defaultWeight: 10,
           description: 'Weekly download count from npm',
           benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },

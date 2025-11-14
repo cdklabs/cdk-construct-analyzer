@@ -98,13 +98,13 @@ describe('ConstructAnalyzer', () => {
 
       // Verify that the total score is calculated using signal weights
       // Each pillar's contribution is weighted by the sum of its signal weights
-      // MAINTENANCE: 15+10+10+10 = 45 weight
-      // QUALITY: 10+5+5+5 = 25 weight
-      // POPULARITY: 15+10+5 = 35 weight
-      // Total weight: 45+25+30 = 100
+      // MAINTENANCE: 15+10+10+5+5 = 45 weight
+      // QUALITY: 5+5+5+5+5+5 = 30 weight
+      // POPULARITY: 10+10+5 = 25 weight
+      // Total weight: 40+30+30 = 100
       const maintenanceWeight = 45;
-      const qualityWeight = 25;
-      const popularityWeight = 30;
+      const qualityWeight = 30;
+      const popularityWeight = 25;
       const totalWeight = maintenanceWeight + qualityWeight + popularityWeight;
 
       const expectedScore = Math.round(

@@ -70,6 +70,8 @@ describe('collectPackageData', () => {
         { publishedAt: '2025-09-01T00:00:00Z', tagName: 'v0.9.0', description: 'Minor updates and documentation' },
         { publishedAt: '2025-08-01T00:00:00Z', tagName: 'v0.8.0', description: 'Initial release' },
       ],
+      openIssuesCount: 10,
+      totalIssuesCount: 100,
     };
 
     const mockGitHubInstance = {
@@ -117,6 +119,7 @@ describe('collectPackageData', () => {
       releaseFrequency: 3,
       timeToFirstResponse: undefined,
       multiLanguageSupport: 0,
+      openIssuesRatio: 10,
     });
   });
 

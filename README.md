@@ -72,6 +72,7 @@ SUBSCORES
 — Provenance Verification ........................... ★★★★★    10
 — Release Frequency ................................. ★★★★☆    10
 — Number Of Contributors - Maintenance .............. ★★★★☆    5
+— Open Issues Ratio ................................. ★★★★★    5
 
 === QUALITY ===                                       SCORE  WEIGHT
 — Documentation Completeness ........................ ★★★★☆    5
@@ -145,6 +146,7 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 
 * Time to first response: Fast issue resolution reflects active, responsive maintainers.
 * Provenance Verification: Verifies package authenticity and supply chain security.
+* Open issues / total issues: A lower ratio of open issues indicates backlog health and follow through normalized by repository popularity. Note: 0 total issues scores worst (100% ratio) as it suggests no community engagement.
 * Release Frequency: Regular releases signal iteration, patching, and progress.
 * Number of Contributors: More contributors reduce risk of abandonment and reflect shared maintenance.
 

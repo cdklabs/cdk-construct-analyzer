@@ -1,9 +1,17 @@
 import { PackageData, GitHubRepository } from '../types';
 import { GitHubRepo } from './github-repo';
 import { NpmCollector, NpmPackageData, NpmDownloadData } from './npm';
-import { extractRepoInfo, processContributorsData, analyzeDocumentationCompleteness, analyzeTestsPresence, analyzeJsiiLanguageSupport, analyzeReleaseNotesContent } from '../utils';
-import { calculateTimeToFirstResponse } from '../utils/issues';
-import { calculateReleaseFrequency } from '../utils/releases';
+import {
+  extractRepoInfo,
+  processContributorsData,
+  analyzeDocumentationCompleteness,
+  analyzeTestsPresence,
+  calculateTimeToFirstResponse,
+  calculateOpenIssuesRatio,
+  calculateReleaseFrequency,
+  analyzeReleaseNotesContent,
+  analyzeJsiiLanguageSupport
+} from '../utils';
 
 /**
  * Raw data fetched from external APIs before processing
@@ -94,6 +102,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     numberOfContributors_Popularity: processContributorsData(repository.commits),
     releaseFrequency: calculateReleaseFrequency(repository.releases),
     multiLanguageSupport: jsiiLanguageCount,
+    openIssuesRatio: calculateOpenIssuesRatio(repository.openIssuesCount, repository.totalIssuesCount),
   };
 }
 

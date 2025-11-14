@@ -4,4 +4,6 @@ export * from './documentation';
 export * from './tests';
 export * from './releases';
 export * from './jsii';
+export * from './issues';
+export * from './contributors';
 export * from './releaseNotes';

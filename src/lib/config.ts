@@ -110,7 +110,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'weeklyDownloads',
-          defaultWeight: 15,
+          defaultWeight: 10,
           description: 'Weekly download count from npm',
           benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },

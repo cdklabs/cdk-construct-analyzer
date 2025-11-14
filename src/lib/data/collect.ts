@@ -10,7 +10,7 @@ import {
   calculateOpenIssuesRatio,
   calculateReleaseFrequency,
   analyzeReleaseNotesContent,
-  analyzeJsiiLanguageSupport
+  analyzeJsiiLanguageSupport,
 } from '../utils';
 
 /**

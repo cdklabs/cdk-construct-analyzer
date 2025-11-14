@@ -42,16 +42,16 @@ OVERALL SCORE: 76/100
 ---
 
 SUBSCORES
-  MAINTENANCE :           63/100
+  MAINTENANCE :           67/100
   QUALITY     :           83/100
-  POPULARITY  :           88/100
+  POPULARITY  :           85/100
 ```
 
 ##### Details
 Add `--details` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-deployment --details  
+> cdk-construct-analyzer cdk-ecr-deployment --details    
 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
@@ -61,9 +61,9 @@ OVERALL SCORE: 76/100
 ---
 
 SUBSCORES
-  MAINTENANCE :           63/100
+  MAINTENANCE :           67/100
   QUALITY     :           83/100
-  POPULARITY  :           88/100
+  POPULARITY  :           85/100
 
 ---
 

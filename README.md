@@ -37,38 +37,38 @@ You can run it locally on any library published to npm by providing its package 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
 
-OVERALL SCORE: 76/100
+OVERALL SCORE: 80/100
 
 ---
 
 SUBSCORES
-  MAINTENANCE :           67/100
-  QUALITY     :           80/100
-  POPULARITY  :           88/100
+  MAINTENANCE :           75/100
+  QUALITY     :           83/100
+  POPULARITY  :           85/100
 ```
 
 ##### Details
 Add `--details` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-deployment --details    
+> cdk-construct-analyzer cdk-ecr-deployment --details
 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
 
-OVERALL SCORE: 76/100
+OVERALL SCORE: 80/100
 
 ---
 
 SUBSCORES
-  MAINTENANCE :           67/100
-  QUALITY     :           80/100
-  POPULARITY  :           88/100
+  MAINTENANCE :           75/100
+  QUALITY     :           83/100
+  POPULARITY  :           85/100
 
 ---
 
 === MAINTENANCE ===                                   SCORE  WEIGHT
-— Time To First Response ............................ ★★☆☆☆    15
+— Time To First Response ............................ ★★☆☆☆    10
 — Provenance Verification ........................... ★★★★★    10
 — Release Frequency ................................. ★★★★☆    10
 — Number Of Contributors - Maintenance .............. ★★★★☆    5
@@ -84,7 +84,7 @@ SUBSCORES
 — Multi Language Support ............................ ★★★★★    5
 
 === POPULARITY ===                                    SCORE  WEIGHT
-— Weekly Downloads .................................. ★★★★★    15
+— Weekly Downloads .................................. ★★★★★    10
 — Github Stars ...................................... ★★★★☆    10
 — Number Of Contributors - Popularity ............... ★★★★☆    5
 ```

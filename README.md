@@ -161,6 +161,7 @@ Signals that are visible in the repo/package that showcases quality:
 * Author Track Record: Measures how many packages the author has published, more published packages often indicate greater experience.
 * Changelog includes feats/fixes: Checks if there are feats/fixes published in the release notes.
 * Stable versioning (>=1.x.x, not deprecated): Indicates API maturity and stability.ation makes the project easier to adopt and use (README, API References, Usage Examples).
+* Multi-language Support: Supporting more CDK languages shows extra effort and intent to reach a broader developer base
 
 ##### Popularity
 

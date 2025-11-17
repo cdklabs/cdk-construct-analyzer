@@ -37,12 +37,12 @@ You can run it locally on any library published to npm by providing its package 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
 
-OVERALL SCORE: 76/100
+OVERALL SCORE: 80/100
 
 ---
 
 SUBSCORES
-  MAINTENANCE :           67/100
+  MAINTENANCE :           75/100
   QUALITY     :           83/100
   POPULARITY  :           85/100
 ```
@@ -51,27 +51,28 @@ SUBSCORES
 Add `--details` for a detailed breakdown:
 
 ```
-> cdk-construct-analyzer cdk-ecr-deployment --details    
+> cdk-construct-analyzer cdk-ecr-deployment --details
 
 LIBRARY: cdk-ecr-deployment
 VERSION: 4.0.3
 
-OVERALL SCORE: 76/100
+OVERALL SCORE: 80/100
 
 ---
 
 SUBSCORES
-  MAINTENANCE :           67/100
+  MAINTENANCE :           75/100
   QUALITY     :           83/100
   POPULARITY  :           85/100
 
 ---
 
 === MAINTENANCE ===                                   SCORE  WEIGHT
-— Time To First Response ............................ ★★☆☆☆    15
+— Time To First Response ............................ ★★☆☆☆    10
 — Provenance Verification ........................... ★★★★★    10
 — Release Frequency ................................. ★★★★☆    10
 — Number Of Contributors - Maintenance .............. ★★★★☆    5
+— Number Of Feats And Fixes ......................... ★★★★★    5
 — Open Issues Ratio ................................. ★★★★★    5
 
 === QUALITY ===                                       SCORE  WEIGHT
@@ -83,7 +84,7 @@ SUBSCORES
 — Multi Language Support ............................ ★★★★★    5
 
 === POPULARITY ===                                    SCORE  WEIGHT
-— Weekly Downloads .................................. ★★★★★    15
+— Weekly Downloads .................................. ★★★★★    10
 — Github Stars ...................................... ★★★★☆    10
 — Number Of Contributors - Popularity ............... ★★★★☆    5
 ```
@@ -149,6 +150,7 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 * Open issues / total issues: A lower ratio of open issues indicates backlog health and follow through normalized by repository popularity. Note: 0 total issues scores worst (100% ratio) as it suggests no community engagement.
 * Release Frequency: Regular releases signal iteration, patching, and progress.
 * Number of Contributors: More contributors reduce risk of abandonment and reflect shared maintenance.
+* Number of Features and Fixes: Counts occurrences of "feat" and "fix" in release notes from the past year, indicating active development.
 
 ##### Quality
 
@@ -159,6 +161,7 @@ Signals that are visible in the repo/package that showcases quality:
 * Author Track Record: Measures how many packages the author has published, more published packages often indicate greater experience.
 * Changelog includes feats/fixes: Checks if there are feats/fixes published in the release notes.
 * Stable versioning (>=1.x.x, not deprecated): Indicates API maturity and stability.ation makes the project easier to adopt and use (README, API References, Usage Examples).
+* Multi-language Support: Supporting more CDK languages shows extra effort and intent to reach a broader developer base
 
 ##### Popularity
 

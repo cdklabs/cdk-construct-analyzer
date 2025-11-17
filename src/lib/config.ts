@@ -12,7 +12,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'timeToFirstResponse',
-          defaultWeight: 15,
+          defaultWeight: 10,
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
@@ -35,6 +35,12 @@ export const CONFIG: Config = {
           defaultWeight: 5,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
+        },
+        {
+          name: 'numberOfFeatsAndFixes',
+          defaultWeight: 5,
+          description: 'Number of features and bug fixes contributed to the project in the past year',
+          benchmarks: (contributors: number) => categorizeHigherIsBetter([28, 10, 2, 1], contributors),
         },
         {
           name: 'openIssuesRatio',

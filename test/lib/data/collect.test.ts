@@ -110,6 +110,7 @@ describe('collectPackageData', () => {
       weeklyDownloads: 10000,
       githubStars: 500,
       numberOfContributors_Popularity: 2,
+      numberOfFeatsAndFixes: 2,
       stableVersioning: {
         isStableMajorVersion: true,
         hasMinorReleases: false,

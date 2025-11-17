@@ -60,6 +60,7 @@ export type PackageData = {
   readonly timeToFirstResponse?: number;
   readonly provenanceVerification?: boolean;
   readonly releaseFrequency?: number;
+  readonly numberOfFeatsAndFixes?: number;
   readonly multiLanguageSupport?: number;
   readonly openIssuesRatio?: number;
 } & Record<string, any>;

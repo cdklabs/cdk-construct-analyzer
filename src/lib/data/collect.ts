@@ -6,10 +6,11 @@ import {
   processContributorsData,
   analyzeDocumentationCompleteness,
   analyzeTestsPresence,
-  calculateTimeToFirstResponse,
-  calculateOpenIssuesRatio,
-  calculateReleaseFrequency,
   analyzeReleaseNotesContent,
+  countFeatsAndFixes,
+  calculateTimeToFirstResponse,
+  calculateReleaseFrequency,
+  calculateOpenIssuesRatio,
   analyzeJsiiLanguageSupport,
 } from '../utils';
 
@@ -101,6 +102,7 @@ function processPackageData(rawData: RawPackageData): PackageData {
     provenanceVerification: rawData.npm.hasProvenance,
     numberOfContributors_Popularity: processContributorsData(repository.commits),
     releaseFrequency: calculateReleaseFrequency(repository.releases),
+    numberOfFeatsAndFixes: countFeatsAndFixes(repository),
     multiLanguageSupport: jsiiLanguageCount,
     openIssuesRatio: calculateOpenIssuesRatio(repository.openIssuesCount, repository.totalIssuesCount),
   };

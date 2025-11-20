@@ -1,18 +1,6 @@
-import { CONFIG } from './config';
+import { CONFIG, Pillar } from './config';
 import { collectPackageData } from './data/collect';
-import type { Config, PackageData, SignalWeights } from './types';
-
-/**
- * Properties analyzer result
- */
-export interface ScoreResult {
-  readonly packageName: string; // "aws-cdk"
-  readonly version: string; // "1.2.3"
-  readonly totalScore: number; // 85
-  readonly pillarScores: Record<string, number>; // { "popularity": 42 }
-  readonly signalScores: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 4, "githubStars": 2 } }
-  readonly signalWeights: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 3, "githubStars": 2 } }
-}
+import type { ScoreResult, Config, PackageData, SignalWeights, PillarScores } from './types';
 
 export class ConstructAnalyzer {
   private config: Config;
@@ -26,7 +14,7 @@ export class ConstructAnalyzer {
     const version = packageData.version;
 
     const { signalScores, pillarScores, totalScore } = await this.calculateSignalScores(packageData, weights);
-    const normalizedPillarScores = this.normalizePillarScores(pillarScores, weights);
+    const normalizedPillarScores = this.normalizePillarScores(pillarScores, weights) as Readonly<PillarScores>;
     const signalWeights = this.getSignalWeights(weights);
 
     return {
@@ -41,25 +29,25 @@ export class ConstructAnalyzer {
 
   private async calculateSignalScores(packageData: PackageData, weights?: SignalWeights) {
     const signalScores: Record<string, Record<string, number>> = {};
-    const pillarScores: Record<string, number> = {};
+    const pillarScores = Object.fromEntries(
+      Object.values(Pillar).map(pillar => [pillar, 0]),
+    ) as PillarScores;
+
     let totalWeightedSum = 0;
     let totalWeight = 0;
 
     for (const pillar of this.config.pillars) {
       for (const signal of pillar.signals) {
-        const rawValue = packageData[signal.name];
-
-        const level = signal.benchmarks(rawValue);
+        const level = signal.benchmarks(packageData[signal.name]);
         const points = this.convertLevelToPoints(level, signal.name);
 
-        // Use custom weight if provided, otherwise use default weight
         const weight = weights?.[signal.name] ?? signal.defaultWeight;
 
-        this.updateSignalScore(signalScores, pillar.name, signal.name, level ?? 1);
-        this.updatePillarScore(pillarScores, pillar.name, points, weight);
+        (signalScores[pillar.name] ??= {})[signal.name] = level ?? 1;
+        pillarScores[pillar.name as Pillar] = (pillarScores[pillar.name as Pillar] || 0) + points * weight;
 
-        totalWeightedSum += points * signal.defaultWeight;
-        totalWeight += signal.defaultWeight;
+        totalWeightedSum += points * weight;
+        totalWeight += weight;
       }
     }
 
@@ -84,24 +72,18 @@ export class ConstructAnalyzer {
     return (level - 1) * 25;
   }
 
-  private updateSignalScore(signalScores: Record<string, Record<string, number>>, pillar: string, signalName: string, starRating: number): void {
-    (signalScores[pillar] ??= {})[signalName] = starRating;
-  }
-
-  private updatePillarScore(pillarScores: Record<string, number>, pillar: string, points: number, weight: number): void {
-    const weightedScore = points * weight;
-    pillarScores[pillar] = (pillarScores[pillar] ?? 0) + weightedScore;
-  }
-
-  private normalizePillarScores(pillarScores: Record<string, number>, weights?: SignalWeights): Record<string, number> {
-    const normalizedScores: Record<string, number> = {};
+  private normalizePillarScores(pillarScores: Record<string, number>, weights?: SignalWeights): PillarScores {
+    const normalizedScores = Object.fromEntries(
+      Object.values(Pillar).map(pillar => [pillar, 0]),
+    ) as PillarScores;
 
     const pillarEntries = Object.entries(pillarScores);
     for (const [pillar, weightedSum] of pillarEntries) {
       const totalWeight = this.getTotalWeightForPillar(pillar, weights);
       const normalizedScore = totalWeight > 0 ? Math.min(100, weightedSum / totalWeight) : 0;
-      normalizedScores[pillar] = Math.round(normalizedScore);
+      normalizedScores[pillar as keyof PillarScores] = Math.round(normalizedScore);
     }
+
     return normalizedScores;
   }
 

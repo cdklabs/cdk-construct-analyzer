@@ -2,6 +2,20 @@
  * Configuration type definitions for the CDK Construct Analyzer
  */
 
+import type { Pillar } from './config';
+
+/**
+ * Properties analyzer result
+ */
+export interface ScoreResult {
+  readonly packageName: string; // "aws-cdk"
+  readonly version: string; // "1.2.3"
+  readonly totalScore: number; // 85
+  readonly pillarScores: Readonly<PillarScores>; // { "MAINTENANCE": 42, "QUALITY": 85, "POPULARITY": 67 }
+  readonly signalScores: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 4, "githubStars": 2 } }
+  readonly signalWeights: Record<string, Record<string, number>>; // { "popularity": { "weeklyDownloads": 3, "githubStars": 2 } }
+}
+
 /**
  * Benchmark function type for converting raw values to quality levels (1-5)
  */
@@ -34,8 +48,13 @@ export interface Config {
 }
 
 /**
- * Custom signal weights map: signal name -> weight
+ * Pillar scores for the three main evaluation pillars
+ * Dynamically generated from Pillar enum
  */
+export type PillarScores = {
+  [K in Pillar]: number;
+};
+
 export type SignalWeights = Record<string, number>;
 
 /**

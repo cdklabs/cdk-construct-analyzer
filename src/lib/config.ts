@@ -2,12 +2,21 @@ import { categorizeByChecklist, categorizeHigherIsBetter, categorizeLowerIsBette
 import type { Config, DocumentationCompleteness, VersionStability, TestsData, ReleaseNotesData } from './types';
 
 /**
+ * Pillar enum - single source of truth for pillar names
+ */
+export enum Pillar {
+  MAINTENANCE = 'MAINTENANCE',
+  QUALITY = 'QUALITY',
+  POPULARITY = 'POPULARITY',
+}
+
+/**
  * Main configuration object with all signals and their benchmarks
  */
 export const CONFIG: Config = {
   pillars: [
     {
-      name: 'MAINTENANCE',
+      name: Pillar.MAINTENANCE,
       description: 'Measures how actively maintained and updated the package is',
       signals: [
         {
@@ -52,7 +61,7 @@ export const CONFIG: Config = {
       ],
     },
     {
-      name: 'QUALITY',
+      name: Pillar.QUALITY,
       description: 'Measures the overall quality and reliability of the package',
       signals: [
         {
@@ -111,7 +120,7 @@ export const CONFIG: Config = {
       ],
     },
     {
-      name: 'POPULARITY',
+      name: Pillar.POPULARITY,
       description: 'Measures how widely adopted and used the package is',
       signals: [
         {

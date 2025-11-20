@@ -1,10 +1,11 @@
+import chalk from 'chalk';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import { ConstructAnalyzer } from '../lib/analyzer';
 
 function convertToStars(rating: number): string {
-  const fullStars = '★'.repeat(rating);
-  const emptyStars = '☆'.repeat(5 - rating);
+  const fullStars = chalk.yellow('★'.repeat(rating));
+  const emptyStars = chalk.gray('☆'.repeat(5 - rating));
   return fullStars + emptyStars;
 }
 
@@ -24,19 +25,19 @@ function convertToDisplayName(signalName: string): string {
 }
 
 function displayDetailsSignalInfo(signalScores: Record<string, Record<string, number>>, weights: Record<string, Record<string, number>>): void {
-  console.log('\n---');
+  console.log(chalk.gray('\n---'));
 
   Object.entries(signalScores).forEach(([pillar, signals]) => {
     const pillarString = '\n=== ' + pillar + ' ===';
-    console.log(`${pillarString.padEnd(54)} SCORE  WEIGHT`);
+    console.log(chalk.bold.cyan(`${pillarString.padEnd(54)}`), chalk.bold('SCORE  WEIGHT'));
 
     Object.entries(signals as Record<string, number>).forEach(([signal, score]) => {
       const displayName = convertToDisplayName(signal);
-      const dots = '.'.repeat(Math.max(1, 50 - displayName.length));
+      const dots = chalk.gray('.'.repeat(Math.max(1, 50 - displayName.length)));
       const stars = convertToStars(score);
       const signalWeight = weights[pillar][signal];
 
-      console.log(`— ${displayName} ${dots} ${stars}    ${signalWeight}`);
+      console.log(`${chalk.dim('—')} ${displayName} ${dots} ${stars}    ${chalk.cyan(signalWeight)}`);
     });
   });
 }
@@ -67,16 +68,34 @@ export function cli() {
           const result = await analyzer.analyzePackage(argv.package as string);
           const weights = result.signalWeights;
 
-          console.log(`\nLIBRARY: ${result.packageName}`);
-          console.log(`VERSION: ${result.version}`);
+          console.log(chalk.bold('\nLIBRARY:'), chalk.blue(result.packageName));
+          console.log(chalk.bold('VERSION:'), chalk.blue(result.version));
 
-          console.log(`\nOVERALL SCORE: ${result.totalScore}/100`);
+          // Color overall score based on value
+          let scoreColor;
+          if (result.totalScore >= 80) {
+            scoreColor = chalk.green;
+          } else if (result.totalScore >= 60) {
+            scoreColor = chalk.yellow;
+          } else {
+            scoreColor = chalk.red;
+          }
+          console.log(chalk.bold('\nOVERALL SCORE:'), scoreColor(`${result.totalScore}/100`));
 
-          console.log('\n---');
-          console.log('\nSUBSCORES');
+          console.log(chalk.gray('\n---'));
+          console.log(chalk.bold('\nSUBSCORES'));
 
           Object.entries(result.pillarScores).forEach(([pillar, score]) => {
-            console.log(`  ${pillar.padEnd(12)}: ${score.toString().padStart(12)}/100`);
+            // Color subscore based on value
+            let pillarColor;
+            if (score >= 80) {
+              pillarColor = chalk.green;
+            } else if (score >= 60) {
+              pillarColor = chalk.yellow;
+            } else {
+              pillarColor = chalk.red;
+            }
+            console.log(`  ${chalk.cyan(pillar.padEnd(12))}: ${pillarColor(score.toString().padStart(12) + '/100')}`);
           });
 
           // Only show detailed signal information if details flag is set
@@ -84,7 +103,7 @@ export function cli() {
             displayDetailsSignalInfo(result.signalScores, weights);
           }
         } catch (error) {
-          console.error('Error:', error instanceof Error ? error.message : error);
+          console.error(chalk.red('Error:'), error instanceof Error ? error.message : error);
           process.exit(1);
         }
       },

@@ -72,6 +72,10 @@
       "type": "build"
     },
     {
+      "name": "chalk",
+      "type": "runtime"
+    },
+    {
       "name": "yargs",
       "type": "runtime"
     }

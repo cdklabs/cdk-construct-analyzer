@@ -1,5 +1,5 @@
-import { GitHubIssue } from '../../../src/lib/types';
-import { calculateTimeToFirstResponse, calculateOpenIssuesRatio } from '../../../src/lib/utils/issues';
+import { GitHubIssue } from '../../../src/library/types';
+import { calculateTimeToFirstResponse, calculateOpenIssuesRatio } from '../../../src/library/utils/issues';
 
 describe('calculateTimeToFirstResponse', () => {
   const createMockIssue = (

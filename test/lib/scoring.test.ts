@@ -1,5 +1,5 @@
-import { categorizeHigherIsBetter, categorizeLowerIsBetter, categorizeByChecklist } from '../../src/lib/scoring';
-import { ChecklistItem } from '../../src/lib/types';
+import { categorizeHigherIsBetter, categorizeLowerIsBetter, categorizeByChecklist } from '../../src/library/scoring';
+import { ChecklistItem } from '../../src/library/types';
 
 describe('scoring functions', () => {
   describe('categorizeHigherIsBetter', () => {

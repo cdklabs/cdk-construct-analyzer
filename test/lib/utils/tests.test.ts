@@ -1,5 +1,5 @@
-import type { GitHubRepository } from '../../../src/lib/types';
-import { analyzeTestsPresence } from '../../../src/lib/utils/tests';
+import type { GitHubRepository } from '../../../src/library/types';
+import { analyzeTestsPresence } from '../../../src/library/utils/tests';
 
 describe('analyzeTestsPresence', () => {
   test('should detect unit tests from test directory', () => {

@@ -1,4 +1,4 @@
-import { GitHubRepo } from '../../../src/lib/data/github-repo';
+import { GitHubRepo } from '../../../src/library/data/github-repo';
 
 const mockFetch = jest.fn();
 global.fetch = mockFetch;

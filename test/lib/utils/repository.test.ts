@@ -1,4 +1,4 @@
-import { extractRepoInfo } from '../../../src/lib/utils/repository';
+import { extractRepoInfo } from '../../../src/library/utils/repository';
 
 describe('extractRepoInfo', () => {
   test('should parse GitHub URLs correctly', () => {

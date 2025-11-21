@@ -21,6 +21,7 @@ const project = new CdklabsTypeScriptProject({
       },
     },
   },
+  releaseToNpm: true,
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */
   // packageName: undefined,  /* The "name" in package.json. */
 });

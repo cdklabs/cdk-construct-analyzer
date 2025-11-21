@@ -6,7 +6,7 @@ const project = new CdklabsTypeScriptProject({
   devDeps: ['cdklabs-projen-project-types', '@types/jest'],
   name: '@cdklabs/cdk-construct-analyzer',
   projenrcTs: true,
-  release: false,
+  release: true,
   jest: true,
   deps: ['yargs'], /* Runtime dependencies of this module. */
   bin: {

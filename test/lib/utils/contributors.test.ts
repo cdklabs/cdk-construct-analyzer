@@ -1,4 +1,4 @@
-import { processContributorsData, isBotOrAutomated } from '../../../src/lib/utils/contributors';
+import { processContributorsData, isBotOrAutomated } from '../../../src/library/utils/contributors';
 
 describe('processContributorsData', () => {
   test('should return 0 for undefined data', () => {

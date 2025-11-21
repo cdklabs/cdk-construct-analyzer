@@ -1,12 +1,12 @@
 import chalk from 'chalk';
 import { cli } from '../../src/lib';
-import { ConstructAnalyzer } from '../../src/lib/analyzer';
+import { ConstructAnalyzer } from '../../src/library/analyzer';
 
 // Disable chalk colors for testing
 chalk.level = 0;
 
 // Mock the analyzer
-jest.mock('../../src/lib/analyzer');
+jest.mock('../../src/library/analyzer');
 const MockedConstructAnalyzer = ConstructAnalyzer as jest.MockedClass<typeof ConstructAnalyzer>;
 
 // Mock console methods

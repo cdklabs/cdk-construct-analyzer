@@ -1,5 +1,5 @@
-import type { GitHubRelease } from '../../../src/lib/types';
-import { calculateReleaseFrequency } from '../../../src/lib/utils/releases';
+import type { GitHubRelease } from '../../../src/library/types';
+import { calculateReleaseFrequency } from '../../../src/library/utils/releases';
 
 describe('calculateReleaseFrequency', () => {
   const currentDate = new Date('2024-10-28T00:00:00Z');

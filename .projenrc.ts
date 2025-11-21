@@ -12,6 +12,7 @@ const project = new CdklabsTypeScriptProject({
   bin: {
     'cdk-construct-analyzer': './bin/cdk-construct-analyzer',
   },
+  entrypoint: 'lib/library/index.js',
   npmAccess: NpmAccess.PUBLIC,
   githubOptions: {
     pullRequestLintOptions: {

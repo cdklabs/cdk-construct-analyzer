@@ -1,10 +1,10 @@
-import { collectPackageData } from '../../../src/lib/data/collect';
-import { GitHubRepo } from '../../../src/lib/data/github-repo';
-import { NpmCollector } from '../../../src/lib/data/npm';
+import { collectPackageData } from '../../../src/library/data/collect';
+import { GitHubRepo } from '../../../src/library/data/github-repo';
+import { NpmCollector } from '../../../src/library/data/npm';
 
 // Mock the collectors
-jest.mock('../../../src/lib/data/npm');
-jest.mock('../../../src/lib/data/github-repo');
+jest.mock('../../../src/library/data/npm');
+jest.mock('../../../src/library/data/github-repo');
 
 const MockedNpmCollector = NpmCollector as jest.MockedClass<typeof NpmCollector>;
 const MockedGitHubRepo = GitHubRepo as jest.MockedClass<typeof GitHubRepo>;

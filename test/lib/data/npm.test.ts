@@ -1,4 +1,4 @@
-import { NpmCollector } from '../../../src/lib/data/npm';
+import { NpmCollector } from '../../../src/library/data/npm';
 
 // Mock fetch globally
 global.fetch = jest.fn();

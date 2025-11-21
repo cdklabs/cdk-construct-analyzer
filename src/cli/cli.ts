@@ -1,6 +1,6 @@
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
-import { ConstructAnalyzer } from '../lib/analyzer';
+import { ConstructAnalyzer } from '../library/analyzer';
 
 function convertToStars(rating: number): string {
   const fullStars = '★'.repeat(rating);

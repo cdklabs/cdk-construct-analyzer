@@ -1,8 +1,8 @@
-import { ConstructAnalyzer } from '../../src/lib/analyzer';
-import { collectPackageData } from '../../src/lib/data/collect';
+import { ConstructAnalyzer } from '../../src/library/analyzer';
+import { collectPackageData } from '../../src/library/data/collect';
 
 // Mock dependencies
-jest.mock('../../src/lib/data/collect');
+jest.mock('../../src/library/data/collect');
 
 const mockedCollectPackageData = collectPackageData as jest.MockedFunction<typeof collectPackageData>;
 

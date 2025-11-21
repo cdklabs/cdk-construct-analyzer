@@ -1,5 +1,5 @@
-import type { GitHubRepository } from '../../../src/lib/types';
-import { analyzeReleaseNotesContent, countFeatsAndFixes } from '../../../src/lib/utils/releaseNotes';
+import type { GitHubRepository } from '../../../src/library/types';
+import { analyzeReleaseNotesContent, countFeatsAndFixes } from '../../../src/library/utils/releaseNotes';
 
 describe('analyzeReleaseNotesContent', () => {
   test('should return false for both when no releases exist', () => {

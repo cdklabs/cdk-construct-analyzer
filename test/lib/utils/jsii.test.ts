@@ -1,4 +1,4 @@
-import { analyzeJsiiLanguageSupport } from '../../../src/lib/utils/jsii';
+import { analyzeJsiiLanguageSupport } from '../../../src/library/utils/jsii';
 
 describe('analyzeJsiiLanguageSupport', () => {
   test('should return 0 when jsii is not configured', () => {

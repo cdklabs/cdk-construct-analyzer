@@ -1,5 +1,5 @@
-import type { GitHubRepository } from '../../../src/lib/types';
-import { analyzeDocumentationCompleteness } from '../../../src/lib/utils/documentation';
+import type { GitHubRepository } from '../../../src/library/types';
+import { analyzeDocumentationCompleteness } from '../../../src/library/utils/documentation';
 
 describe('analyzeDocumentationCompleteness', () => {
   test('should detect complete documentation', () => {

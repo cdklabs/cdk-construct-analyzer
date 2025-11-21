@@ -1,5 +1,5 @@
 import chalk from 'chalk';
-import { cli } from '../../src/lib';
+import { cli } from '../../src/library';
 import { ConstructAnalyzer } from '../../src/library/analyzer';
 
 // Disable chalk colors for testing

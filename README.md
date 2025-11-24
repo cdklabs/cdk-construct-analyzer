@@ -1,4 +1,16 @@
-#### CDK Construct Analyzer
+# CDK Construct Analyzer
+
+![cdk-constructs: Experimental](https://img.shields.io/badge/cdk--constructs-experimental-important.svg?style=for-the-badge)
+
+[![View on Construct Hub](https://constructs.dev/badge?package=@cdklabs/cdk-construct-analyzer)](https://constructs.dev/packages/@cdklabs/cdk-construct-analyzer)
+
+> The APIs in this module are experimental and under active development.
+> They are subject to non-backward compatible changes or removal in any future version. These are
+> not subject to the [Semantic Versioning](https://semver.org/) model and breaking changes will be
+> announced in the release notes. This means that while you may use them, you may need to update
+> your source code when upgrading to a newer version of this package.
+
+## Overview
 
 `@cdklabs/cdk-construct-analyzer` is a CLI and library for evaluating the quality of construct libraries.
 
@@ -8,13 +20,12 @@ It calculates a single score (0–100) based on three equally weighted aspects:
 * **Quality**: Does the project have good docs, tests, linting, and hygiene?
 * **Popularity**: How widely is the library adopted in the community?
 
+Each package is scored on their latest version. Scores are unlikely to change drasically between versions.
+
 > [!WARNING]  
 > **Important Usage Guidelines**: This tool provides automated scoring based on publicly available metrics and can be used as **one factor** in your evaluation process, not as the sole decision making criteria. Scores reflect measurable signals but cannot capture all aspects of library quality, such as code architecture, security practices, or alignment with your specific use case. Always combine these scores with your own technical evaluation, security review, and testing before making adoption decisions.
 
-> [!NOTE]  
-> Each package is scored on their latest version. Scores are unlikely to change drasically between versions.
-
-#### CLI Usage
+## CLI Usage
 
 ```
 > cdk-construct-analyzer --help
@@ -47,7 +58,8 @@ SUBSCORES
   POPULARITY  :           85/100
 ```
 
-##### Details
+## Details
+
 Add `--details` for a detailed breakdown:
 
 ```
@@ -89,7 +101,7 @@ SUBSCORES
 — Number Of Contributors - Popularity ............... ★★★★☆    5
 ```
 
-#### Programmatic Access
+## Programmatic Access
 
 You can also use the analyzer programmatically in your TypeScript/JavaScript applications by importing the `ConstructAnalyzer` class:
 
@@ -121,7 +133,7 @@ Object.entries(result.signalScores).forEach(([pillar, signals]) => {
 });
 ```
 
-##### ScoreResult Interface
+### ScoreResult Interface
 
 The `analyzePackage` method returns a `ScoreResult` object with the following structure:
 
@@ -137,11 +149,11 @@ interface ScoreResult {
 
 The `signalScores` contain star ratings (1-5) for each individual signal, while `pillarScores` and `totalScore` are normalized to a 0-100 scale.
 
-#### Scoring Pillars and Signals
+## Scoring Pillars and Signals
 
 The scoring algorithm evaluates each construct on three pillars with multiple weighted signals as support:
 
-##### Maintenance
+### Maintenance
 
 Helps determine if the project is active and healthy, or abandoned. Signals include:
 
@@ -152,7 +164,7 @@ Helps determine if the project is active and healthy, or abandoned. Signals incl
 * Number of Contributors: More contributors reduce risk of abandonment and reflect shared maintenance.
 * Number of Features and Fixes: Counts occurrences of "feat" and "fix" in release notes from the past year, indicating active development.
 
-##### Quality
+### Quality
 
 Signals that are visible in the repo/package that showcases quality:
 
@@ -163,7 +175,7 @@ Signals that are visible in the repo/package that showcases quality:
 * Stable versioning (>=1.x.x, not deprecated): Indicates API maturity and stability.ation makes the project easier to adopt and use (README, API References, Usage Examples).
 * Multi-language Support: Supporting more CDK languages shows extra effort and intent to reach a broader developer base
 
-##### Popularity
+### Popularity
 
 Signals that reflect adoption and community size:
 
@@ -171,7 +183,7 @@ Signals that reflect adoption and community size:
 * Weekly Downloads: High or rising download counts suggest the library is being actively used.
 * Repo stars: Stars represent general developer interest and visibility on GitHub.
 
-#### Scoring Weights
+## Scoring Weights
 
 Not every signal has the same impact on library , so each signal is assigned an importance level. A signal with
 importance level 3 will carry 3× the weight of a signal with importance level 1:

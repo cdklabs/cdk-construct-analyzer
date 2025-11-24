@@ -1568,7 +1568,7 @@ case@^1.6.3:
   resolved "https://registry.yarnpkg.com/case/-/case-1.6.3.tgz#0a4386e3e9825351ca2e6216c60467ff5f1ea1c9"
   integrity sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==
 
-cdklabs-projen-project-types@^0.3.7:
+cdklabs-projen-project-types@^0.3.9:
   version "0.3.9"
   resolved "https://registry.yarnpkg.com/cdklabs-projen-project-types/-/cdklabs-projen-project-types-0.3.9.tgz#865e85e1c1eab1b49993eca576deb2dfce91045b"
   integrity sha512-fimZYCiGnAmTNfh9RoIPsoKt3AMOUpLGRWj3TqtSio8TBS9z5DDqNDNXHI1u1RPMXFEkafFoLr7CypJY1Ph2Vg==
@@ -4397,7 +4397,7 @@ process-nextick-args@~2.0.0:
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
 
-projen@^0.98.4:
+projen@^0.98.21:
   version "0.98.21"
   resolved "https://registry.yarnpkg.com/projen/-/projen-0.98.21.tgz#2b4e6c09e6a67631fa934b5c3251a560f5a26d8e"
   integrity sha512-VY0kPsua4n1EwjddzaBDNLVJxxbCRBJNOSWAl7q+wLEbKPsdlDXD+zyAcP+qBIOo/dS8hBnii3OZGRqVOX8h6w==

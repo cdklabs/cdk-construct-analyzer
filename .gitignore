@@ -3,6 +3,7 @@
 !/.projen/tasks.json
 !/.projen/deps.json
 !/.projen/files.json
+!/.github/workflows/auto-queue.yml
 !/.github/workflows/pull-request-lint.yml
 !/.github/workflows/auto-approve.yml
 !/package.json
@@ -38,6 +39,7 @@ junit.xml
 /dist/changelog.md
 /dist/version.txt
 !/.github/workflows/release.yml
+!/.mergify.yml
 !/.github/pull_request_template.md
 !/test/
 !/tsconfig.json
@@ -47,7 +49,6 @@ junit.xml
 /dist/
 !/.eslintrc.json
 !/.github/workflows/retry-automerge.yml
-!/.github/workflows/auto-queue.yml
 !/.github/workflows/upgrade-cdklabs-projen-project-types-main.yml
 !/.github/workflows/upgrade-main.yml
 !/.github/workflows/upgrade-dev-deps-main.yml

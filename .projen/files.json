@@ -13,6 +13,8 @@
     ".github/workflows/upgrade-dev-deps-main.yml",
     ".github/workflows/upgrade-main.yml",
     ".gitignore",
+    ".mergify.yml",
+    ".npmignore",
     ".projen/deps.json",
     ".projen/files.json",
     ".projen/tasks.json",

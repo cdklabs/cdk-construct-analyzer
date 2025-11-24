@@ -7,6 +7,7 @@ const project = new CdklabsTypeScriptProject({
   name: '@cdklabs/cdk-construct-analyzer',
   projenrcTs: true,
   release: true,
+  private: false,
   jest: true,
   deps: ['yargs', 'chalk'], /* Runtime dependencies of this module. */
   bin: {
@@ -19,6 +20,11 @@ const project = new CdklabsTypeScriptProject({
       semanticTitleOptions: {
         types: ['feat', 'fix', 'chore', 'refactor', 'test', 'docs', 'revert'],
       },
+    },
+    mergify: false,
+    mergeQueue: true,
+    mergeQueueOptions: {
+      autoQueue: true,
     },
   },
   releaseToNpm: true,

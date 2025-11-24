@@ -21,6 +21,11 @@ const project = new CdklabsTypeScriptProject({
         types: ['feat', 'fix', 'chore', 'refactor', 'test', 'docs', 'revert'],
       },
     },
+    mergify: false,
+    mergeQueue: true,
+    mergeQueueOptions: {
+      autoQueue: true,
+    },
   },
   releaseToNpm: true,
   // description: undefined,  /* The description is just a string that helps people understand the purpose of the package. */

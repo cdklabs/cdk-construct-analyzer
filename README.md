@@ -10,12 +10,6 @@
 > announced in the release notes. This means that while you may use them, you may need to update
 > your source code when upgrading to a newer version of this package.
 
-> [!WARNING]  
-> **Important Usage Guidelines**: This tool provides automated scoring based on publicly available metrics and can be used as **one factor** in your evaluation process, not as the sole decision making criteria. Scores reflect measurable signals but cannot capture all aspects of library quality, such as code architecture, security practices, or alignment with your specific use case. Always combine these scores with your own technical evaluation, security review, and testing before making adoption decisions.
-
-> [!NOTE]  
-> Each package is scored on their latest version. Scores are unlikely to change drasically between versions.
-
 ## Overview
 
 `@cdklabs/cdk-construct-analyzer` is a CLI and library for evaluating the quality of construct libraries.
@@ -25,6 +19,11 @@ It calculates a single score (0–100) based on three equally weighted aspects:
 * **Maintenance**: Is the project actively maintained and are owners/maintainers responsive?
 * **Quality**: Does the project have good docs, tests, linting, and hygiene?
 * **Popularity**: How widely is the library adopted in the community?
+
+Each package is scored on their latest version. Scores are unlikely to change drasically between versions.
+
+> [!WARNING]  
+> **Important Usage Guidelines**: This tool provides automated scoring based on publicly available metrics and can be used as **one factor** in your evaluation process, not as the sole decision making criteria. Scores reflect measurable signals but cannot capture all aspects of library quality, such as code architecture, security practices, or alignment with your specific use case. Always combine these scores with your own technical evaluation, security review, and testing before making adoption decisions.
 
 ## CLI Usage
 

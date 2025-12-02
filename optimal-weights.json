@@ -1,0 +1,17 @@
+{
+  "timeToFirstResponse": 6,
+  "provenanceVerification": 6,
+  "releaseFrequency": 9,
+  "numberOfContributors_Maintenance": 2,
+  "numberOfFeatsAndFixes": 17,
+  "openIssuesRatio": 7,
+  "documentationCompleteness": 5,
+  "testsChecklist": 1,
+  "authorPackageCount": 9,
+  "releaseNotesIncludeFeatsAndFixes": 8,
+  "stableVersioning": 11,
+  "multiLanguageSupport": 4,
+  "weeklyDownloads": 7,
+  "githubStars": 6,
+  "numberOfContributors_Popularity": 2
+}

@@ -21,13 +21,13 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'timeToFirstResponse',
-          defaultWeight: 10,
+          defaultWeight: 5,
           description: 'Time to first response on issues',
           benchmarks: (weeks: number) => categorizeLowerIsBetter([1, 4, 12, 52], weeks),
         },
         {
           name: 'provenanceVerification',
-          defaultWeight: 10,
+          defaultWeight: 3,
           description: 'Ensures supply chain security through provenance verification',
           benchmarks: (verified: boolean) => categorizeByChecklist({
             versionVerified: { present: verified, value: 4 },
@@ -35,25 +35,25 @@ export const CONFIG: Config = {
         },
         {
           name: 'releaseFrequency',
-          defaultWeight: 10,
+          defaultWeight: 3,
           description: 'Number of releases in the past year',
           benchmarks: (releases: number) => categorizeHigherIsBetter([55, 34, 5, 1], releases),
         },
         {
           name: 'numberOfContributors_Maintenance',
-          defaultWeight: 5,
+          defaultWeight: 0,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },
         {
           name: 'numberOfFeatsAndFixes',
-          defaultWeight: 5,
+          defaultWeight: 7,
           description: 'Number of features and bug fixes contributed to the project in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([28, 10, 2, 1], contributors),
         },
         {
           name: 'openIssuesRatio',
-          defaultWeight: 5,
+          defaultWeight: 0,
           description: 'Open issues / total issues',
           benchmarks: (ratio: number) => categorizeLowerIsBetter([25, 50, 75, 90], ratio),
           // ratio will be 100 if 0 total issues
@@ -66,7 +66,7 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'documentationCompleteness',
-          defaultWeight: 5,
+          defaultWeight: 14,
           description: 'Presence of README, API reference, and usage examples',
           benchmarks: (docData: DocumentationCompleteness) => categorizeByChecklist(
             {
@@ -79,7 +79,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'testsChecklist',
-          defaultWeight: 5,
+          defaultWeight: 0,
           description: 'Presence of unit tests and snapshot tests',
           benchmarks: (testsData: TestsData) => categorizeByChecklist({
             unitTests: { present: testsData.hasUnitTests, value: 2 },
@@ -88,13 +88,13 @@ export const CONFIG: Config = {
         },
         {
           name: 'authorPackageCount',
-          defaultWeight: 5,
+          defaultWeight: 0,
           description: 'Highest package count among authors',
           benchmarks: (packageCount: number) => categorizeHigherIsBetter([20, 11, 5, 2], packageCount),
         },
         {
           name: 'releaseNotesIncludeFeatsAndFixes',
-          defaultWeight: 5,
+          defaultWeight: 7,
           description: 'Presence of features and fixes in release notes',
           benchmarks: (releaseNotesData: ReleaseNotesData) => categorizeByChecklist({
             hasFeats: { present: releaseNotesData.hasFeats, value: 2 },
@@ -103,7 +103,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'stableVersioning',
-          defaultWeight: 5,
+          defaultWeight: 6,
           description: 'Package version stability and deprecation status',
           benchmarks: (versionData: VersionStability) => categorizeByChecklist({
             isStableMajorVersion: { present: versionData.isStableMajorVersion, value: 2 },
@@ -113,7 +113,7 @@ export const CONFIG: Config = {
         },
         {
           name: 'multiLanguageSupport',
-          defaultWeight: 5,
+          defaultWeight: 18,
           description: 'Number of programming languages supported via jsii (excluding typescript)',
           benchmarks: (languageCount: number) => categorizeHigherIsBetter([4, 3, 2, 1], languageCount),
         },
@@ -125,19 +125,19 @@ export const CONFIG: Config = {
       signals: [
         {
           name: 'weeklyDownloads',
-          defaultWeight: 10,
+          defaultWeight: 16,
           description: 'Weekly download count from npm',
           benchmarks: (downloads: number) => categorizeHigherIsBetter([2500, 251, 41, 6], downloads),
         },
         {
           name: 'githubStars',
-          defaultWeight: 10,
+          defaultWeight: 21,
           description: 'GitHub repository stars',
           benchmarks: (stars: number) => categorizeHigherIsBetter([638, 28, 4, 1], stars),
         },
         {
           name: 'numberOfContributors_Popularity',
-          defaultWeight: 5,
+          defaultWeight: 0,
           description: 'Number of Contributors in the past year',
           benchmarks: (contributors: number) => categorizeHigherIsBetter([8, 2, 1, 1], contributors),
         },

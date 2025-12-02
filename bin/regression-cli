@@ -1,0 +1,16 @@
+#!/usr/bin/env node
+
+require('ts-node/register');
+
+// Import and run the CLI
+const { RegressionCLI } = require('../src/experimental/regression-cli.ts');
+
+async function main() {
+  const args = process.argv.slice(2);
+  const inputFile = args[0];
+
+  const cli = new RegressionCLI();
+  await cli.run(inputFile);
+}
+
+main().catch(console.error);

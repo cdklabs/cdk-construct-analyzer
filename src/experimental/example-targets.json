@@ -1,0 +1,9 @@
+{
+  "aws-cdk-lib": 95,
+  "cdk-ecr-deployment": 85,
+  "@mrgrain/cdk-esbuild": 75,
+  "cdk-stacksets": 65,
+  "cdk-remote-stack": 55,
+  "@aws-amplify/cdk-exported-backend": 35,
+  "cdk-ssm-parameter-store": 25
+}

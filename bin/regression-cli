@@ -3,7 +3,7 @@
 require('ts-node/register');
 
 // Import and run the CLI
-const { RegressionCLI } = require('../src/experimental/regression-cli.ts');
+const { RegressionCLI } = require('../src/experimental/regression-tool.ts');
 
 async function main() {
   const args = process.argv.slice(2);

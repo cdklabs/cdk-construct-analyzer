@@ -5,7 +5,8 @@
     "url": "https://github.com/cdklabs/cdk-construct-analyzer.git"
   },
   "bin": {
-    "cdk-construct-analyzer": "bin/cdk-construct-analyzer"
+    "cdk-construct-analyzer": "bin/cdk-construct-analyzer",
+    "regression-cli": "bin/regression-cli"
   },
   "scripts": {
     "build": "npx projen build",

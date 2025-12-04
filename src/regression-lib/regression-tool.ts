@@ -28,7 +28,7 @@ interface TrainingPoint {
 }
 
 /**
- * Experimental CLI tool for generating optimal signal weights using regression
+ * CLI tool for generating optimal signal weights using regression
  */
 class RegressionCLI {
   private analyzer: ConstructAnalyzer;
@@ -40,8 +40,8 @@ class RegressionCLI {
   }
 
   /**
-     * Extract all signal names from the current config
-     */
+   * Extract all signal names from the current config
+   */
   private extractAllSignalNames(): string[] {
     const signalNames: string[] = [];
     for (const pillar of CONFIG.pillars) {
@@ -53,8 +53,8 @@ class RegressionCLI {
   }
 
   /**
-     * Main entry point for the CLI
-     */
+   * Main entry point for the CLI
+   */
   async run(inputFile?: string): Promise<void> {
     try {
       console.log(chalk.bold.cyan('Experimental Signal Weight Regression Tool'));
@@ -82,8 +82,8 @@ class RegressionCLI {
   }
 
   /**
-     * Load target scores from file or prompt user
-     */
+   * Load target scores from file or prompt user
+   */
   private async loadTargetScores(inputFile?: string): Promise<TargetScores> {
     if (inputFile && fs.existsSync(inputFile)) {
       const content = fs.readFileSync(inputFile, 'utf-8');
@@ -107,8 +107,8 @@ class RegressionCLI {
   }
 
   /**
-     * Collect training data by analyzing each package
-     */
+   * Collect training data by analyzing each package
+   */
   private async collectTrainingData(targetScores: TargetScores): Promise<TrainingPoint[]> {
     const trainingData: TrainingPoint[] = [];
 
@@ -143,9 +143,9 @@ class RegressionCLI {
   }
 
   /**
-     * Perform linear regression to find optimal weights
-     * Using regularized least squares to handle singular matrices
-     */
+   * Perform linear regression to find optimal weights
+   * Using regularized least squares to handle singular matrices
+   */
   private performRegression(trainingData: TrainingPoint[]): OptimalWeights {
     if (trainingData.length === 0) {
       throw new Error('No training data available for regression');
@@ -205,9 +205,9 @@ class RegressionCLI {
   }
 
   /**
-     * Solve non-negative least squares using iterative algorithm
-     * Ensures all weights >= 0
-     */
+   * Solve non-negative least squares using iterative algorithm
+   * Ensures all weights >= 0
+   */
   private solveNonNegativeLeastSquares(X: number[][], y: number[]): number[] {
     const numFeatures = this.allSignalNames.length;
     const numSamples = X.length;
@@ -268,9 +268,9 @@ class RegressionCLI {
   }
 
   /**
-     * Solve ridge regression: weights = (X^T * X + λI)^-1 * X^T * y
-     * This adds regularization to prevent singular matrices
-     */
+   * Solve ridge regression: weights = (X^T * X + λI)^-1 * X^T * y
+   * This adds regularization to prevent singular matrices
+   */
   private solveRidgeRegression(X: number[][], y: number[], lambda: number = 0.1): number[] {
     // X^T (transpose)
     const XT = this.transpose(X);
@@ -298,8 +298,8 @@ class RegressionCLI {
   }
 
   /**
-     * Fallback method using simple pseudoinverse approximation
-     */
+   * Fallback method using simple pseudoinverse approximation
+   */
   private solvePseudoInverse(X: number[][], y: number[]): number[] {
     // Simple approach: solve each signal weight independently
     const weights: number[] = [];
@@ -320,8 +320,8 @@ class RegressionCLI {
   }
 
   /**
-     * Matrix transpose
-     */
+   * Matrix transpose
+   */
   private transpose(matrix: number[][]): number[][] {
     const rows = matrix.length;
     const cols = matrix[0].length;
@@ -338,8 +338,8 @@ class RegressionCLI {
   }
 
   /**
-     * Matrix multiplication
-     */
+   * Matrix multiplication
+   */
   private multiply(A: number[][], B: number[][]): number[][] {
     const rowsA = A.length;
     const colsA = A[0].length;
@@ -361,8 +361,8 @@ class RegressionCLI {
   }
 
   /**
-     * Matrix-vector multiplication
-     */
+   * Matrix-vector multiplication
+   */
   private multiplyVector(matrix: number[][], vector: number[]): number[] {
     const result: number[] = [];
     for (let i = 0; i < matrix.length; i++) {
@@ -376,8 +376,8 @@ class RegressionCLI {
   }
 
   /**
-     * Matrix inversion using Gauss-Jordan elimination
-     */
+   * Matrix inversion using Gauss-Jordan elimination
+   */
   private invert(matrix: number[][]): number[][] {
     const n = matrix.length;
     const augmented: number[][] = [];
@@ -434,8 +434,8 @@ class RegressionCLI {
   }
 
   /**
-     * Output results and validation
-     */
+   * Output results and validation
+   */
   private async outputResults(optimalWeights: OptimalWeights, trainingData: TrainingPoint[]): Promise<void> {
     console.log(chalk.bold.magenta('\nOptimal Signal Weights (sum = 100):'));
     console.log(chalk.magenta('===================================='));

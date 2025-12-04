@@ -53,35 +53,6 @@ class RegressionCLI {
   }
 
   /**
-   * Main entry point for the CLI
-   */
-  async run(inputFile?: string): Promise<void> {
-    try {
-      console.log(chalk.bold.cyan('Experimental Signal Weight Regression Tool'));
-      console.log(chalk.cyan('============================================\n'));
-
-      // Load target scores
-      const targetScores = await this.loadTargetScores(inputFile);
-      console.log(chalk.green(`Loaded ${Object.keys(targetScores).length} packages with target scores`));
-
-      // Collect training data
-      console.log(chalk.blue('Analyzing packages to collect signal data...'));
-      const trainingData = await this.collectTrainingData(targetScores);
-
-      // Perform regression
-      console.log(chalk.blue('Performing regression to find optimal weights...'));
-      const optimalWeights = this.performRegression(trainingData);
-
-      // Output results
-      await this.outputResults(optimalWeights, trainingData);
-
-    } catch (error) {
-      console.error(chalk.red('Error:'), error instanceof Error ? error.message : String(error));
-      process.exit(1);
-    }
-  }
-
-  /**
    * Load target scores from file or prompt user
    */
   private async loadTargetScores(inputFile?: string): Promise<TargetScores> {
@@ -491,6 +462,35 @@ class RegressionCLI {
     const outputFile = 'optimal-weights.json';
     fs.writeFileSync(outputFile, JSON.stringify(optimalWeights, null, 2));
     console.log(chalk.green(`\nResults saved to ${outputFile}`));
+  }
+
+  /**
+   * Main entry point for the CLI
+   */
+  async run(inputFile?: string): Promise<void> {
+    try {
+      console.log(chalk.bold.cyan('Experimental Signal Weight Regression Tool'));
+      console.log(chalk.cyan('============================================\n'));
+
+      // Load target scores
+      const targetScores = await this.loadTargetScores(inputFile);
+      console.log(chalk.green(`Loaded ${Object.keys(targetScores).length} packages with target scores`));
+
+      // Collect training data
+      console.log(chalk.blue('Analyzing packages to collect signal data...'));
+      const trainingData = await this.collectTrainingData(targetScores);
+
+      // Perform regression
+      console.log(chalk.blue('Performing regression to find optimal weights...'));
+      const optimalWeights = this.performRegression(trainingData);
+
+      // Output results
+      await this.outputResults(optimalWeights, trainingData);
+
+    } catch (error) {
+      console.error(chalk.red('Error:'), error instanceof Error ? error.message : String(error));
+      process.exit(1);
+    }
   }
 }
 

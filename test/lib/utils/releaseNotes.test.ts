@@ -1,6 +1,10 @@
 import type { GitHubRepository } from '../../../src/library/types';
 import { analyzeReleaseNotesContent, countFeatsAndFixes } from '../../../src/library/utils/releaseNotes';
 
+// Use a current date, because we filter for releases of the last year
+const publishedToday = new Date().toISOString();
+const publishedYesterday = new Date(Date.now() - 86400000).toISOString();
+
 describe('analyzeReleaseNotesContent', () => {
   test('should return false for both when no releases exist', () => {
     const repository: GitHubRepository = {
@@ -28,7 +32,7 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: 'This release includes new features and bug fixes',
         },
@@ -45,7 +49,7 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: 'feat: add new authentication system',
         },
@@ -62,7 +66,7 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: 'fix: resolve memory leak issue',
         },
@@ -79,7 +83,7 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: 'feat: add new authentication system\nfix: resolve memory leak issue',
         },
@@ -96,7 +100,7 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: '## Features\n- Added new dashboard\n\n## Bug Fixes\n- Fixed login issue',
         },
@@ -113,7 +117,7 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: 'Minor documentation updates and dependency bumps',
         },
@@ -130,7 +134,7 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: '',
         },
@@ -147,12 +151,12 @@ describe('analyzeReleaseNotesContent', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: '2025-01-01T00:00:00Z',
+          publishedAt: publishedYesterday,
           tagName: 'v1.0.0',
           description: 'feat: add new dashboard',
         },
         {
-          publishedAt: '2025-01-02T00:00:00Z',
+          publishedAt: publishedToday,
           tagName: 'v1.0.1',
           description: 'fix: resolve login issue',
         },
@@ -189,7 +193,7 @@ describe('countFeatsAndFixes', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: new Date().toISOString(),
+          publishedAt: publishedToday,
           tagName: 'v1.0.0',
           description: 'feat fix',
         },
@@ -204,12 +208,12 @@ describe('countFeatsAndFixes', () => {
       stargazerCount: 0,
       releases: [
         {
-          publishedAt: new Date().toISOString(),
+          publishedAt: publishedYesterday,
           tagName: 'v1.0.0',
           description: 'feat fix',
         },
         {
-          publishedAt: new Date().toISOString(),
+          publishedAt: publishedToday,
           tagName: 'v1.1.0',
           description: 'feat feat',
         },

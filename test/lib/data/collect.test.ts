@@ -1,6 +1,7 @@
 import { collectPackageData } from '../../../src/library/data/collect';
 import { GitHubRepo } from '../../../src/library/data/github-repo';
 import { NpmCollector } from '../../../src/library/data/npm';
+import { pinSystemTime } from '../../util';
 
 // Mock the collectors
 jest.mock('../../../src/library/data/npm');
@@ -10,6 +11,10 @@ const MockedNpmCollector = NpmCollector as jest.MockedClass<typeof NpmCollector>
 const MockedGitHubRepo = GitHubRepo as jest.MockedClass<typeof GitHubRepo>;
 
 describe('collectPackageData', () => {
+  // Release signals count a trailing year from the current time, so pin the
+  // clock to keep the absolute dates below inside the window
+  pinSystemTime(new Date('2025-11-01T00:00:00Z'));
+
   const mockNpmData = {
     name: 'test-package',
     version: '1.0.0',

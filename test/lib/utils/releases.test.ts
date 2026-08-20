@@ -1,17 +1,11 @@
 import type { GitHubRelease } from '../../../src/library/types';
 import { calculateReleaseFrequency } from '../../../src/library/utils/releases';
+import { pinSystemTime } from '../../util';
 
 describe('calculateReleaseFrequency', () => {
   const currentDate = new Date('2024-10-28T00:00:00Z');
 
-  beforeAll(() => {
-    jest.useFakeTimers();
-    jest.setSystemTime(currentDate);
-  });
-
-  afterAll(() => {
-    jest.useRealTimers();
-  });
+  pinSystemTime(currentDate);
 
   test('should return 0 when no releases are provided', () => {
     expect(calculateReleaseFrequency(undefined)).toBe(0);
